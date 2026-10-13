@@ -1,0 +1,3994 @@
+{
+ "meta": {
+  "version_jeu": "3.7",
+  "genere_le": "2026-10-13",
+  "sources": [
+   "Données officielles du jeu via api.dofusdb.fr (succès 95-133, 1488-1497, 9013-9015, 1684-1694) : liste et génération de chaque monture",
+   "dragodinde.fr (arbres volkorneTree/muldoTree/dragodindeTree) : recettes",
+   "dafous.app (ElevagePage) : recettes, recoupement",
+   "dofuspourlesnoobs.com/les-muldos.html : recettes Muldo G7/G9"
+  ],
+  "verification": "Liste + génération : 306/306 identiques aux objectifs officiels des succès. Recettes DD : 2 sources identiques. Recettes Muldo/Volkorne : 2 sources identiques sauf Aigue-marine (4 recettes alternatives ajoutées depuis dafous + dofuspourlesnoobs). Génération Volkorne Ivoire/Turquoise=3, Prune/Emeraude=5 confirmée par DofusDB (dafous erroné)."
+ },
+ "familles": {
+  "dragodinde": {
+   "nom": "Dragodinde",
+   "couleurs": [
+    {
+     "id": "rousse",
+     "nom": "Rousse",
+     "generation": 1,
+     "capturable": true,
+     "recettes": []
+    },
+    {
+     "id": "doree",
+     "nom": "Dorée",
+     "generation": 1,
+     "capturable": true,
+     "recettes": []
+    },
+    {
+     "id": "amande",
+     "nom": "Amande",
+     "generation": 1,
+     "capturable": true,
+     "recettes": []
+    },
+    {
+     "id": "amande_doree",
+     "nom": "Amande et Dorée",
+     "generation": 2,
+     "capturable": false,
+     "recettes": [
+      [
+       "amande",
+       "doree"
+      ]
+     ]
+    },
+    {
+     "id": "amande_rousse",
+     "nom": "Amande et Rousse",
+     "generation": 2,
+     "capturable": false,
+     "recettes": [
+      [
+       "amande",
+       "rousse"
+      ]
+     ]
+    },
+    {
+     "id": "doree_rousse",
+     "nom": "Dorée et Rousse",
+     "generation": 2,
+     "capturable": false,
+     "recettes": [
+      [
+       "doree",
+       "rousse"
+      ]
+     ]
+    },
+    {
+     "id": "indigo",
+     "nom": "Indigo",
+     "generation": 3,
+     "capturable": false,
+     "recettes": [
+      [
+       "amande_doree",
+       "amande_rousse"
+      ]
+     ]
+    },
+    {
+     "id": "ebene",
+     "nom": "Ebène",
+     "generation": 3,
+     "capturable": false,
+     "recettes": [
+      [
+       "amande_doree",
+       "doree_rousse"
+      ]
+     ]
+    },
+    {
+     "id": "ebene_rousse",
+     "nom": "Ebène et Rousse",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "ebene",
+       "rousse"
+      ]
+     ]
+    },
+    {
+     "id": "amande_ebene",
+     "nom": "Amande et Ebène",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "amande",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "amande_indigo",
+     "nom": "Amande et Indigo",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "amande",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "doree_ebene",
+     "nom": "Dorée et Ebène",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "doree",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "doree_indigo",
+     "nom": "Dorée et Indigo",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "doree",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "ebene_indigo",
+     "nom": "Ebène et Indigo",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "ebene",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "indigo_rousse",
+     "nom": "Indigo et Rousse",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "indigo",
+       "rousse"
+      ]
+     ]
+    },
+    {
+     "id": "pourpre",
+     "nom": "Pourpre",
+     "generation": 5,
+     "capturable": false,
+     "recettes": [
+      [
+       "amande_rousse",
+       "ebene_indigo"
+      ]
+     ]
+    },
+    {
+     "id": "orchidee",
+     "nom": "Orchidée",
+     "generation": 5,
+     "capturable": false,
+     "recettes": [
+      [
+       "doree_rousse",
+       "ebene_indigo"
+      ]
+     ]
+    },
+    {
+     "id": "amande_orchidee",
+     "nom": "Amande et Orchidée",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "amande",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "amande_pourpre",
+     "nom": "Amande et Pourpre",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "amande",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "doree_orchidee",
+     "nom": "Dorée et Orchidée",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "doree",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "doree_pourpre",
+     "nom": "Dorée et Pourpre",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "doree",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "ebene_orchidee",
+     "nom": "Ebène et Orchidée",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "ebene",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "ebene_pourpre",
+     "nom": "Ebène et Pourpre",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "ebene",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "indigo_orchidee",
+     "nom": "Indigo et Orchidée",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "indigo",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "indigo_pourpre",
+     "nom": "Indigo et Pourpre",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "indigo",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "orchidee_rousse",
+     "nom": "Orchidée et Rousse",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "orchidee",
+       "rousse"
+      ]
+     ]
+    },
+    {
+     "id": "pourpre_rousse",
+     "nom": "Pourpre et Rousse",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "pourpre",
+       "rousse"
+      ]
+     ]
+    },
+    {
+     "id": "orchidee_pourpre",
+     "nom": "Orchidée et Pourpre",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "orchidee",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "turquoise",
+     "nom": "Turquoise",
+     "generation": 7,
+     "capturable": false,
+     "recettes": [
+      [
+       "ebene_orchidee",
+       "orchidee_pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "ivoire",
+     "nom": "Ivoire",
+     "generation": 7,
+     "capturable": false,
+     "recettes": [
+      [
+       "indigo_pourpre",
+       "orchidee_pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "ebene_ivoire",
+     "nom": "Ebène et Ivoire",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "ebene",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "ivoire_rousse",
+     "nom": "Ivoire et Rousse",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "ivoire",
+       "rousse"
+      ]
+     ]
+    },
+    {
+     "id": "amande_ivoire",
+     "nom": "Amande et Ivoire",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "amande",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "amande_turquoise",
+     "nom": "Amande et Turquoise",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "amande",
+       "turquoise"
+      ]
+     ]
+    },
+    {
+     "id": "doree_ivoire",
+     "nom": "Dorée et Ivoire",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "doree",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "doree_turquoise",
+     "nom": "Dorée et Turquoise",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "doree",
+       "turquoise"
+      ]
+     ]
+    },
+    {
+     "id": "ebene_turquoise",
+     "nom": "Ebène et Turquoise",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "ebene",
+       "turquoise"
+      ]
+     ]
+    },
+    {
+     "id": "indigo_ivoire",
+     "nom": "Indigo et Ivoire",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "indigo",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "indigo_turquoise",
+     "nom": "Indigo et Turquoise",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "indigo",
+       "turquoise"
+      ]
+     ]
+    },
+    {
+     "id": "ivoire_turquoise",
+     "nom": "Ivoire et Turquoise",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "ivoire",
+       "turquoise"
+      ]
+     ]
+    },
+    {
+     "id": "ivoire_orchidee",
+     "nom": "Ivoire et Orchidée",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "ivoire",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "ivoire_pourpre",
+     "nom": "Ivoire et Pourpre",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "ivoire",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "turquoise_rousse",
+     "nom": "Turquoise et Rousse",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "turquoise",
+       "rousse"
+      ]
+     ]
+    },
+    {
+     "id": "turquoise_orchidee",
+     "nom": "Turquoise et Orchidée",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "turquoise",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "turquoise_pourpre",
+     "nom": "Turquoise et Pourpre",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "turquoise",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "emeraude",
+     "nom": "Emeraude",
+     "generation": 9,
+     "capturable": false,
+     "recettes": [
+      [
+       "ivoire_turquoise",
+       "ivoire_pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "prune",
+     "nom": "Prune",
+     "generation": 9,
+     "capturable": false,
+     "recettes": [
+      [
+       "ivoire_turquoise",
+       "turquoise_orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "amande_emeraude",
+     "nom": "Amande et Emeraude",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "amande",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "doree_emeraude",
+     "nom": "Dorée et Emeraude",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "doree",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "ebene_emeraude",
+     "nom": "Ebène et Emeraude",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "ebene",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "emeraude_indigo",
+     "nom": "Emeraude et Indigo",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "emeraude",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "emeraude_ivoire",
+     "nom": "Emeraude et Ivoire",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "emeraude",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "emeraude_rousse",
+     "nom": "Emeraude et Rousse",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "emeraude",
+       "rousse"
+      ]
+     ]
+    },
+    {
+     "id": "emeraude_turquoise",
+     "nom": "Emeraude et Turquoise",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "emeraude",
+       "turquoise"
+      ]
+     ]
+    },
+    {
+     "id": "emeraude_orchidee",
+     "nom": "Emeraude et Orchidée",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "emeraude",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "emeraude_pourpre",
+     "nom": "Emeraude et Pourpre",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "emeraude",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "prune_amande",
+     "nom": "Prune et Amande",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "amande"
+      ]
+     ]
+    },
+    {
+     "id": "prune_doree",
+     "nom": "Prune et Dorée",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "doree"
+      ]
+     ]
+    },
+    {
+     "id": "prune_ebene",
+     "nom": "Prune et Ebène",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "prune_emeraude",
+     "nom": "Prune et Emeraude",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "prune_indigo",
+     "nom": "Prune et Indigo",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "prune_ivoire",
+     "nom": "Prune et Ivoire",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "prune_rousse",
+     "nom": "Prune et Rousse",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "rousse"
+      ]
+     ]
+    },
+    {
+     "id": "prune_turquoise",
+     "nom": "Prune et Turquoise",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "turquoise"
+      ]
+     ]
+    },
+    {
+     "id": "prune_orchidee",
+     "nom": "Prune et Orchidée",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "prune_pourpre",
+     "nom": "Prune et Pourpre",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "pourpre"
+      ]
+     ]
+    }
+   ]
+  },
+  "muldo": {
+   "nom": "Muldo",
+   "couleurs": [
+    {
+     "id": "dore",
+     "nom": "Doré",
+     "generation": 1,
+     "capturable": true,
+     "recettes": []
+    },
+    {
+     "id": "ebene",
+     "nom": "Ebène",
+     "generation": 1,
+     "capturable": true,
+     "recettes": []
+    },
+    {
+     "id": "indigo",
+     "nom": "Indigo",
+     "generation": 1,
+     "capturable": true,
+     "recettes": []
+    },
+    {
+     "id": "pourpre",
+     "nom": "Pourpre",
+     "generation": 1,
+     "capturable": true,
+     "recettes": []
+    },
+    {
+     "id": "orchidee",
+     "nom": "Orchidée",
+     "generation": 1,
+     "capturable": true,
+     "recettes": []
+    },
+    {
+     "id": "dore_pourpre",
+     "nom": "Doré et Pourpre",
+     "generation": 2,
+     "capturable": false,
+     "recettes": [
+      [
+       "dore",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "indigo_pourpre",
+     "nom": "Indigo et Pourpre",
+     "generation": 2,
+     "capturable": false,
+     "recettes": [
+      [
+       "indigo",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "ebene_pourpre",
+     "nom": "Ebène et Pourpre",
+     "generation": 2,
+     "capturable": false,
+     "recettes": [
+      [
+       "ebene",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "orchidee_pourpre",
+     "nom": "Orchidée et Pourpre",
+     "generation": 2,
+     "capturable": false,
+     "recettes": [
+      [
+       "orchidee",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "dore_orchidee",
+     "nom": "Doré et Orchidée",
+     "generation": 2,
+     "capturable": false,
+     "recettes": [
+      [
+       "dore",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "indigo_orchidee",
+     "nom": "Indigo et Orchidée",
+     "generation": 2,
+     "capturable": false,
+     "recettes": [
+      [
+       "indigo",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "ebene_orchidee",
+     "nom": "Ebène et Orchidée",
+     "generation": 2,
+     "capturable": false,
+     "recettes": [
+      [
+       "ebene",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "dore_ebene",
+     "nom": "Doré et Ebène",
+     "generation": 2,
+     "capturable": false,
+     "recettes": [
+      [
+       "dore",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "dore_indigo",
+     "nom": "Doré et Indigo",
+     "generation": 2,
+     "capturable": false,
+     "recettes": [
+      [
+       "dore",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "ebene_indigo",
+     "nom": "Ebène et Indigo",
+     "generation": 2,
+     "capturable": false,
+     "recettes": [
+      [
+       "ebene",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "roux",
+     "nom": "Roux",
+     "generation": 3,
+     "capturable": false,
+     "recettes": [
+      [
+       "dore_pourpre",
+       "dore_orchidee"
+      ],
+      [
+       "dore_pourpre",
+       "dore_indigo"
+      ],
+      [
+       "dore_pourpre",
+       "dore_ebene"
+      ],
+      [
+       "dore_orchidee",
+       "dore_indigo"
+      ],
+      [
+       "dore_orchidee",
+       "dore_ebene"
+      ],
+      [
+       "dore_indigo",
+       "dore_ebene"
+      ]
+     ]
+    },
+    {
+     "id": "amande",
+     "nom": "Amande",
+     "generation": 3,
+     "capturable": false,
+     "recettes": [
+      [
+       "indigo_pourpre",
+       "ebene_orchidee"
+      ],
+      [
+       "ebene_pourpre",
+       "indigo_orchidee"
+      ],
+      [
+       "orchidee_pourpre",
+       "ebene_indigo"
+      ]
+     ]
+    },
+    {
+     "id": "dore_amande",
+     "nom": "Doré et Amande",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "dore",
+       "amande"
+      ]
+     ]
+    },
+    {
+     "id": "ebene_amande",
+     "nom": "Ebène et Amande",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "ebene",
+       "amande"
+      ]
+     ]
+    },
+    {
+     "id": "indigo_amande",
+     "nom": "Indigo et Amande",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "indigo",
+       "amande"
+      ]
+     ]
+    },
+    {
+     "id": "orchidee_amande",
+     "nom": "Orchidée et Amande",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "orchidee",
+       "amande"
+      ]
+     ]
+    },
+    {
+     "id": "pourpre_amande",
+     "nom": "Pourpre et Amande",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "pourpre",
+       "amande"
+      ]
+     ]
+    },
+    {
+     "id": "roux_amande",
+     "nom": "Roux et Amande",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "roux",
+       "amande"
+      ]
+     ]
+    },
+    {
+     "id": "roux_dore",
+     "nom": "Roux et Doré",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "roux",
+       "dore"
+      ]
+     ]
+    },
+    {
+     "id": "roux_ebene",
+     "nom": "Roux et Ebène",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "roux",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "roux_indigo",
+     "nom": "Roux et Indigo",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "roux",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "roux_orchidee",
+     "nom": "Roux et Orchidée",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "roux",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "roux_pourpre",
+     "nom": "Roux et Pourpre",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "roux",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "ivoire",
+     "nom": "Ivoire",
+     "generation": 5,
+     "capturable": false,
+     "recettes": [
+      [
+       "roux_dore",
+       "ebene_amande"
+      ],
+      [
+       "roux_dore",
+       "indigo_amande"
+      ],
+      [
+       "roux_dore",
+       "orchidee_amande"
+      ],
+      [
+       "roux_dore",
+       "pourpre_amande"
+      ],
+      [
+       "roux_amande",
+       "ebene_amande"
+      ],
+      [
+       "roux_amande",
+       "pourpre_amande"
+      ],
+      [
+       "roux_amande",
+       "indigo_amande"
+      ],
+      [
+       "roux_amande",
+       "orchidee_amande"
+      ]
+     ]
+    },
+    {
+     "id": "turquoise",
+     "nom": "Turquoise",
+     "generation": 5,
+     "capturable": false,
+     "recettes": [
+      [
+       "roux_ebene",
+       "dore_amande"
+      ],
+      [
+       "roux_orchidee",
+       "dore_amande"
+      ],
+      [
+       "roux_pourpre",
+       "dore_amande"
+      ],
+      [
+       "roux_ebene",
+       "roux_amande"
+      ],
+      [
+       "roux_indigo",
+       "dore_amande"
+      ],
+      [
+       "roux_indigo",
+       "roux_amande"
+      ],
+      [
+       "roux_orchidee",
+       "roux_amande"
+      ],
+      [
+       "roux_pourpre",
+       "roux_amande"
+      ]
+     ]
+    },
+    {
+     "id": "pourpre_ivoire",
+     "nom": "Pourpre et Ivoire",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "pourpre",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "orchidee_ivoire",
+     "nom": "Orchidée et Ivoire",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "orchidee",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "indigo_ivoire",
+     "nom": "Indigo et Ivoire",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "indigo",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "ebene_ivoire",
+     "nom": "Ebène et Ivoire",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "ebene",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "dore_ivoire",
+     "nom": "Doré et Ivoire",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "dore",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "roux_ivoire",
+     "nom": "Roux et Ivoire",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "roux",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "amande_ivoire",
+     "nom": "Amande et Ivoire",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "amande",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "turquoise_ivoire",
+     "nom": "Turquoise et Ivoire",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "turquoise",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "turquoise_pourpre",
+     "nom": "Turquoise et Pourpre",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "turquoise",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "turquoise_orchidee",
+     "nom": "Turquoise et Orchidée",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "turquoise",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "turquoise_indigo",
+     "nom": "Turquoise et Indigo",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "turquoise",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "turquoise_ebene",
+     "nom": "Turquoise et Ebène",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "turquoise",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "turquoise_roux",
+     "nom": "Turquoise et Roux",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "turquoise",
+       "roux"
+      ]
+     ]
+    },
+    {
+     "id": "turquoise_amande",
+     "nom": "Turquoise et Amande",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "turquoise",
+       "amande"
+      ]
+     ]
+    },
+    {
+     "id": "turquoise_dore",
+     "nom": "Turquoise et Doré",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "turquoise",
+       "dore"
+      ]
+     ]
+    },
+    {
+     "id": "prune",
+     "nom": "Prune",
+     "generation": 7,
+     "capturable": false,
+     "recettes": [
+      [
+       "ebene_ivoire",
+       "turquoise_pourpre"
+      ],
+      [
+       "indigo_ivoire",
+       "turquoise_orchidee"
+      ],
+      [
+       "orchidee_ivoire",
+       "turquoise_indigo"
+      ],
+      [
+       "pourpre_ivoire",
+       "turquoise_ebene"
+      ]
+     ]
+    },
+    {
+     "id": "emeraude",
+     "nom": "Emeraude",
+     "generation": 7,
+     "capturable": false,
+     "recettes": [
+      [
+       "turquoise_ivoire",
+       "turquoise_dore"
+      ],
+      [
+       "turquoise_ivoire",
+       "turquoise_amande"
+      ],
+      [
+       "turquoise_ivoire",
+       "turquoise_roux"
+      ],
+      [
+       "amande_ivoire",
+       "turquoise_ivoire"
+      ],
+      [
+       "roux_ivoire",
+       "turquoise_amande"
+      ],
+      [
+       "dore_ivoire",
+       "turquoise_amande"
+      ],
+      [
+       "dore_ivoire",
+       "turquoise_roux"
+      ],
+      [
+       "dore_ivoire",
+       "turquoise_ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "prune_pourpre",
+     "nom": "Prune et Pourpre",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "prune_orchidee",
+     "nom": "Prune et Orchidée",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "prune_indigo",
+     "nom": "Prune et Indigo",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "prune_ebene",
+     "nom": "Prune et Ebène",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "prune_dore",
+     "nom": "Prune et Doré",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "dore"
+      ]
+     ]
+    },
+    {
+     "id": "prune_roux",
+     "nom": "Prune et Roux",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "roux"
+      ]
+     ]
+    },
+    {
+     "id": "prune_amande",
+     "nom": "Prune et Amande",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "amande"
+      ]
+     ]
+    },
+    {
+     "id": "prune_ivoire",
+     "nom": "Prune et Ivoire",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "prune_turquoise",
+     "nom": "Prune et Turquoise",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "turquoise"
+      ]
+     ]
+    },
+    {
+     "id": "prune_emeraude",
+     "nom": "Prune et Emeraude",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "pourpre_emeraude",
+     "nom": "Pourpre et Emeraude",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "pourpre",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "orchidee_emeraude",
+     "nom": "Orchidée et Emeraude",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "orchidee",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "indigo_emeraude",
+     "nom": "Indigo et Emeraude",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "indigo",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "ebene_emeraude",
+     "nom": "Ebène et Emeraude",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "ebene",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "dore_emeraude",
+     "nom": "Doré et Emeraude",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "dore",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "roux_emeraude",
+     "nom": "Roux et Emeraude",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "roux",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "amande_emeraude",
+     "nom": "Amande et Emeraude",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "amande",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "ivoire_emeraude",
+     "nom": "Ivoire et Emeraude",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "ivoire",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "turquoise_emeraude",
+     "nom": "Turquoise et Emeraude",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "turquoise",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "ambre",
+     "nom": "Ambre",
+     "generation": 9,
+     "capturable": false,
+     "recettes": [
+      [
+       "pourpre_emeraude",
+       "roux_emeraude"
+      ],
+      [
+       "orchidee_emeraude",
+       "amande_emeraude"
+      ],
+      [
+       "indigo_emeraude",
+       "ivoire_emeraude"
+      ],
+      [
+       "ebene_emeraude",
+       "turquoise_emeraude"
+      ],
+      [
+       "dore_emeraude",
+       "prune_emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "corail",
+     "nom": "Corail",
+     "generation": 9,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune_pourpre",
+       "prune_roux"
+      ],
+      [
+       "prune_orchidee",
+       "prune_amande"
+      ],
+      [
+       "prune_indigo",
+       "prune_ivoire"
+      ],
+      [
+       "prune_ebene",
+       "prune_turquoise"
+      ],
+      [
+       "prune_dore",
+       "prune_emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "azur",
+     "nom": "Azur",
+     "generation": 9,
+     "capturable": false,
+     "recettes": [
+      [
+       "pourpre_emeraude",
+       "prune_roux"
+      ],
+      [
+       "orchidee_emeraude",
+       "prune_amande"
+      ],
+      [
+       "indigo_emeraude",
+       "prune_ivoire"
+      ],
+      [
+       "ebene_emeraude",
+       "prune_turquoise"
+      ],
+      [
+       "dore_emeraude",
+       "prune_ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "aigue_marine",
+     "nom": "Aigue-marine",
+     "generation": 9,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune_pourpre",
+       "roux_emeraude"
+      ],
+      [
+       "prune_orchidee",
+       "amande_emeraude"
+      ],
+      [
+       "prune_indigo",
+       "ivoire_emeraude"
+      ],
+      [
+       "prune_ebene",
+       "turquoise_emeraude"
+      ],
+      [
+       "prune_dore",
+       "turquoise_emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "ambre_dore",
+     "nom": "Ambre et Doré",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "ambre",
+       "dore"
+      ]
+     ]
+    },
+    {
+     "id": "ambre_ebene",
+     "nom": "Ambre et Ebène",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "ambre",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "ambre_indigo",
+     "nom": "Ambre et Indigo",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "ambre",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "ambre_pourpre",
+     "nom": "Ambre et Pourpre",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "ambre",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "ambre_orchidee",
+     "nom": "Ambre et Orchidée",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "ambre",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "ambre_amande",
+     "nom": "Ambre et Amande",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "ambre",
+       "amande"
+      ]
+     ]
+    },
+    {
+     "id": "ambre_roux",
+     "nom": "Ambre et Roux",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "ambre",
+       "roux"
+      ]
+     ]
+    },
+    {
+     "id": "ambre_ivoire",
+     "nom": "Ambre et Ivoire",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "ambre",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "ambre_turquoise",
+     "nom": "Ambre et Turquoise",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "ambre",
+       "turquoise"
+      ]
+     ]
+    },
+    {
+     "id": "ambre_emeraude",
+     "nom": "Ambre et Émeraude",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "ambre",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "ambre_prune",
+     "nom": "Ambre et Prune",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "ambre",
+       "prune"
+      ]
+     ]
+    },
+    {
+     "id": "corail_dore",
+     "nom": "Corail et Doré",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "corail",
+       "dore"
+      ]
+     ]
+    },
+    {
+     "id": "corail_ebene",
+     "nom": "Corail et Ebène",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "corail",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "corail_indigo",
+     "nom": "Corail et Indigo",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "corail",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "corail_pourpre",
+     "nom": "Corail et Pourpre",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "corail",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "corail_orchidee",
+     "nom": "Corail et Orchidée",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "corail",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "corail_amande",
+     "nom": "Corail et Amande",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "corail",
+       "amande"
+      ]
+     ]
+    },
+    {
+     "id": "corail_roux",
+     "nom": "Corail et Roux",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "corail",
+       "roux"
+      ]
+     ]
+    },
+    {
+     "id": "corail_ivoire",
+     "nom": "Corail et Ivoire",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "corail",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "corail_turquoise",
+     "nom": "Corail et Turquoise",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "corail",
+       "turquoise"
+      ]
+     ]
+    },
+    {
+     "id": "corail_emeraude",
+     "nom": "Corail et Émeraude",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "corail",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "corail_prune",
+     "nom": "Corail et Prune",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "corail",
+       "prune"
+      ]
+     ]
+    },
+    {
+     "id": "azur_dore",
+     "nom": "Azur et Doré",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "azur",
+       "dore"
+      ]
+     ]
+    },
+    {
+     "id": "azur_ebene",
+     "nom": "Azur et Ebène",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "azur",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "azur_indigo",
+     "nom": "Azur et Indigo",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "azur",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "azur_pourpre",
+     "nom": "Azur et Pourpre",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "azur",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "azur_orchidee",
+     "nom": "Azur et Orchidée",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "azur",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "azur_amande",
+     "nom": "Azur et Amande",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "azur",
+       "amande"
+      ]
+     ]
+    },
+    {
+     "id": "azur_roux",
+     "nom": "Azur et Roux",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "azur",
+       "roux"
+      ]
+     ]
+    },
+    {
+     "id": "azur_ivoire",
+     "nom": "Azur et Ivoire",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "azur",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "azur_turquoise",
+     "nom": "Azur et Turquoise",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "azur",
+       "turquoise"
+      ]
+     ]
+    },
+    {
+     "id": "azur_emeraude",
+     "nom": "Azur et Émeraude",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "azur",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "azur_prune",
+     "nom": "Azur et Prune",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "azur",
+       "prune"
+      ]
+     ]
+    },
+    {
+     "id": "aigue_marine_dore",
+     "nom": "Aigue-marine et Doré",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "aigue_marine",
+       "dore"
+      ]
+     ]
+    },
+    {
+     "id": "aigue_marine_ebene",
+     "nom": "Aigue-marine et Ebène",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "aigue_marine",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "aigue_marine_indigo",
+     "nom": "Aigue-marine et Indigo",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "aigue_marine",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "aigue_marine_pourpre",
+     "nom": "Aigue-marine et Pourpre",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "aigue_marine",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "aigue_marine_orchidee",
+     "nom": "Aigue-marine et Orchidée",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "aigue_marine",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "aigue_marine_amande",
+     "nom": "Aigue-marine et Amande",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "aigue_marine",
+       "amande"
+      ]
+     ]
+    },
+    {
+     "id": "aigue_marine_roux",
+     "nom": "Aigue-marine et Roux",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "aigue_marine",
+       "roux"
+      ]
+     ]
+    },
+    {
+     "id": "aigue_marine_ivoire",
+     "nom": "Aigue-marine et Ivoire",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "aigue_marine",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "aigue_marine_turquoise",
+     "nom": "Aigue-marine et Turquoise",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "aigue_marine",
+       "turquoise"
+      ]
+     ]
+    },
+    {
+     "id": "aigue_marine_emeraude",
+     "nom": "Aigue-marine et Émeraude",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "aigue_marine",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "aigue_marine_prune",
+     "nom": "Aigue-marine et Prune",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "aigue_marine",
+       "prune"
+      ]
+     ]
+    },
+    {
+     "id": "ambre_corail",
+     "nom": "Ambre et Corail",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "ambre",
+       "corail"
+      ]
+     ]
+    },
+    {
+     "id": "ambre_azur",
+     "nom": "Ambre et Azur",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "ambre",
+       "azur"
+      ]
+     ]
+    },
+    {
+     "id": "ambre_aigue_marine",
+     "nom": "Ambre et Aigue-marine",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "ambre",
+       "aigue_marine"
+      ]
+     ]
+    },
+    {
+     "id": "corail_azur",
+     "nom": "Corail et Azur",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "corail",
+       "azur"
+      ]
+     ]
+    },
+    {
+     "id": "corail_aigue_marine",
+     "nom": "Corail et Aigue-marine",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "corail",
+       "aigue_marine"
+      ]
+     ]
+    },
+    {
+     "id": "azur_aigue_marine",
+     "nom": "Azur et Aigue-marine",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "azur",
+       "aigue_marine"
+      ]
+     ]
+    }
+   ]
+  },
+  "volkorne": {
+   "nom": "Volkorne",
+   "couleurs": [
+    {
+     "id": "indigo",
+     "nom": "Indigo",
+     "generation": 1,
+     "capturable": true,
+     "recettes": []
+    },
+    {
+     "id": "ebene",
+     "nom": "Ebène",
+     "generation": 1,
+     "capturable": true,
+     "recettes": []
+    },
+    {
+     "id": "pourpre",
+     "nom": "Pourpre",
+     "generation": 1,
+     "capturable": true,
+     "recettes": []
+    },
+    {
+     "id": "orchidee",
+     "nom": "Orchidée",
+     "generation": 1,
+     "capturable": true,
+     "recettes": []
+    },
+    {
+     "id": "pourpre_orchidee",
+     "nom": "Pourpre et Orchidée",
+     "generation": 2,
+     "capturable": false,
+     "recettes": [
+      [
+       "pourpre",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "pourpre_indigo",
+     "nom": "Pourpre et Indigo",
+     "generation": 2,
+     "capturable": false,
+     "recettes": [
+      [
+       "pourpre",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "pourpre_ebene",
+     "nom": "Pourpre et Ebène",
+     "generation": 2,
+     "capturable": false,
+     "recettes": [
+      [
+       "pourpre",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "orchidee_indigo",
+     "nom": "Orchidée et Indigo",
+     "generation": 2,
+     "capturable": false,
+     "recettes": [
+      [
+       "orchidee",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "orchidee_ebene",
+     "nom": "Orchidée et Ebène",
+     "generation": 2,
+     "capturable": false,
+     "recettes": [
+      [
+       "orchidee",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "indigo_ebene",
+     "nom": "Indigo et Ebène",
+     "generation": 2,
+     "capturable": false,
+     "recettes": [
+      [
+       "indigo",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "roux",
+     "nom": "Roux",
+     "generation": 3,
+     "capturable": false,
+     "recettes": [
+      [
+       "pourpre_orchidee",
+       "pourpre_indigo"
+      ],
+      [
+       "pourpre_orchidee",
+       "pourpre_ebene"
+      ],
+      [
+       "pourpre_indigo",
+       "pourpre_ebene"
+      ]
+     ]
+    },
+    {
+     "id": "amande",
+     "nom": "Amande",
+     "generation": 3,
+     "capturable": false,
+     "recettes": [
+      [
+       "pourpre_ebene",
+       "orchidee_ebene"
+      ],
+      [
+       "pourpre_ebene",
+       "indigo_ebene"
+      ],
+      [
+       "orchidee_ebene",
+       "indigo_ebene"
+      ]
+     ]
+    },
+    {
+     "id": "ivoire",
+     "nom": "Ivoire",
+     "generation": 3,
+     "capturable": false,
+     "recettes": [
+      [
+       "pourpre_indigo",
+       "indigo_ebene"
+      ],
+      [
+       "pourpre_indigo",
+       "orchidee_indigo"
+      ],
+      [
+       "orchidee_indigo",
+       "indigo_ebene"
+      ]
+     ]
+    },
+    {
+     "id": "turquoise",
+     "nom": "Turquoise",
+     "generation": 3,
+     "capturable": false,
+     "recettes": [
+      [
+       "pourpre_orchidee",
+       "orchidee_ebene"
+      ],
+      [
+       "orchidee_indigo",
+       "orchidee_ebene"
+      ],
+      [
+       "pourpre_orchidee",
+       "orchidee_indigo"
+      ]
+     ]
+    },
+    {
+     "id": "amande_pourpre",
+     "nom": "Amande et Pourpre",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "amande",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "amande_orchidee",
+     "nom": "Amande et Orchidée",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "amande",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "amande_indigo",
+     "nom": "Amande et Indigo",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "amande",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "amande_ebene",
+     "nom": "Amande et Ebène",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "amande",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "amande_roux",
+     "nom": "Amande et Roux",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "amande",
+       "roux"
+      ]
+     ]
+    },
+    {
+     "id": "amande_ivoire",
+     "nom": "Amande et Ivoire",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "amande",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "amande_turquoise",
+     "nom": "Amande et Turquoise",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "amande",
+       "turquoise"
+      ]
+     ]
+    },
+    {
+     "id": "roux_pourpre",
+     "nom": "Roux et Pourpre",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "roux",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "roux_orchidee",
+     "nom": "Roux et Orchidée",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "roux",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "roux_indigo",
+     "nom": "Roux et Indigo",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "roux",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "roux_ebene",
+     "nom": "Roux et Ebène",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "roux",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "roux_ivoire",
+     "nom": "Roux et Ivoire",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "roux",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "roux_turquoise",
+     "nom": "Roux et Turquoise",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "roux",
+       "turquoise"
+      ]
+     ]
+    },
+    {
+     "id": "ivoire_pourpre",
+     "nom": "Ivoire et Pourpre",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "ivoire",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "ivoire_orchidee",
+     "nom": "Ivoire et Orchidée",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "ivoire",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "ivoire_indigo",
+     "nom": "Ivoire et Indigo",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "ivoire",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "ivoire_ebene",
+     "nom": "Ivoire et Ebène",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "ivoire",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "ivoire_turquoise",
+     "nom": "Ivoire et Turquoise",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "ivoire",
+       "turquoise"
+      ]
+     ]
+    },
+    {
+     "id": "turquoise_pourpre",
+     "nom": "Turquoise et Pourpre",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "turquoise",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "turquoise_orchidee",
+     "nom": "Turquoise et Orchidée",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "turquoise",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "turquoise_indigo",
+     "nom": "Turquoise et Indigo",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "turquoise",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "turquoise_ebene",
+     "nom": "Turquoise et Ebène",
+     "generation": 4,
+     "capturable": false,
+     "recettes": [
+      [
+       "turquoise",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "prune",
+     "nom": "Prune",
+     "generation": 5,
+     "capturable": false,
+     "recettes": [
+      [
+       "amande_pourpre",
+       "amande_roux"
+      ],
+      [
+       "amande_orchidee",
+       "amande_roux"
+      ],
+      [
+       "amande_indigo",
+       "amande_roux"
+      ],
+      [
+       "amande_ebene",
+       "amande_roux"
+      ],
+      [
+       "amande_roux",
+       "amande_turquoise"
+      ],
+      [
+       "amande_roux",
+       "amande_ivoire"
+      ],
+      [
+       "amande_roux",
+       "roux_pourpre"
+      ],
+      [
+       "amande_roux",
+       "roux_orchidee"
+      ],
+      [
+       "amande_roux",
+       "roux_indigo"
+      ],
+      [
+       "amande_roux",
+       "roux_ebene"
+      ],
+      [
+       "amande_roux",
+       "roux_ivoire"
+      ],
+      [
+       "amande_roux",
+       "roux_turquoise"
+      ]
+     ]
+    },
+    {
+     "id": "emeraude",
+     "nom": "Emeraude",
+     "generation": 5,
+     "capturable": false,
+     "recettes": [
+      [
+       "ivoire_orchidee",
+       "ivoire_turquoise"
+      ],
+      [
+       "ivoire_indigo",
+       "ivoire_turquoise"
+      ],
+      [
+       "ivoire_ebene",
+       "ivoire_turquoise"
+      ],
+      [
+       "ivoire_pourpre",
+       "ivoire_turquoise"
+      ],
+      [
+       "roux_ivoire",
+       "ivoire_turquoise"
+      ],
+      [
+       "roux_turquoise",
+       "ivoire_turquoise"
+      ],
+      [
+       "amande_ivoire",
+       "ivoire_turquoise"
+      ],
+      [
+       "amande_turquoise",
+       "ivoire_turquoise"
+      ],
+      [
+       "ivoire_turquoise",
+       "turquoise_orchidee"
+      ],
+      [
+       "ivoire_turquoise",
+       "turquoise_pourpre"
+      ],
+      [
+       "ivoire_turquoise",
+       "turquoise_indigo"
+      ],
+      [
+       "ivoire_turquoise",
+       "turquoise_ebene"
+      ]
+     ]
+    },
+    {
+     "id": "prune_pourpre",
+     "nom": "Prune et Pourpre",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "prune_orchidee",
+     "nom": "Prune et Orchidée",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "prune_indigo",
+     "nom": "Prune et Indigo",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "prune_ebene",
+     "nom": "Prune et Ebène",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "prune_amande",
+     "nom": "Prune et Amande",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "amande"
+      ]
+     ]
+    },
+    {
+     "id": "prune_turquoise",
+     "nom": "Prune et Turquoise",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "turquoise"
+      ]
+     ]
+    },
+    {
+     "id": "prune_emeraude",
+     "nom": "Prune et Emeraude",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "prune_roux",
+     "nom": "Prune et Roux",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "roux"
+      ]
+     ]
+    },
+    {
+     "id": "prune_ivoire",
+     "nom": "Prune et Ivoire",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "emeraude_pourpre",
+     "nom": "Emeraude et Pourpre",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "emeraude",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "emeraude_orchidee",
+     "nom": "Emeraude et Orchidée",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "emeraude",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "emeraude_indigo",
+     "nom": "Emeraude et Indigo",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "emeraude",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "emeraude_ebene",
+     "nom": "Emeraude et Ebène",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "emeraude",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "emeraude_amande",
+     "nom": "Emeraude et Amande",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "emeraude",
+       "amande"
+      ]
+     ]
+    },
+    {
+     "id": "emeraude_roux",
+     "nom": "Emeraude et Roux",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "emeraude",
+       "roux"
+      ]
+     ]
+    },
+    {
+     "id": "emeraude_ivoire",
+     "nom": "Emeraude et Ivoire",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "emeraude",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "emeraude_turquoise",
+     "nom": "Emeraude et Turquoise",
+     "generation": 6,
+     "capturable": false,
+     "recettes": [
+      [
+       "emeraude",
+       "turquoise"
+      ]
+     ]
+    },
+    {
+     "id": "dore",
+     "nom": "Doré",
+     "generation": 7,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune_pourpre",
+       "emeraude_roux"
+      ],
+      [
+       "prune_orchidee",
+       "emeraude_turquoise"
+      ],
+      [
+       "prune_indigo",
+       "emeraude_ivoire"
+      ],
+      [
+       "prune_ebene",
+       "emeraude_amande"
+      ],
+      [
+       "prune_amande",
+       "emeraude_ebene"
+      ],
+      [
+       "prune_turquoise",
+       "emeraude_orchidee"
+      ],
+      [
+       "emeraude_pourpre",
+       "prune_roux"
+      ],
+      [
+       "emeraude_indigo",
+       "prune_ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "dore_pourpre",
+     "nom": "Doré et Pourpre",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "dore",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "dore_orchidee",
+     "nom": "Doré et Orchidée",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "dore",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "dore_indigo",
+     "nom": "Doré et Indigo",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "dore",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "dore_ebene",
+     "nom": "Doré et Ebène",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "dore",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "dore_roux",
+     "nom": "Doré et Roux",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "dore",
+       "roux"
+      ]
+     ]
+    },
+    {
+     "id": "dore_amande",
+     "nom": "Doré et Amande",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "dore",
+       "amande"
+      ]
+     ]
+    },
+    {
+     "id": "dore_ivoire",
+     "nom": "Doré et Ivoire",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "dore",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "dore_turquoise",
+     "nom": "Doré et Turquoise",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "dore",
+       "turquoise"
+      ]
+     ]
+    },
+    {
+     "id": "dore_prune",
+     "nom": "Doré et Prune",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "dore",
+       "prune"
+      ]
+     ]
+    },
+    {
+     "id": "dore_emeraude",
+     "nom": "Doré et Emeraude",
+     "generation": 8,
+     "capturable": false,
+     "recettes": [
+      [
+       "dore",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "jade",
+     "nom": "Jade",
+     "generation": 9,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune_emeraude",
+       "dore_pourpre"
+      ],
+      [
+       "dore_roux",
+       "dore_prune"
+      ]
+     ]
+    },
+    {
+     "id": "rubis",
+     "nom": "Rubis",
+     "generation": 9,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune_emeraude",
+       "dore_orchidee"
+      ],
+      [
+       "dore_amande",
+       "dore_prune"
+      ]
+     ]
+    },
+    {
+     "id": "saphir",
+     "nom": "Saphir",
+     "generation": 9,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune_emeraude",
+       "dore_indigo"
+      ],
+      [
+       "dore_turquoise",
+       "dore_emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "amethyste",
+     "nom": "Améthyste",
+     "generation": 9,
+     "capturable": false,
+     "recettes": [
+      [
+       "prune_emeraude",
+       "dore_ebene"
+      ],
+      [
+       "dore_ivoire",
+       "dore_emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "jade_pourpre",
+     "nom": "Jade et Pourpre",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "jade",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "jade_orchidee",
+     "nom": "Jade et Orchidée",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "jade",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "jade_indigo",
+     "nom": "Jade et Indigo",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "jade",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "jade_ebene",
+     "nom": "Jade et Ebène",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "jade",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "jade_amande",
+     "nom": "Jade et Amande",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "jade",
+       "amande"
+      ]
+     ]
+    },
+    {
+     "id": "jade_roux",
+     "nom": "Jade et Roux",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "jade",
+       "roux"
+      ]
+     ]
+    },
+    {
+     "id": "jade_ivoire",
+     "nom": "Jade et Ivoire",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "jade",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "jade_turquoise",
+     "nom": "Jade et Turquoise",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "jade",
+       "turquoise"
+      ]
+     ]
+    },
+    {
+     "id": "jade_prune",
+     "nom": "Jade et Prune",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "jade",
+       "prune"
+      ]
+     ]
+    },
+    {
+     "id": "jade_emeraude",
+     "nom": "Jade et Emeraude",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "jade",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "jade_dore",
+     "nom": "Jade et Doré",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "jade",
+       "dore"
+      ]
+     ]
+    },
+    {
+     "id": "jade_rubis",
+     "nom": "Jade et Rubis",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "jade",
+       "rubis"
+      ]
+     ]
+    },
+    {
+     "id": "jade_saphir",
+     "nom": "Jade et Saphir",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "jade",
+       "saphir"
+      ]
+     ]
+    },
+    {
+     "id": "jade_amethyste",
+     "nom": "Jade et Améthyste",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "jade",
+       "amethyste"
+      ]
+     ]
+    },
+    {
+     "id": "rubis_pourpre",
+     "nom": "Rubis et Pourpre",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "rubis",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "rubis_orchidee",
+     "nom": "Rubis et Orchidée",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "rubis",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "rubis_indigo",
+     "nom": "Rubis et Indigo",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "rubis",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "rubis_ebene",
+     "nom": "Rubis et Ebène",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "rubis",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "rubis_amande",
+     "nom": "Rubis et Amande",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "rubis",
+       "amande"
+      ]
+     ]
+    },
+    {
+     "id": "rubis_roux",
+     "nom": "Rubis et Roux",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "rubis",
+       "roux"
+      ]
+     ]
+    },
+    {
+     "id": "rubis_ivoire",
+     "nom": "Rubis et Ivoire",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "rubis",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "rubis_turquoise",
+     "nom": "Rubis et Turquoise",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "rubis",
+       "turquoise"
+      ]
+     ]
+    },
+    {
+     "id": "rubis_prune",
+     "nom": "Rubis et Prune",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "rubis",
+       "prune"
+      ]
+     ]
+    },
+    {
+     "id": "rubis_emeraude",
+     "nom": "Rubis et Emeraude",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "rubis",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "rubis_dore",
+     "nom": "Rubis et Doré",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "rubis",
+       "dore"
+      ]
+     ]
+    },
+    {
+     "id": "rubis_saphir",
+     "nom": "Rubis et Saphir",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "rubis",
+       "saphir"
+      ]
+     ]
+    },
+    {
+     "id": "rubis_amethyste",
+     "nom": "Rubis et Améthyste",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "rubis",
+       "amethyste"
+      ]
+     ]
+    },
+    {
+     "id": "saphir_pourpre",
+     "nom": "Saphir et Pourpre",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "saphir",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "saphir_orchidee",
+     "nom": "Saphir et Orchidée",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "saphir",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "saphir_indigo",
+     "nom": "Saphir et Indigo",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "saphir",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "saphir_ebene",
+     "nom": "Saphir et Ebène",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "saphir",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "saphir_amande",
+     "nom": "Saphir et Amande",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "saphir",
+       "amande"
+      ]
+     ]
+    },
+    {
+     "id": "saphir_roux",
+     "nom": "Saphir et Roux",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "saphir",
+       "roux"
+      ]
+     ]
+    },
+    {
+     "id": "saphir_ivoire",
+     "nom": "Saphir et Ivoire",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "saphir",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "saphir_turquoise",
+     "nom": "Saphir et Turquoise",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "saphir",
+       "turquoise"
+      ]
+     ]
+    },
+    {
+     "id": "saphir_prune",
+     "nom": "Saphir et Prune",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "saphir",
+       "prune"
+      ]
+     ]
+    },
+    {
+     "id": "saphir_emeraude",
+     "nom": "Saphir et Emeraude",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "saphir",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "saphir_dore",
+     "nom": "Saphir et Doré",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "saphir",
+       "dore"
+      ]
+     ]
+    },
+    {
+     "id": "saphir_amethyste",
+     "nom": "Saphir et Améthyste",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "saphir",
+       "amethyste"
+      ]
+     ]
+    },
+    {
+     "id": "amethyste_pourpre",
+     "nom": "Améthyste et Pourpre",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "amethyste",
+       "pourpre"
+      ]
+     ]
+    },
+    {
+     "id": "amethyste_orchidee",
+     "nom": "Améthyste et Orchidée",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "amethyste",
+       "orchidee"
+      ]
+     ]
+    },
+    {
+     "id": "amethyste_indigo",
+     "nom": "Améthyste et Indigo",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "amethyste",
+       "indigo"
+      ]
+     ]
+    },
+    {
+     "id": "amethyste_ebene",
+     "nom": "Améthyste et Ebène",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "amethyste",
+       "ebene"
+      ]
+     ]
+    },
+    {
+     "id": "amethyste_amande",
+     "nom": "Améthyste et Amande",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "amethyste",
+       "amande"
+      ]
+     ]
+    },
+    {
+     "id": "amethyste_roux",
+     "nom": "Améthyste et Roux",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "amethyste",
+       "roux"
+      ]
+     ]
+    },
+    {
+     "id": "amethyste_ivoire",
+     "nom": "Améthyste et Ivoire",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "amethyste",
+       "ivoire"
+      ]
+     ]
+    },
+    {
+     "id": "amethyste_turquoise",
+     "nom": "Améthyste et Turquoise",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "amethyste",
+       "turquoise"
+      ]
+     ]
+    },
+    {
+     "id": "amethyste_prune",
+     "nom": "Améthyste et Prune",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "amethyste",
+       "prune"
+      ]
+     ]
+    },
+    {
+     "id": "amethyste_emeraude",
+     "nom": "Améthyste et Emeraude",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "amethyste",
+       "emeraude"
+      ]
+     ]
+    },
+    {
+     "id": "amethyste_dore",
+     "nom": "Améthyste et Doré",
+     "generation": 10,
+     "capturable": false,
+     "recettes": [
+      [
+       "amethyste",
+       "dore"
+      ]
+     ]
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+body {
+  @apply bg-bg-primary font-sans text-text-primary;
+}
