@@ -7,7 +7,7 @@ export const nouvelId = () => Math.random().toString(36).slice(2, 10);
 const maintenant = () => new Date().toISOString();
 
 export function sauvegardeVide(): Sauvegarde {
-  return { version: 1, montures: [], journal: [], obtenues: { dragodinde: [], muldo: [], volkorne: [] }, options: { takeza: false } };
+  return { version: 1, montures: [], journal: [], obtenues: { dragodinde: [], muldo: [], volkorne: [] }, options: { takeza: false, niveauParDefaut: 100, afficherNom: false, langue: "fr" } };
 }
 
 function ajouterObtenue(s: Sauvegarde, f: Famille, c: string): Sauvegarde["obtenues"] {
