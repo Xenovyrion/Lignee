@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Actions } from "./ecrans/Actions";
+import { Actions } from "./ecrans/actions/Actions";
 import { Etable } from "./ecrans/etable/Etable";
 import { Parametres } from "./ecrans/Parametres";
 import { Succes } from "./ecrans/Succes";

@@ -44,6 +44,11 @@ export interface Plan {
   clonages: number;
   /** Montures de l'étable utilisées par le plan (à ne pas sacrifier). */
   reservees: Set<string>;
+  /**
+   * Importance de chaque étape : coût de reconstruction de ses parents en cas d'échec
+   * (naissances et captures en amont) + nombre d'étapes qui en dépendent.
+   */
+  importance: number[];
 }
 
 const autreSexe = (s: Sexe): Sexe => (s === "M" ? "F" : "M");
@@ -127,7 +132,13 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
       const k = cout(r[0]) + cout(r[1]);
       if (k < meilleur) [meilleur, recette] = [k, r];
     }
-    const a = prendre(recette[0]);
+    // Si les deux parents existent dans l'étable, choisir le sexe du premier pour que le second
+    // ait une monture du sexe opposé disponible.
+    const sexes = (c: string) => new Set((stock.get(c) ?? []).map((m) => m.sexe));
+    const sa = sexes(recette[0]);
+    const sb = sexes(recette[1]);
+    const sexeA: Sexe | undefined = sa.has("M") && sb.has("F") ? "M" : sa.has("F") && sb.has("M") ? "F" : undefined;
+    const a = prendre(recette[0], sexeA);
     const b = prendre(recette[1], a.type === "monture" ? autreSexe(a.monture.sexe) : undefined);
     const alerteSexe = a.type === "monture" && b.type === "monture" && a.monture.sexe === b.monture.sexe;
     etapes.push({ couleur: c, generation: col.generation, recette, pour, parents: [a, b], alerteSexe });
@@ -157,12 +168,50 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
     virtuels.get(c)!.push(e);
   }
 
+  // Réaffectation par niveau : pour chaque couleur et sexe, les montures existantes de plus haut
+  // niveau vont aux étapes les plus importantes (un échec en G8 coûte bien plus cher qu'en G2).
+  const importance = calculerImportance(etapes);
+  const emplacements = new Map<string, { etape: number; cote: 0 | 1 }[]>();
+  etapes.forEach((e, i) =>
+    e.parents.forEach((p, cote) => {
+      if (p.type !== "monture") return;
+      const cle = `${p.monture.couleur}/${p.monture.sexe}`;
+      if (!emplacements.has(cle)) emplacements.set(cle, []);
+      emplacements.get(cle)!.push({ etape: i, cote: cote as 0 | 1 });
+    }),
+  );
+  for (const [cle, places] of emplacements) {
+    const candidates = montures
+      .filter((m) => m.famille === famille && peutSAccoupler(m) && `${m.couleur}/${m.sexe}` === cle)
+      .sort((a, b) => b.niveau - a.niveau || Number(b.etat === "feconde") - Number(a.etat === "feconde"));
+    places.sort((x, y) => importance[y.etape] - importance[x.etape] || x.etape - y.etape);
+    places.forEach(({ etape, cote }, k) => {
+      const ancienne = etapes[etape].parents[cote] as { monture: Monture };
+      reservees.delete(ancienne.monture.id);
+      etapes[etape].parents[cote] = { type: "monture", monture: candidates[k] };
+    });
+    places.forEach((_, k) => reservees.add(candidates[k].id));
+  }
+
   const immediates = etapes
     .map((e, i) => ({ e, i }))
     .filter(({ e }) => e.parents.every((p) => p.type === "monture") && !e.alerteSexe)
     .map(({ i }) => i);
 
-  return { famille, etapes, captures, immediates, reservees, clonages };
+  return { famille, etapes, captures, immediates, reservees, clonages, importance };
+}
+
+/** Importance de chaque étape : coût en amont (naissances + captures) + étapes en aval. */
+export function calculerImportance(etapes: Etape[]): number[] {
+  const amont: number[] = [];
+  etapes.forEach((e, i) => {
+    amont[i] = 1 + e.parents.reduce((a, p) => a + (p.type === "naissance" ? amont[p.etape] : p.type === "capture" ? 1 : 0), 0);
+  });
+  const aval = etapes.map(() => 0);
+  for (let i = etapes.length - 1; i >= 0; i--) {
+    for (const p of etapes[i].parents) if (p.type === "naissance") aval[p.etape] += 1 + aval[i];
+  }
+  return etapes.map((_, i) => amont[i] + aval[i]);
 }
 
 export interface PaireClonage {
