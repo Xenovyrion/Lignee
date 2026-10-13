@@ -55,3 +55,19 @@ export function libelleMonture(m: Monture) {
 }
 
 export const pourcent = (p: number) => `${Math.round(p * 1000) / 10} %`;
+
+export const ETATS: Record<import("./moteur/types").Etat, string> = { fertile: "Fertile", feconde: "Féconde", sterile: "Stérile" };
+
+export const BadgeSexe = ({ sexe }: { sexe: "M" | "F" }) => (
+  <span className={`font-semibold ${sexe === "M" ? "text-sky-400" : "text-pink-400"}`}>{sexeSymbole(sexe)}</span>
+);
+
+export const BadgeEtat = ({ etat }: { etat: import("./moteur/types").Etat }) => (
+  <span
+    className={`rounded px-1.5 py-0.5 text-xs font-medium ${
+      etat === "feconde" ? "bg-status-ok/15 text-status-ok" : etat === "sterile" ? "bg-status-err/15 text-status-err" : "bg-status-info/15 text-status-info"
+    }`}
+  >
+    {ETATS[etat]}
+  </span>
+);

@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Actions } from "./ecrans/Actions";
-import { Etable } from "./ecrans/Etable";
+import { Etable } from "./ecrans/etable/Etable";
+import { Parametres } from "./ecrans/Parametres";
 import { Succes } from "./ecrans/Succes";
 import { FAMILLES, NOMS_FAMILLE, objectifs } from "./moteur/donnees";
 import type { Famille, Sauvegarde } from "./moteur/types";
 import { useSauvegarde } from "./stockage";
 
-const ONGLETS = { actions: "Prochaines actions", etable: "Étable", succes: "Succès" } as const;
+const ONGLETS = { actions: "Prochaines actions", etable: "Étable", succes: "Succès", parametres: "Paramètres" } as const;
 type Onglet = keyof typeof ONGLETS;
 
 export function App() {
@@ -19,7 +20,7 @@ export function App() {
   const props = { famille, s, setS: majS };
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-4 p-6">
+    <div className="mx-auto flex max-w-[1500px] flex-col gap-4 p-6">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-2xl font-bold">
           Lignée <span className="text-sm font-normal text-text-muted">— pilotage d'élevage Dofus 3.7</span>
@@ -49,8 +50,9 @@ export function App() {
       </nav>
       {erreur && <div className="rounded-md bg-status-err/15 p-2 text-sm text-status-err">Sauvegarde impossible : {erreur}</div>}
       {onglet === "actions" && <Actions {...props} />}
-      {onglet === "etable" && <Etable {...props} />}
+      {onglet === "etable" && <Etable key={famille} {...props} />}
       {onglet === "succes" && <Succes {...props} />}
+      {onglet === "parametres" && <Parametres s={s} setS={majS} />}
     </div>
   );
 }

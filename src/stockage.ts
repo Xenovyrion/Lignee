@@ -14,7 +14,10 @@ async function lire(): Promise<Sauvegarde> {
       const fs = await import("@tauri-apps/plugin-fs");
       texte = (await fs.exists(FICHIER, { baseDir: fs.BaseDirectory.AppData })) ? await fs.readTextFile(FICHIER, { baseDir: fs.BaseDirectory.AppData }) : null;
     } else texte = localStorage.getItem(FICHIER);
-    return texte ? { ...sauvegardeVide(), ...JSON.parse(texte) } : sauvegardeVide();
+    if (!texte) return sauvegardeVide();
+    const vide = sauvegardeVide();
+    const lue = JSON.parse(texte);
+    return { ...vide, ...lue, options: { ...vide.options, ...lue.options } };
   } catch (e) {
     console.error("Lecture de la sauvegarde impossible", e);
     return sauvegardeVide();

@@ -45,5 +45,14 @@ export interface Sauvegarde {
   journal: Accouplement[];
   /** Couleurs déjà obtenues par naissance (succès de génération), par famille. */
   obtenues: Record<Famille, string[]>;
-  options: { takeza: boolean };
+  options: Options;
+}
+
+export interface Options {
+  takeza: boolean;
+  /** Niveau proposé pour les nouvelles montures saisies. */
+  niveauParDefaut: number;
+  /** Affiche la colonne « Nom » dans l'étable. */
+  afficherNom: boolean;
+  langue: "fr";
 }
