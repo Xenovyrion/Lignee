@@ -115,6 +115,42 @@ describe("planificateur", () => {
     const clone = p.etapes.flatMap((e) => e.parents).find((s) => s.type === "clone" && s.couleur === "pourpre");
     expect(clone).toBeDefined();
   });
+  it("choisit les sexes pour former un couple quand c'est possible", () => {
+    const obtenues = couleurs("dragodinde").filter((c) => c.generation <= 4).map((c) => c.id);
+    const etable = [m("dragodinde", "amande_rousse", "F"), m("dragodinde", "amande_rousse", "M"), m("dragodinde", "ebene_indigo", "M")];
+    const p = planifier("dragodinde", etable, obtenues);
+    const pourpre = p.etapes.find((e) => e.couleur === "pourpre")!;
+    expect(pourpre.alerteSexe).toBeFalsy();
+    expect(p.immediates.map((i) => p.etapes[i].couleur)).toContain("pourpre");
+  });
+  it("réserve les montures de plus haut niveau aux étapes les plus importantes", () => {
+    const niveaux = [97, 120, 60, 200, 150, 80];
+    const etable = ["amande", "rousse", "doree"].flatMap((c) =>
+      niveaux.flatMap((niveau) => [m("dragodinde", c, "M", { niveau, etat: "fertile" }), m("dragodinde", c, "F", { niveau, etat: "feconde" })]),
+    );
+    const p = planifier("dragodinde", etable, []);
+    const parGroupe = new Map<string, { imp: number; niveau: number }[]>();
+    p.etapes.forEach((e, i) =>
+      e.parents.forEach((s) => {
+        if (s.type !== "monture") return;
+        const k = s.monture.couleur + s.monture.sexe;
+        parGroupe.set(k, [...(parGroupe.get(k) ?? []), { imp: p.importance[i], niveau: s.monture.niveau }]);
+      }),
+    );
+    expect(parGroupe.size).toBeGreaterThan(0);
+    for (const l of parGroupe.values()) {
+      l.sort((a, b) => b.imp - a.imp);
+      for (let i = 1; i < l.length; i++) if (l[i].imp < l[i - 1].imp) expect(l[i].niveau).toBeLessThanOrEqual(l[i - 1].niveau);
+    }
+    // La monture niveau 200 est toujours utilisée quand une couleur sert au moins une fois.
+    for (const [k, l] of parGroupe) expect(l.some((x) => x.niveau === 200), k).toBe(true);
+  });
+  it("les montures réservées sont exactement celles utilisées par le plan", () => {
+    const etable = [m("dragodinde", "amande", "M", { niveau: 50 }), m("dragodinde", "amande", "M", { niveau: 180 }), m("dragodinde", "rousse", "F")];
+    const p = planifier("dragodinde", etable, []);
+    const utilisees = new Set(p.etapes.flatMap((e) => e.parents.flatMap((s) => (s.type === "monture" ? [s.monture.id] : []))));
+    expect([...p.reservees].sort()).toEqual([...utilisees].sort());
+  });
   it("signale deux parents existants du même sexe", () => {
     const obtenues = couleurs("dragodinde").filter((c) => c.generation <= 4).map((c) => c.id);
     const p = planifier("dragodinde", [m("dragodinde", "amande_rousse", "F"), m("dragodinde", "ebene_indigo", "F")], obtenues);
