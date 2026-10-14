@@ -22,7 +22,12 @@ export function enfantsDe(f: Famille, id: string): string[] {
  * Ancêtres (toutes recettes confondues) et descendants d'une couleur, jusqu'à `profondeur`
  * liens de parenté (1 = parents et enfants directs).
  */
-export function lignee(f: Famille, id: string, profondeur = Infinity): { ancetres: Set<string>; descendants: Set<string> } {
+export function lignee(
+  f: Famille,
+  id: string,
+  profondeur = Infinity,
+): { ancetres: Set<string>; descendants: Set<string>; distance: Map<string, number> } {
+  const distance = new Map<string, number>([[id, 0]]);
   const parcourir = (depart: string, suivants: (x: string) => string[]) => {
     const vus = new Set<string>();
     let niveau = [depart];
@@ -32,6 +37,7 @@ export function lignee(f: Famille, id: string, profondeur = Infinity): { ancetre
         for (const y of suivants(x))
           if (!vus.has(y)) {
             vus.add(y);
+            if (!distance.has(y)) distance.set(y, d + 1);
             suivant.push(y);
           }
       niveau = suivant;
@@ -41,6 +47,7 @@ export function lignee(f: Famille, id: string, profondeur = Infinity): { ancetre
   return {
     ancetres: parcourir(id, (x) => couleur(f, x).recettes.flat()),
     descendants: parcourir(id, (x) => enfantsDe(f, x)),
+    distance,
   };
 }
 
@@ -134,7 +141,6 @@ export function arbrePrincipal(f: Famille): { principal: Map<string, string>; en
 
 export const CASE = 64; // emplacement d'un médaillon
 const ECART = 28; // espace entre deux branches voisines
-const COLONNES_BOUQUET = 3; // largeur maximale d'un demi-bouquet de feuilles
 const ESPACE_NIVEAU = 46; // espace vertical entre deux générations
 
 export interface Disposition {
@@ -152,7 +158,7 @@ export interface Disposition {
  * branche. Les sous-arbres sont emboîtés génération par génération au plus près (contours),
  * et les branches principales ne se croisent jamais.
  */
-export function dispositionArbre(f: Famille): Disposition {
+export function dispositionArbre(f: Famille, colonnesBouquet = 3): Disposition {
   const { principal, enfants, racines } = arbrePrincipal(f);
   const gen = (id: string) => couleur(f, id).generation;
   const internes = (id: string) => (enfants.get(id) ?? []).filter((e) => enfants.has(e));
@@ -167,7 +173,7 @@ export function dispositionArbre(f: Famille): Disposition {
     const m = Math.ceil(l.length / 2);
     return [l.slice(0, m), l.slice(m)].filter((x) => x.length);
   };
-  const colonnes = (n: number, s: boolean) => Math.min(n, s ? 2 * COLONNES_BOUQUET : COLONNES_BOUQUET);
+  const colonnes = (n: number, s: boolean) => Math.min(n, s ? 2 * colonnesBouquet : colonnesBouquet);
 
   // Hauteur de chaque génération : assez pour le plus grand bouquet qui y pousse.
   const lignes = new Map<number, number>();

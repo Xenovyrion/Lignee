@@ -1,9 +1,11 @@
 import { useMemo, useState } from "react";
 import { couleur, nomCouleur } from "../../moteur/donnees";
+import { conseiller, type ActionAccouplement } from "../../moteur/conseils";
 import { enfantsDe, lignee } from "../../moteur/genealogie";
+import { planifier } from "../../moteur/planificateur";
 import type { Famille, Sauvegarde } from "../../moteur/types";
 import { ArbreCentre, type Sens } from "./ArbreCentre";
-import { fabriquerStatut, ImageMonture, Legende, type Statut } from "./commun";
+import { COULEURS, fabriquerStatut, ImageMonture, LegendeArbre, type RolePlan, type Statut } from "./commun";
 import { VueEnsemble } from "./VueEnsemble";
 
 interface Props {
@@ -20,10 +22,22 @@ export function Arbre({ famille, s }: Props) {
   const [survol, setSurvol] = useState<string | null>(null);
   // Profondeur affichée : par défaut, liens directs dans le soleil, arbre complet quand il est centré.
   const [profSoleil, setProfSoleil] = useState(1);
-  const [profArbre, setProfArbre] = useState(Infinity);
-  const profondeur = racine ? profArbre : profSoleil;
-  const setProfondeur = racine ? setProfArbre : setProfSoleil;
-  const statut = useMemo(() => fabriquerStatut(famille, s.montures, s.obtenues[famille]), [famille, s.montures, s.obtenues]);
+  const [profArbre, setProfArbre] = useState<Record<Sens, number>>({ ancetres: Infinity, descendants: 1 });
+  const profondeur = racine ? profArbre[sens] : profSoleil;
+  const setProfondeur = (p: number) => (racine ? setProfArbre((x) => ({ ...x, [sens]: p })) : setProfSoleil(p));
+  // Le plan d'élevage colore l'arbre : prochaines naissances (★/☆) et couleurs à faire naître pour la suite.
+  const { statut, prochaines } = useMemo(() => {
+    const plan = planifier(famille, s.montures, s.obtenues[famille]);
+    const c = conseiller(plan, { takeza: s.options.takeza });
+    const roles = new Map<string, RolePlan>();
+    for (const e of plan.etapes) if (e.pour === "intermediaire") roles.set(e.couleur, "produire");
+    for (const a of c.aPreparer) roles.set(a.e.couleur, "preparer");
+    for (const a of c.prets) roles.set(a.e.couleur, "pret");
+    // Une ligne par couleur, les prêtes d'abord.
+    const vues = new Set<string>();
+    const prochaines = [...c.prets, ...c.aPreparer].filter((a) => !vues.has(a.e.couleur) && vues.add(a.e.couleur));
+    return { statut: fabriquerStatut(famille, s.montures, s.obtenues[famille], roles), prochaines };
+  }, [famille, s.montures, s.obtenues, s.options.takeza]);
 
   const centrer = (id: string) => {
     if (racine) setHistorique((h) => [...h, racine]);
@@ -91,7 +105,6 @@ export function Arbre({ famille, s }: Props) {
               ))}
             </div>
           </div>
-          <Legende />
         </div>
         <div className="min-h-0 flex-1">
           {racine ? (
@@ -111,13 +124,17 @@ export function Arbre({ famille, s }: Props) {
             <VueEnsemble famille={famille} statut={statut} profondeur={profondeur} survol={survol} setSurvol={setSurvol} choisir={centrer} />
           )}
         </div>
+        <LegendeArbre />
       </div>
 
       <aside className="w-72 shrink-0 overflow-y-auto rounded-xl border border-border bg-bg-card p-4">
         {detail ? (
           <Detail famille={famille} id={detail} statut={statut(detail)} centrer={centrer} />
         ) : (
-          <p className="text-sm text-text-muted">Survole ou choisis une couleur pour voir ses recettes, ce qu'elle débloque et ton stock.</p>
+          <div className="flex flex-col gap-5">
+            <Prochaines famille={famille} liste={prochaines} centrer={centrer} />
+            <p className="text-xs text-text-muted">Survole une couleur pour voir ses recettes, ce qu'elle débloque et ton stock ; clique pour ouvrir son arbre.</p>
+          </div>
         )}
       </aside>
     </div>
@@ -181,6 +198,33 @@ function Detail({ famille, id, statut, centrer }: { famille: Famille; id: string
       <div className="text-xs text-text-muted">
         Lignée : {l.ancetres.size} ancêtre(s), {l.descendants.size} descendant(s) au total.
       </div>
+    </div>
+  );
+}
+
+function Prochaines({ famille, liste, centrer }: { famille: Famille; liste: ActionAccouplement[]; centrer: (id: string) => void }) {
+  return (
+    <div>
+      <div className="mb-1.5 text-[11px] font-semibold uppercase text-text-muted">Prochaines naissances ({liste.length})</div>
+      {liste.length === 0 ? (
+        <p className="text-xs text-text-muted">Aucune pour l'instant : voir les captures dans « Prochaines actions ».</p>
+      ) : (
+        <div className="flex flex-col gap-1">
+          {liste.map((a) => (
+            <button
+              key={a.e.couleur}
+              onClick={() => centrer(a.e.couleur)}
+              className="flex items-center gap-2 rounded-md px-1.5 py-1 text-left text-sm hover:bg-bg-hover"
+              title="Ouvrir son arbre"
+            >
+              <span style={{ color: COULEURS.prochaine }}>{a.aPreparer.length ? "☆" : "★"}</span>
+              <ImageMonture famille={famille} id={a.e.couleur} taille={24} />
+              <span className="flex-1 truncate">{nomCouleur(famille, a.e.couleur)}</span>
+              <span className="text-[11px] text-text-muted">G{a.e.generation}</span>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

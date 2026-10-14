@@ -34,6 +34,10 @@ describe("généalogie", () => {
     expect(d.enfants.every((n) => couleur("dragodinde", n.couleur).generation === 10)).toBe(true);
     expect(d.enfants).toHaveLength(10);
   });
+  it("distance de parenté (zoom au survol)", () => {
+    const d = lignee("dragodinde", "pourpre").distance;
+    expect([d.get("pourpre"), d.get("amande_rousse"), d.get("amande"), d.get("prune_pourpre"), d.get("prune")]).toEqual([0, 1, 2, 1, 4]);
+  });
   it("profondeur limitée : parents et enfants directs seulement", () => {
     const l = lignee("dragodinde", "amande", 1);
     expect(l.descendants.size).toBe(10);
@@ -46,8 +50,9 @@ describe("généalogie", () => {
     expect(parentsPrincipaux("dragodinde", "amande_rousse").sort()).toEqual(["amande", "rousse"]);
   });
   it("vue d'ensemble : toutes les couleurs placées, sans chevauchement", () => {
-    for (const f of FAMILLES) {
-      const { positions } = dispositionArbre(f);
+    for (const f of FAMILLES)
+      for (const colonnes of [2, 3, 4, 5, 6]) {
+      const { positions } = dispositionArbre(f, colonnes);
       expect(positions.size).toBe(couleurs(f).length);
       const p = [...positions.values()];
       for (let i = 0; i < p.length; i++)
