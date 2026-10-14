@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Actions } from "./ecrans/actions/Actions";
+import { Arbre } from "./ecrans/arbre/Arbre";
 import { Etable } from "./ecrans/etable/Etable";
 import { Parametres } from "./ecrans/Parametres";
 import { Succes } from "./ecrans/Succes";
@@ -7,7 +8,7 @@ import { FAMILLES, NOMS_FAMILLE, objectifs } from "./moteur/donnees";
 import type { Famille, Sauvegarde } from "./moteur/types";
 import { useSauvegarde } from "./stockage";
 
-const ONGLETS = { actions: "Prochaines actions", etable: "Étable", succes: "Succès", parametres: "Paramètres" } as const;
+const ONGLETS = { actions: "Prochaines actions", etable: "Étable", arbre: "Arbre", succes: "Succès", parametres: "Paramètres" } as const;
 type Onglet = keyof typeof ONGLETS;
 
 export function App() {
@@ -51,6 +52,7 @@ export function App() {
       {erreur && <div className="rounded-md bg-status-err/15 p-2 text-sm text-status-err">Sauvegarde impossible : {erreur}</div>}
       {onglet === "actions" && <Actions {...props} />}
       {onglet === "etable" && <Etable key={famille} {...props} />}
+      {onglet === "arbre" && <Arbre key={famille} famille={famille} s={s} />}
       {onglet === "succes" && <Succes {...props} />}
       {onglet === "parametres" && <Parametres s={s} setS={majS} />}
     </div>

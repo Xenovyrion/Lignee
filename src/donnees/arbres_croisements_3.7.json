@@ -19,21 +19,24 @@
      "nom": "Rousse",
      "generation": 1,
      "capturable": true,
-     "recettes": []
+     "recettes": [],
+     "image": "https://api.dofusdb.fr/img/items/97010.png"
     },
     {
      "id": "doree",
      "nom": "Dorée",
      "generation": 1,
      "capturable": true,
-     "recettes": []
+     "recettes": [],
+     "image": "https://api.dofusdb.fr/img/items/97018.png"
     },
     {
      "id": "amande",
      "nom": "Amande",
      "generation": 1,
      "capturable": true,
-     "recettes": []
+     "recettes": [],
+     "image": "https://api.dofusdb.fr/img/items/97020.png"
     },
     {
      "id": "amande_doree",
@@ -45,7 +48,8 @@
        "amande",
        "doree"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97033.png"
     },
     {
      "id": "amande_rousse",
@@ -57,7 +61,8 @@
        "amande",
        "rousse"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97038.png"
     },
     {
      "id": "doree_rousse",
@@ -69,7 +74,8 @@
        "doree",
        "rousse"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97046.png"
     },
     {
      "id": "indigo",
@@ -81,7 +87,8 @@
        "amande_doree",
        "amande_rousse"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97017.png"
     },
     {
      "id": "ebene",
@@ -93,7 +100,8 @@
        "amande_doree",
        "doree_rousse"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97004.png"
     },
     {
      "id": "ebene_rousse",
@@ -105,7 +113,8 @@
        "ebene",
        "rousse"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97012.png"
     },
     {
      "id": "amande_ebene",
@@ -117,7 +126,8 @@
        "amande",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97034.png"
     },
     {
      "id": "amande_indigo",
@@ -129,7 +139,8 @@
        "amande",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97036.png"
     },
     {
      "id": "doree_ebene",
@@ -141,7 +152,8 @@
        "doree",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97042.png"
     },
     {
      "id": "doree_indigo",
@@ -153,7 +165,8 @@
        "doree",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97044.png"
     },
     {
      "id": "ebene_indigo",
@@ -165,7 +178,8 @@
        "ebene",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97051.png"
     },
     {
      "id": "indigo_rousse",
@@ -177,7 +191,8 @@
        "indigo",
        "rousse"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97062.png"
     },
     {
      "id": "pourpre",
@@ -189,7 +204,8 @@
        "amande_rousse",
        "ebene_indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97019.png"
     },
     {
      "id": "orchidee",
@@ -201,7 +217,8 @@
        "doree_rousse",
        "ebene_indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97022.png"
     },
     {
      "id": "amande_orchidee",
@@ -213,7 +230,8 @@
        "amande",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97040.png"
     },
     {
      "id": "amande_pourpre",
@@ -225,7 +243,8 @@
        "amande",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97041.png"
     },
     {
      "id": "doree_orchidee",
@@ -237,7 +256,8 @@
        "doree",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97048.png"
     },
     {
      "id": "doree_pourpre",
@@ -249,7 +269,8 @@
        "doree",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97049.png"
     },
     {
      "id": "ebene_orchidee",
@@ -261,7 +282,8 @@
        "ebene",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97053.png"
     },
     {
      "id": "ebene_pourpre",
@@ -273,7 +295,8 @@
        "ebene",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97054.png"
     },
     {
      "id": "indigo_orchidee",
@@ -285,7 +308,8 @@
        "indigo",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97064.png"
     },
     {
      "id": "indigo_pourpre",
@@ -297,7 +321,8 @@
        "indigo",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97065.png"
     },
     {
      "id": "orchidee_rousse",
@@ -309,7 +334,8 @@
        "orchidee",
        "rousse"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97070.png"
     },
     {
      "id": "pourpre_rousse",
@@ -321,7 +347,8 @@
        "pourpre",
        "rousse"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97071.png"
     },
     {
      "id": "orchidee_pourpre",
@@ -333,7 +360,8 @@
        "orchidee",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97076.png"
     },
     {
      "id": "turquoise",
@@ -345,7 +373,8 @@
        "ebene_orchidee",
        "orchidee_pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97015.png"
     },
     {
      "id": "ivoire",
@@ -357,7 +386,8 @@
        "indigo_pourpre",
        "orchidee_pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97016.png"
     },
     {
      "id": "ebene_ivoire",
@@ -369,7 +399,8 @@
        "ebene",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97009.png"
     },
     {
      "id": "ivoire_rousse",
@@ -381,7 +412,8 @@
        "ivoire",
        "rousse"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97011.png"
     },
     {
      "id": "amande_ivoire",
@@ -393,7 +425,8 @@
        "amande",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97037.png"
     },
     {
      "id": "amande_turquoise",
@@ -405,7 +438,8 @@
        "amande",
        "turquoise"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97039.png"
     },
     {
      "id": "doree_ivoire",
@@ -417,7 +451,8 @@
        "doree",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97045.png"
     },
     {
      "id": "doree_turquoise",
@@ -429,7 +464,8 @@
        "doree",
        "turquoise"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97047.png"
     },
     {
      "id": "ebene_turquoise",
@@ -441,7 +477,8 @@
        "ebene",
        "turquoise"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97052.png"
     },
     {
      "id": "indigo_ivoire",
@@ -453,7 +490,8 @@
        "indigo",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97061.png"
     },
     {
      "id": "indigo_turquoise",
@@ -465,7 +503,8 @@
        "indigo",
        "turquoise"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97063.png"
     },
     {
      "id": "ivoire_turquoise",
@@ -477,7 +516,8 @@
        "ivoire",
        "turquoise"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97066.png"
     },
     {
      "id": "ivoire_orchidee",
@@ -489,7 +529,8 @@
        "ivoire",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97067.png"
     },
     {
      "id": "ivoire_pourpre",
@@ -501,7 +542,8 @@
        "ivoire",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97068.png"
     },
     {
      "id": "turquoise_rousse",
@@ -513,7 +555,8 @@
        "turquoise",
        "rousse"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97069.png"
     },
     {
      "id": "turquoise_orchidee",
@@ -525,7 +568,8 @@
        "turquoise",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97072.png"
     },
     {
      "id": "turquoise_pourpre",
@@ -537,7 +581,8 @@
        "turquoise",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97073.png"
     },
     {
      "id": "emeraude",
@@ -549,7 +594,8 @@
        "ivoire_turquoise",
        "ivoire_pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97021.png"
     },
     {
      "id": "prune",
@@ -561,7 +607,8 @@
        "ivoire_turquoise",
        "turquoise_orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97023.png"
     },
     {
      "id": "amande_emeraude",
@@ -573,7 +620,8 @@
        "amande",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97035.png"
     },
     {
      "id": "doree_emeraude",
@@ -585,7 +633,8 @@
        "doree",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97043.png"
     },
     {
      "id": "ebene_emeraude",
@@ -597,7 +646,8 @@
        "ebene",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97050.png"
     },
     {
      "id": "emeraude_indigo",
@@ -609,7 +659,8 @@
        "emeraude",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97055.png"
     },
     {
      "id": "emeraude_ivoire",
@@ -621,7 +672,8 @@
        "emeraude",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97056.png"
     },
     {
      "id": "emeraude_rousse",
@@ -633,7 +685,8 @@
        "emeraude",
        "rousse"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97057.png"
     },
     {
      "id": "emeraude_turquoise",
@@ -645,7 +698,8 @@
        "emeraude",
        "turquoise"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97058.png"
     },
     {
      "id": "emeraude_orchidee",
@@ -657,7 +711,8 @@
        "emeraude",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97059.png"
     },
     {
      "id": "emeraude_pourpre",
@@ -669,7 +724,8 @@
        "emeraude",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97060.png"
     },
     {
      "id": "prune_amande",
@@ -681,7 +737,8 @@
        "prune",
        "amande"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97077.png"
     },
     {
      "id": "prune_doree",
@@ -693,7 +750,8 @@
        "prune",
        "doree"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97078.png"
     },
     {
      "id": "prune_ebene",
@@ -705,7 +763,8 @@
        "prune",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97079.png"
     },
     {
      "id": "prune_emeraude",
@@ -717,7 +776,8 @@
        "prune",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97080.png"
     },
     {
      "id": "prune_indigo",
@@ -729,7 +789,8 @@
        "prune",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97082.png"
     },
     {
      "id": "prune_ivoire",
@@ -741,7 +802,8 @@
        "prune",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97083.png"
     },
     {
      "id": "prune_rousse",
@@ -753,7 +815,8 @@
        "prune",
        "rousse"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97084.png"
     },
     {
      "id": "prune_turquoise",
@@ -765,7 +828,8 @@
        "prune",
        "turquoise"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97085.png"
     },
     {
      "id": "prune_orchidee",
@@ -777,7 +841,8 @@
        "prune",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97086.png"
     },
     {
      "id": "prune_pourpre",
@@ -789,7 +854,8 @@
        "prune",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97087.png"
     }
    ]
   },
@@ -801,35 +867,40 @@
      "nom": "Doré",
      "generation": 1,
      "capturable": true,
-     "recettes": []
+     "recettes": [],
+     "image": "https://api.dofusdb.fr/img/items/97094.png"
     },
     {
      "id": "ebene",
      "nom": "Ebène",
      "generation": 1,
      "capturable": true,
-     "recettes": []
+     "recettes": [],
+     "image": "https://api.dofusdb.fr/img/items/97091.png"
     },
     {
      "id": "indigo",
      "nom": "Indigo",
      "generation": 1,
      "capturable": true,
-     "recettes": []
+     "recettes": [],
+     "image": "https://api.dofusdb.fr/img/items/97092.png"
     },
     {
      "id": "pourpre",
      "nom": "Pourpre",
      "generation": 1,
      "capturable": true,
-     "recettes": []
+     "recettes": [],
+     "image": "https://api.dofusdb.fr/img/items/97093.png"
     },
     {
      "id": "orchidee",
      "nom": "Orchidée",
      "generation": 1,
      "capturable": true,
-     "recettes": []
+     "recettes": [],
+     "image": "https://api.dofusdb.fr/img/items/97090.png"
     },
     {
      "id": "dore_pourpre",
@@ -841,7 +912,8 @@
        "dore",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97101.png"
     },
     {
      "id": "indigo_pourpre",
@@ -853,7 +925,8 @@
        "indigo",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97102.png"
     },
     {
      "id": "ebene_pourpre",
@@ -865,7 +938,8 @@
        "ebene",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97103.png"
     },
     {
      "id": "orchidee_pourpre",
@@ -877,7 +951,8 @@
        "orchidee",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97104.png"
     },
     {
      "id": "dore_orchidee",
@@ -889,7 +964,8 @@
        "dore",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97105.png"
     },
     {
      "id": "indigo_orchidee",
@@ -901,7 +977,8 @@
        "indigo",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97106.png"
     },
     {
      "id": "ebene_orchidee",
@@ -913,7 +990,8 @@
        "ebene",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97107.png"
     },
     {
      "id": "dore_ebene",
@@ -925,7 +1003,8 @@
        "dore",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97110.png"
     },
     {
      "id": "dore_indigo",
@@ -937,7 +1016,8 @@
        "dore",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97108.png"
     },
     {
      "id": "ebene_indigo",
@@ -949,7 +1029,8 @@
        "ebene",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97109.png"
     },
     {
      "id": "roux",
@@ -981,7 +1062,8 @@
        "dore_indigo",
        "dore_ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97095.png"
     },
     {
      "id": "amande",
@@ -1001,7 +1083,8 @@
        "orchidee_pourpre",
        "ebene_indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97096.png"
     },
     {
      "id": "dore_amande",
@@ -1013,7 +1096,8 @@
        "dore",
        "amande"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97121.png"
     },
     {
      "id": "ebene_amande",
@@ -1025,7 +1109,8 @@
        "ebene",
        "amande"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97120.png"
     },
     {
      "id": "indigo_amande",
@@ -1037,7 +1122,8 @@
        "indigo",
        "amande"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97119.png"
     },
     {
      "id": "orchidee_amande",
@@ -1049,7 +1135,8 @@
        "orchidee",
        "amande"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97118.png"
     },
     {
      "id": "pourpre_amande",
@@ -1061,7 +1148,8 @@
        "pourpre",
        "amande"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97117.png"
     },
     {
      "id": "roux_amande",
@@ -1073,7 +1161,8 @@
        "roux",
        "amande"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97116.png"
     },
     {
      "id": "roux_dore",
@@ -1085,7 +1174,8 @@
        "roux",
        "dore"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97115.png"
     },
     {
      "id": "roux_ebene",
@@ -1097,7 +1187,8 @@
        "roux",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97114.png"
     },
     {
      "id": "roux_indigo",
@@ -1109,7 +1200,8 @@
        "roux",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97113.png"
     },
     {
      "id": "roux_orchidee",
@@ -1121,7 +1213,8 @@
        "roux",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97112.png"
     },
     {
      "id": "roux_pourpre",
@@ -1133,7 +1226,8 @@
        "roux",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97111.png"
     },
     {
      "id": "ivoire",
@@ -1173,7 +1267,8 @@
        "roux_amande",
        "orchidee_amande"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97097.png"
     },
     {
      "id": "turquoise",
@@ -1213,7 +1308,8 @@
        "roux_pourpre",
        "roux_amande"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97098.png"
     },
     {
      "id": "pourpre_ivoire",
@@ -1225,7 +1321,8 @@
        "pourpre",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97122.png"
     },
     {
      "id": "orchidee_ivoire",
@@ -1237,7 +1334,8 @@
        "orchidee",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97123.png"
     },
     {
      "id": "indigo_ivoire",
@@ -1249,7 +1347,8 @@
        "indigo",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97124.png"
     },
     {
      "id": "ebene_ivoire",
@@ -1261,7 +1360,8 @@
        "ebene",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97125.png"
     },
     {
      "id": "dore_ivoire",
@@ -1273,7 +1373,8 @@
        "dore",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97126.png"
     },
     {
      "id": "roux_ivoire",
@@ -1285,7 +1386,8 @@
        "roux",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97127.png"
     },
     {
      "id": "amande_ivoire",
@@ -1297,7 +1399,8 @@
        "amande",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97138.png"
     },
     {
      "id": "turquoise_ivoire",
@@ -1309,7 +1412,8 @@
        "turquoise",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97139.png"
     },
     {
      "id": "turquoise_pourpre",
@@ -1321,7 +1425,8 @@
        "turquoise",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97140.png"
     },
     {
      "id": "turquoise_orchidee",
@@ -1333,7 +1438,8 @@
        "turquoise",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97165.png"
     },
     {
      "id": "turquoise_indigo",
@@ -1345,7 +1451,8 @@
        "turquoise",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97141.png"
     },
     {
      "id": "turquoise_ebene",
@@ -1357,7 +1464,8 @@
        "turquoise",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97142.png"
     },
     {
      "id": "turquoise_roux",
@@ -1369,7 +1477,8 @@
        "turquoise",
        "roux"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97143.png"
     },
     {
      "id": "turquoise_amande",
@@ -1381,7 +1490,8 @@
        "turquoise",
        "amande"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97144.png"
     },
     {
      "id": "turquoise_dore",
@@ -1393,7 +1503,8 @@
        "turquoise",
        "dore"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97145.png"
     },
     {
      "id": "prune",
@@ -1417,7 +1528,8 @@
        "pourpre_ivoire",
        "turquoise_ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97099.png"
     },
     {
      "id": "emeraude",
@@ -1457,7 +1569,8 @@
        "dore_ivoire",
        "turquoise_ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97100.png"
     },
     {
      "id": "prune_pourpre",
@@ -1469,7 +1582,8 @@
        "prune",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97146.png"
     },
     {
      "id": "prune_orchidee",
@@ -1481,7 +1595,8 @@
        "prune",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97147.png"
     },
     {
      "id": "prune_indigo",
@@ -1493,7 +1608,8 @@
        "prune",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97148.png"
     },
     {
      "id": "prune_ebene",
@@ -1505,7 +1621,8 @@
        "prune",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97149.png"
     },
     {
      "id": "prune_dore",
@@ -1517,7 +1634,8 @@
        "prune",
        "dore"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97150.png"
     },
     {
      "id": "prune_roux",
@@ -1529,7 +1647,8 @@
        "prune",
        "roux"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97151.png"
     },
     {
      "id": "prune_amande",
@@ -1541,7 +1660,8 @@
        "prune",
        "amande"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97152.png"
     },
     {
      "id": "prune_ivoire",
@@ -1553,7 +1673,8 @@
        "prune",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97153.png"
     },
     {
      "id": "prune_turquoise",
@@ -1565,7 +1686,8 @@
        "prune",
        "turquoise"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97154.png"
     },
     {
      "id": "prune_emeraude",
@@ -1577,7 +1699,8 @@
        "prune",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97155.png"
     },
     {
      "id": "pourpre_emeraude",
@@ -1589,7 +1712,8 @@
        "pourpre",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97156.png"
     },
     {
      "id": "orchidee_emeraude",
@@ -1601,7 +1725,8 @@
        "orchidee",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97157.png"
     },
     {
      "id": "indigo_emeraude",
@@ -1613,7 +1738,8 @@
        "indigo",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97158.png"
     },
     {
      "id": "ebene_emeraude",
@@ -1625,7 +1751,8 @@
        "ebene",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97159.png"
     },
     {
      "id": "dore_emeraude",
@@ -1637,7 +1764,8 @@
        "dore",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97160.png"
     },
     {
      "id": "roux_emeraude",
@@ -1649,7 +1777,8 @@
        "roux",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97161.png"
     },
     {
      "id": "amande_emeraude",
@@ -1661,7 +1790,8 @@
        "amande",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97162.png"
     },
     {
      "id": "ivoire_emeraude",
@@ -1673,7 +1803,8 @@
        "ivoire",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97163.png"
     },
     {
      "id": "turquoise_emeraude",
@@ -1685,7 +1816,8 @@
        "turquoise",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97164.png"
     },
     {
      "id": "ambre",
@@ -1713,7 +1845,8 @@
        "dore_emeraude",
        "prune_emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97297.png"
     },
     {
      "id": "corail",
@@ -1741,7 +1874,8 @@
        "prune_dore",
        "prune_emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97298.png"
     },
     {
      "id": "azur",
@@ -1769,7 +1903,8 @@
        "dore_emeraude",
        "prune_ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97299.png"
     },
     {
      "id": "aigue_marine",
@@ -1797,7 +1932,8 @@
        "prune_dore",
        "turquoise_emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97300.png"
     },
     {
      "id": "ambre_dore",
@@ -1809,7 +1945,8 @@
        "ambre",
        "dore"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97301.png"
     },
     {
      "id": "ambre_ebene",
@@ -1821,7 +1958,8 @@
        "ambre",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97302.png"
     },
     {
      "id": "ambre_indigo",
@@ -1833,7 +1971,8 @@
        "ambre",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97303.png"
     },
     {
      "id": "ambre_pourpre",
@@ -1845,7 +1984,8 @@
        "ambre",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97304.png"
     },
     {
      "id": "ambre_orchidee",
@@ -1857,7 +1997,8 @@
        "ambre",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97305.png"
     },
     {
      "id": "ambre_amande",
@@ -1869,7 +2010,8 @@
        "ambre",
        "amande"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97306.png"
     },
     {
      "id": "ambre_roux",
@@ -1881,7 +2023,8 @@
        "ambre",
        "roux"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97307.png"
     },
     {
      "id": "ambre_ivoire",
@@ -1893,7 +2036,8 @@
        "ambre",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97308.png"
     },
     {
      "id": "ambre_turquoise",
@@ -1905,7 +2049,8 @@
        "ambre",
        "turquoise"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97309.png"
     },
     {
      "id": "ambre_emeraude",
@@ -1917,7 +2062,8 @@
        "ambre",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97310.png"
     },
     {
      "id": "ambre_prune",
@@ -1929,7 +2075,8 @@
        "ambre",
        "prune"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97311.png"
     },
     {
      "id": "corail_dore",
@@ -1941,7 +2088,8 @@
        "corail",
        "dore"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97315.png"
     },
     {
      "id": "corail_ebene",
@@ -1953,7 +2101,8 @@
        "corail",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97316.png"
     },
     {
      "id": "corail_indigo",
@@ -1965,7 +2114,8 @@
        "corail",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97317.png"
     },
     {
      "id": "corail_pourpre",
@@ -1977,7 +2127,8 @@
        "corail",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97318.png"
     },
     {
      "id": "corail_orchidee",
@@ -1989,7 +2140,8 @@
        "corail",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97319.png"
     },
     {
      "id": "corail_amande",
@@ -2001,7 +2153,8 @@
        "corail",
        "amande"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97320.png"
     },
     {
      "id": "corail_roux",
@@ -2013,7 +2166,8 @@
        "corail",
        "roux"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97321.png"
     },
     {
      "id": "corail_ivoire",
@@ -2025,7 +2179,8 @@
        "corail",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97322.png"
     },
     {
      "id": "corail_turquoise",
@@ -2037,7 +2192,8 @@
        "corail",
        "turquoise"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97323.png"
     },
     {
      "id": "corail_emeraude",
@@ -2049,7 +2205,8 @@
        "corail",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97324.png"
     },
     {
      "id": "corail_prune",
@@ -2061,7 +2218,8 @@
        "corail",
        "prune"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97325.png"
     },
     {
      "id": "azur_dore",
@@ -2073,7 +2231,8 @@
        "azur",
        "dore"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97328.png"
     },
     {
      "id": "azur_ebene",
@@ -2085,7 +2244,8 @@
        "azur",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97329.png"
     },
     {
      "id": "azur_indigo",
@@ -2097,7 +2257,8 @@
        "azur",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97330.png"
     },
     {
      "id": "azur_pourpre",
@@ -2109,7 +2270,8 @@
        "azur",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97331.png"
     },
     {
      "id": "azur_orchidee",
@@ -2121,7 +2283,8 @@
        "azur",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97332.png"
     },
     {
      "id": "azur_amande",
@@ -2133,7 +2296,8 @@
        "azur",
        "amande"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97333.png"
     },
     {
      "id": "azur_roux",
@@ -2145,7 +2309,8 @@
        "azur",
        "roux"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97334.png"
     },
     {
      "id": "azur_ivoire",
@@ -2157,7 +2322,8 @@
        "azur",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97335.png"
     },
     {
      "id": "azur_turquoise",
@@ -2169,7 +2335,8 @@
        "azur",
        "turquoise"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97336.png"
     },
     {
      "id": "azur_emeraude",
@@ -2181,7 +2348,8 @@
        "azur",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97337.png"
     },
     {
      "id": "azur_prune",
@@ -2193,7 +2361,8 @@
        "azur",
        "prune"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97338.png"
     },
     {
      "id": "aigue_marine_dore",
@@ -2205,7 +2374,8 @@
        "aigue_marine",
        "dore"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97340.png"
     },
     {
      "id": "aigue_marine_ebene",
@@ -2217,7 +2387,8 @@
        "aigue_marine",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97341.png"
     },
     {
      "id": "aigue_marine_indigo",
@@ -2229,7 +2400,8 @@
        "aigue_marine",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97342.png"
     },
     {
      "id": "aigue_marine_pourpre",
@@ -2241,7 +2413,8 @@
        "aigue_marine",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97343.png"
     },
     {
      "id": "aigue_marine_orchidee",
@@ -2253,7 +2426,8 @@
        "aigue_marine",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97344.png"
     },
     {
      "id": "aigue_marine_amande",
@@ -2265,7 +2439,8 @@
        "aigue_marine",
        "amande"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97345.png"
     },
     {
      "id": "aigue_marine_roux",
@@ -2277,7 +2452,8 @@
        "aigue_marine",
        "roux"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97346.png"
     },
     {
      "id": "aigue_marine_ivoire",
@@ -2289,7 +2465,8 @@
        "aigue_marine",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97347.png"
     },
     {
      "id": "aigue_marine_turquoise",
@@ -2301,7 +2478,8 @@
        "aigue_marine",
        "turquoise"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97348.png"
     },
     {
      "id": "aigue_marine_emeraude",
@@ -2313,7 +2491,8 @@
        "aigue_marine",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97349.png"
     },
     {
      "id": "aigue_marine_prune",
@@ -2325,7 +2504,8 @@
        "aigue_marine",
        "prune"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97350.png"
     },
     {
      "id": "ambre_corail",
@@ -2337,7 +2517,8 @@
        "ambre",
        "corail"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97312.png"
     },
     {
      "id": "ambre_azur",
@@ -2349,7 +2530,8 @@
        "ambre",
        "azur"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97313.png"
     },
     {
      "id": "ambre_aigue_marine",
@@ -2361,7 +2543,8 @@
        "ambre",
        "aigue_marine"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97314.png"
     },
     {
      "id": "corail_azur",
@@ -2373,7 +2556,8 @@
        "corail",
        "azur"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97326.png"
     },
     {
      "id": "corail_aigue_marine",
@@ -2385,7 +2569,8 @@
        "corail",
        "aigue_marine"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97327.png"
     },
     {
      "id": "azur_aigue_marine",
@@ -2397,7 +2582,8 @@
        "azur",
        "aigue_marine"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97339.png"
     }
    ]
   },
@@ -2409,28 +2595,32 @@
      "nom": "Indigo",
      "generation": 1,
      "capturable": true,
-     "recettes": []
+     "recettes": [],
+     "image": "https://api.dofusdb.fr/img/items/97176.png"
     },
     {
      "id": "ebene",
      "nom": "Ebène",
      "generation": 1,
      "capturable": true,
-     "recettes": []
+     "recettes": [],
+     "image": "https://api.dofusdb.fr/img/items/97177.png"
     },
     {
      "id": "pourpre",
      "nom": "Pourpre",
      "generation": 1,
      "capturable": true,
-     "recettes": []
+     "recettes": [],
+     "image": "https://api.dofusdb.fr/img/items/97178.png"
     },
     {
      "id": "orchidee",
      "nom": "Orchidée",
      "generation": 1,
      "capturable": true,
-     "recettes": []
+     "recettes": [],
+     "image": "https://api.dofusdb.fr/img/items/97179.png"
     },
     {
      "id": "pourpre_orchidee",
@@ -2442,7 +2632,8 @@
        "pourpre",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97191.png"
     },
     {
      "id": "pourpre_indigo",
@@ -2454,7 +2645,8 @@
        "pourpre",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97192.png"
     },
     {
      "id": "pourpre_ebene",
@@ -2466,7 +2658,8 @@
        "pourpre",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97193.png"
     },
     {
      "id": "orchidee_indigo",
@@ -2478,7 +2671,8 @@
        "orchidee",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97194.png"
     },
     {
      "id": "orchidee_ebene",
@@ -2490,7 +2684,8 @@
        "orchidee",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97195.png"
     },
     {
      "id": "indigo_ebene",
@@ -2502,7 +2697,8 @@
        "indigo",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97196.png"
     },
     {
      "id": "roux",
@@ -2522,7 +2718,8 @@
        "pourpre_indigo",
        "pourpre_ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97180.png"
     },
     {
      "id": "amande",
@@ -2542,7 +2739,8 @@
        "orchidee_ebene",
        "indigo_ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97181.png"
     },
     {
      "id": "ivoire",
@@ -2562,7 +2760,8 @@
        "orchidee_indigo",
        "indigo_ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97182.png"
     },
     {
      "id": "turquoise",
@@ -2582,7 +2781,8 @@
        "pourpre_orchidee",
        "orchidee_indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97183.png"
     },
     {
      "id": "amande_pourpre",
@@ -2594,7 +2794,8 @@
        "amande",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97197.png"
     },
     {
      "id": "amande_orchidee",
@@ -2606,7 +2807,8 @@
        "amande",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97198.png"
     },
     {
      "id": "amande_indigo",
@@ -2618,7 +2820,8 @@
        "amande",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97199.png"
     },
     {
      "id": "amande_ebene",
@@ -2630,7 +2833,8 @@
        "amande",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97200.png"
     },
     {
      "id": "amande_roux",
@@ -2642,7 +2846,8 @@
        "amande",
        "roux"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97201.png"
     },
     {
      "id": "amande_ivoire",
@@ -2654,7 +2859,8 @@
        "amande",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97202.png"
     },
     {
      "id": "amande_turquoise",
@@ -2666,7 +2872,8 @@
        "amande",
        "turquoise"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97203.png"
     },
     {
      "id": "roux_pourpre",
@@ -2678,7 +2885,8 @@
        "roux",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97204.png"
     },
     {
      "id": "roux_orchidee",
@@ -2690,7 +2898,8 @@
        "roux",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97205.png"
     },
     {
      "id": "roux_indigo",
@@ -2702,7 +2911,8 @@
        "roux",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97206.png"
     },
     {
      "id": "roux_ebene",
@@ -2714,7 +2924,8 @@
        "roux",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97207.png"
     },
     {
      "id": "roux_ivoire",
@@ -2726,7 +2937,8 @@
        "roux",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97208.png"
     },
     {
      "id": "roux_turquoise",
@@ -2738,7 +2950,8 @@
        "roux",
        "turquoise"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97209.png"
     },
     {
      "id": "ivoire_pourpre",
@@ -2750,7 +2963,8 @@
        "ivoire",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97210.png"
     },
     {
      "id": "ivoire_orchidee",
@@ -2762,7 +2976,8 @@
        "ivoire",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97211.png"
     },
     {
      "id": "ivoire_indigo",
@@ -2774,7 +2989,8 @@
        "ivoire",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97212.png"
     },
     {
      "id": "ivoire_ebene",
@@ -2786,7 +3002,8 @@
        "ivoire",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97213.png"
     },
     {
      "id": "ivoire_turquoise",
@@ -2798,7 +3015,8 @@
        "ivoire",
        "turquoise"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97214.png"
     },
     {
      "id": "turquoise_pourpre",
@@ -2810,7 +3028,8 @@
        "turquoise",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97215.png"
     },
     {
      "id": "turquoise_orchidee",
@@ -2822,7 +3041,8 @@
        "turquoise",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97216.png"
     },
     {
      "id": "turquoise_indigo",
@@ -2834,7 +3054,8 @@
        "turquoise",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97217.png"
     },
     {
      "id": "turquoise_ebene",
@@ -2846,7 +3067,8 @@
        "turquoise",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97218.png"
     },
     {
      "id": "prune",
@@ -2902,7 +3124,8 @@
        "amande_roux",
        "roux_turquoise"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97184.png"
     },
     {
      "id": "emeraude",
@@ -2958,7 +3181,8 @@
        "ivoire_turquoise",
        "turquoise_ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97185.png"
     },
     {
      "id": "prune_pourpre",
@@ -2970,7 +3194,8 @@
        "prune",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97219.png"
     },
     {
      "id": "prune_orchidee",
@@ -2982,7 +3207,8 @@
        "prune",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97220.png"
     },
     {
      "id": "prune_indigo",
@@ -2994,7 +3220,8 @@
        "prune",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97221.png"
     },
     {
      "id": "prune_ebene",
@@ -3006,7 +3233,8 @@
        "prune",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97222.png"
     },
     {
      "id": "prune_amande",
@@ -3018,7 +3246,8 @@
        "prune",
        "amande"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97223.png"
     },
     {
      "id": "prune_turquoise",
@@ -3030,7 +3259,8 @@
        "prune",
        "turquoise"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97224.png"
     },
     {
      "id": "prune_emeraude",
@@ -3042,7 +3272,8 @@
        "prune",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97225.png"
     },
     {
      "id": "prune_roux",
@@ -3054,7 +3285,8 @@
        "prune",
        "roux"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97287.png"
     },
     {
      "id": "prune_ivoire",
@@ -3066,7 +3298,8 @@
        "prune",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97288.png"
     },
     {
      "id": "emeraude_pourpre",
@@ -3078,7 +3311,8 @@
        "emeraude",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97226.png"
     },
     {
      "id": "emeraude_orchidee",
@@ -3090,7 +3324,8 @@
        "emeraude",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97227.png"
     },
     {
      "id": "emeraude_indigo",
@@ -3102,7 +3337,8 @@
        "emeraude",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97228.png"
     },
     {
      "id": "emeraude_ebene",
@@ -3114,7 +3350,8 @@
        "emeraude",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97229.png"
     },
     {
      "id": "emeraude_amande",
@@ -3126,7 +3363,8 @@
        "emeraude",
        "amande"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97230.png"
     },
     {
      "id": "emeraude_roux",
@@ -3138,7 +3376,8 @@
        "emeraude",
        "roux"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97231.png"
     },
     {
      "id": "emeraude_ivoire",
@@ -3150,7 +3389,8 @@
        "emeraude",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97233.png"
     },
     {
      "id": "emeraude_turquoise",
@@ -3162,7 +3402,8 @@
        "emeraude",
        "turquoise"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97234.png"
     },
     {
      "id": "dore",
@@ -3202,7 +3443,8 @@
        "emeraude_indigo",
        "prune_ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97186.png"
     },
     {
      "id": "dore_pourpre",
@@ -3214,7 +3456,8 @@
        "dore",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97235.png"
     },
     {
      "id": "dore_orchidee",
@@ -3226,7 +3469,8 @@
        "dore",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97236.png"
     },
     {
      "id": "dore_indigo",
@@ -3238,7 +3482,8 @@
        "dore",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97237.png"
     },
     {
      "id": "dore_ebene",
@@ -3250,7 +3495,8 @@
        "dore",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97238.png"
     },
     {
      "id": "dore_roux",
@@ -3262,7 +3508,8 @@
        "dore",
        "roux"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97291.png"
     },
     {
      "id": "dore_amande",
@@ -3274,7 +3521,8 @@
        "dore",
        "amande"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97292.png"
     },
     {
      "id": "dore_ivoire",
@@ -3286,7 +3534,8 @@
        "dore",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97293.png"
     },
     {
      "id": "dore_turquoise",
@@ -3298,7 +3547,8 @@
        "dore",
        "turquoise"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97294.png"
     },
     {
      "id": "dore_prune",
@@ -3310,7 +3560,8 @@
        "dore",
        "prune"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97295.png"
     },
     {
      "id": "dore_emeraude",
@@ -3322,7 +3573,8 @@
        "dore",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97296.png"
     },
     {
      "id": "jade",
@@ -3338,7 +3590,8 @@
        "dore_roux",
        "dore_prune"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97187.png"
     },
     {
      "id": "rubis",
@@ -3354,7 +3607,8 @@
        "dore_amande",
        "dore_prune"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97188.png"
     },
     {
      "id": "saphir",
@@ -3370,7 +3624,8 @@
        "dore_turquoise",
        "dore_emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97189.png"
     },
     {
      "id": "amethyste",
@@ -3386,7 +3641,8 @@
        "dore_ivoire",
        "dore_emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97190.png"
     },
     {
      "id": "jade_pourpre",
@@ -3398,7 +3654,8 @@
        "jade",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97239.png"
     },
     {
      "id": "jade_orchidee",
@@ -3410,7 +3667,8 @@
        "jade",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97240.png"
     },
     {
      "id": "jade_indigo",
@@ -3422,7 +3680,8 @@
        "jade",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97241.png"
     },
     {
      "id": "jade_ebene",
@@ -3434,7 +3693,8 @@
        "jade",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97242.png"
     },
     {
      "id": "jade_amande",
@@ -3446,7 +3706,8 @@
        "jade",
        "amande"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97243.png"
     },
     {
      "id": "jade_roux",
@@ -3458,7 +3719,8 @@
        "jade",
        "roux"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97244.png"
     },
     {
      "id": "jade_ivoire",
@@ -3470,7 +3732,8 @@
        "jade",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97245.png"
     },
     {
      "id": "jade_turquoise",
@@ -3482,7 +3745,8 @@
        "jade",
        "turquoise"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97246.png"
     },
     {
      "id": "jade_prune",
@@ -3494,7 +3758,8 @@
        "jade",
        "prune"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97247.png"
     },
     {
      "id": "jade_emeraude",
@@ -3506,7 +3771,8 @@
        "jade",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97248.png"
     },
     {
      "id": "jade_dore",
@@ -3518,7 +3784,8 @@
        "jade",
        "dore"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97249.png"
     },
     {
      "id": "jade_rubis",
@@ -3530,7 +3797,8 @@
        "jade",
        "rubis"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97250.png"
     },
     {
      "id": "jade_saphir",
@@ -3542,7 +3810,8 @@
        "jade",
        "saphir"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97251.png"
     },
     {
      "id": "jade_amethyste",
@@ -3554,7 +3823,8 @@
        "jade",
        "amethyste"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97252.png"
     },
     {
      "id": "rubis_pourpre",
@@ -3566,7 +3836,8 @@
        "rubis",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97253.png"
     },
     {
      "id": "rubis_orchidee",
@@ -3578,7 +3849,8 @@
        "rubis",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97254.png"
     },
     {
      "id": "rubis_indigo",
@@ -3590,7 +3862,8 @@
        "rubis",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97255.png"
     },
     {
      "id": "rubis_ebene",
@@ -3602,7 +3875,8 @@
        "rubis",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97256.png"
     },
     {
      "id": "rubis_amande",
@@ -3614,7 +3888,8 @@
        "rubis",
        "amande"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97257.png"
     },
     {
      "id": "rubis_roux",
@@ -3626,7 +3901,8 @@
        "rubis",
        "roux"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97258.png"
     },
     {
      "id": "rubis_ivoire",
@@ -3638,7 +3914,8 @@
        "rubis",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97259.png"
     },
     {
      "id": "rubis_turquoise",
@@ -3650,7 +3927,8 @@
        "rubis",
        "turquoise"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97260.png"
     },
     {
      "id": "rubis_prune",
@@ -3662,7 +3940,8 @@
        "rubis",
        "prune"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97261.png"
     },
     {
      "id": "rubis_emeraude",
@@ -3674,7 +3953,8 @@
        "rubis",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97262.png"
     },
     {
      "id": "rubis_dore",
@@ -3686,7 +3966,8 @@
        "rubis",
        "dore"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97263.png"
     },
     {
      "id": "rubis_saphir",
@@ -3698,7 +3979,8 @@
        "rubis",
        "saphir"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97289.png"
     },
     {
      "id": "rubis_amethyste",
@@ -3710,7 +3992,8 @@
        "rubis",
        "amethyste"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97290.png"
     },
     {
      "id": "saphir_pourpre",
@@ -3722,7 +4005,8 @@
        "saphir",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97264.png"
     },
     {
      "id": "saphir_orchidee",
@@ -3734,7 +4018,8 @@
        "saphir",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97265.png"
     },
     {
      "id": "saphir_indigo",
@@ -3746,7 +4031,8 @@
        "saphir",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97266.png"
     },
     {
      "id": "saphir_ebene",
@@ -3758,7 +4044,8 @@
        "saphir",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97267.png"
     },
     {
      "id": "saphir_amande",
@@ -3770,7 +4057,8 @@
        "saphir",
        "amande"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97268.png"
     },
     {
      "id": "saphir_roux",
@@ -3782,7 +4070,8 @@
        "saphir",
        "roux"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97269.png"
     },
     {
      "id": "saphir_ivoire",
@@ -3794,7 +4083,8 @@
        "saphir",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97270.png"
     },
     {
      "id": "saphir_turquoise",
@@ -3806,7 +4096,8 @@
        "saphir",
        "turquoise"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97271.png"
     },
     {
      "id": "saphir_prune",
@@ -3818,7 +4109,8 @@
        "saphir",
        "prune"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97272.png"
     },
     {
      "id": "saphir_emeraude",
@@ -3830,7 +4122,8 @@
        "saphir",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97273.png"
     },
     {
      "id": "saphir_dore",
@@ -3842,7 +4135,8 @@
        "saphir",
        "dore"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97274.png"
     },
     {
      "id": "saphir_amethyste",
@@ -3854,7 +4148,8 @@
        "saphir",
        "amethyste"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97275.png"
     },
     {
      "id": "amethyste_pourpre",
@@ -3866,7 +4161,8 @@
        "amethyste",
        "pourpre"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97276.png"
     },
     {
      "id": "amethyste_orchidee",
@@ -3878,7 +4174,8 @@
        "amethyste",
        "orchidee"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97277.png"
     },
     {
      "id": "amethyste_indigo",
@@ -3890,7 +4187,8 @@
        "amethyste",
        "indigo"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97278.png"
     },
     {
      "id": "amethyste_ebene",
@@ -3902,7 +4200,8 @@
        "amethyste",
        "ebene"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97279.png"
     },
     {
      "id": "amethyste_amande",
@@ -3914,7 +4213,8 @@
        "amethyste",
        "amande"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97280.png"
     },
     {
      "id": "amethyste_roux",
@@ -3926,7 +4226,8 @@
        "amethyste",
        "roux"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97281.png"
     },
     {
      "id": "amethyste_ivoire",
@@ -3938,7 +4239,8 @@
        "amethyste",
        "ivoire"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97282.png"
     },
     {
      "id": "amethyste_turquoise",
@@ -3950,7 +4252,8 @@
        "amethyste",
        "turquoise"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97283.png"
     },
     {
      "id": "amethyste_prune",
@@ -3962,7 +4265,8 @@
        "amethyste",
        "prune"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97284.png"
     },
     {
      "id": "amethyste_emeraude",
@@ -3974,7 +4278,8 @@
        "amethyste",
        "emeraude"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97285.png"
     },
     {
      "id": "amethyste_dore",
@@ -3986,7 +4291,8 @@
        "amethyste",
        "dore"
       ]
-     ]
+     ],
+     "image": "https://api.dofusdb.fr/img/items/97286.png"
     }
    ]
   }
