@@ -12,6 +12,8 @@ export interface Couleur {
   capturable: boolean;
   /** Paires de couleurs parentes produisant cette couleur (plusieurs pour certains Muldos/Volkornes). */
   recettes: [string, string][];
+  /** Illustration officielle (DofusDB, © Ankama), chargée à l'affichage. */
+  image?: string;
 }
 
 export interface Monture {

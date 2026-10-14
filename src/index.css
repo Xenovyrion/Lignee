@@ -8,3 +8,66 @@
 body {
   @apply bg-bg-primary font-sans text-text-primary;
 }
+
+/* Arbre généalogique centré : branches tracées en CSS entre les cartes. */
+.arbre ul {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding-top: 22px;
+}
+.arbre li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 22px 6px 0;
+  list-style: none;
+}
+.arbre li::before,
+.arbre li::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 50%;
+  width: 50%;
+  height: 22px;
+  border-top: 2px solid var(--branche);
+}
+.arbre li::after {
+  right: auto;
+  left: 50%;
+  border-left: 2px solid var(--branche);
+}
+.arbre li:only-child::before,
+.arbre li:only-child::after {
+  display: none;
+}
+.arbre li:only-child {
+  padding-top: 0;
+}
+.arbre li:first-child::before,
+.arbre li:last-child::after {
+  border: 0 none;
+}
+.arbre li:last-child::before {
+  border-right: 2px solid var(--branche);
+  border-radius: 0 8px 0 0;
+}
+.arbre li:first-child::after {
+  border-radius: 8px 0 0 0;
+}
+.arbre ul ul::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 22px;
+  border-left: 2px solid var(--branche);
+}
+.arbre > ul {
+  padding-top: 0;
+}
+.arbre {
+  --branche: rgba(212, 160, 23, 0.45);
+}
