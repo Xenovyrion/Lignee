@@ -57,4 +57,6 @@ export interface Options {
   /** Affiche la colonne « Nom » dans l'étable. */
   afficherNom: boolean;
   langue: "fr";
+  /** Naissances faites avant d'utiliser l'outil (succès des 1 000 naissances). */
+  naissancesAnterieures: number;
 }

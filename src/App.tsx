@@ -3,7 +3,7 @@ import { Actions } from "./ecrans/actions/Actions";
 import { Arbre } from "./ecrans/arbre/Arbre";
 import { Etable } from "./ecrans/etable/Etable";
 import { Parametres } from "./ecrans/Parametres";
-import { Succes } from "./ecrans/Succes";
+import { Succes } from "./ecrans/succes/Succes";
 import { FAMILLES, NOMS_FAMILLE, objectifs } from "./moteur/donnees";
 import type { Famille, Sauvegarde } from "./moteur/types";
 import { useSauvegarde } from "./stockage";
@@ -53,7 +53,7 @@ export function App() {
       {onglet === "actions" && <Actions {...props} />}
       {onglet === "etable" && <Etable key={famille} {...props} />}
       {onglet === "arbre" && <Arbre key={famille} famille={famille} s={s} />}
-      {onglet === "succes" && <Succes {...props} />}
+      {onglet === "succes" && <Succes {...props} setFamille={setFamille} />}
       {onglet === "parametres" && <Parametres s={s} setS={majS} />}
     </div>
   );
