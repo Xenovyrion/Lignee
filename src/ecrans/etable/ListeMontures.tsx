@@ -14,6 +14,7 @@ interface Props {
   selection: Set<string>;
   setSelection: (s: Set<string>) => void;
   modifier: (id: string, champs: Partial<Monture>) => void;
+  ouvrirFiche: (id: string) => void;
 }
 
 const COULEUR_ETAT: Record<Etat, string> = {
@@ -22,7 +23,7 @@ const COULEUR_ETAT: Record<Etat, string> = {
   sterile: "bg-status-err/15 text-status-err",
 };
 
-export function ListeMontures({ famille, montures, reservees, afficherNom, tri, setTri, selection, setSelection, modifier }: Props) {
+export function ListeMontures({ famille, montures, reservees, afficherNom, tri, setTri, selection, setSelection, modifier, ouvrirFiche }: Props) {
   if (montures.length === 0) return <p className="p-4 text-sm text-text-muted">Aucune monture ne correspond aux filtres.</p>;
   const toutes = montures.every((m) => selection.has(m.id));
   const basculer = (id: string) => {
@@ -62,10 +63,10 @@ export function ListeMontures({ famille, montures, reservees, afficherNom, tri, 
             </td>
             <td className="text-text-muted">{couleur(famille, m.couleur).generation}</td>
             <td className="font-medium">
-              <span className="inline-flex items-center gap-2 py-0.5">
+              <button className="inline-flex items-center gap-2 py-0.5 text-left hover:text-accent" onClick={() => ouvrirFiche(m.id)} title="Ouvrir la fiche de la monture">
                 <ImageMonture famille={famille} id={m.couleur} taille={28} />
                 {nomCouleur(famille, m.couleur)}
-              </span>
+              </button>
               {m.enclos && <span className="ml-2 rounded bg-bg-hover px-1.5 text-xs text-text-secondary">enclos {m.enclos}</span>}
               {reservees.has(m.id) && (
                 <span className="ml-2 text-xs text-accent" title="Utilisée par le plan d'élevage">

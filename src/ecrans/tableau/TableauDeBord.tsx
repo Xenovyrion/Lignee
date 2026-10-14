@@ -1,12 +1,12 @@
 import { Fragment, useMemo, useState, type ReactNode } from "react";
-import { cloner } from "../../moteur/actions";
 import { conseiller, prochainObjectif } from "../../moteur/conseils";
 import { couleur, NOMS_FAMILLE, nomCouleur, objectifs } from "../../moteur/donnees";
-import { planifier, suggererClonages, type PaireClonage, type Source } from "../../moteur/planificateur";
+import { planifier, suggererClonages, type Source } from "../../moteur/planificateur";
 import { nomSuccesGeneration } from "../../moteur/succes";
-import type { Famille, Monture, Sauvegarde, Sexe } from "../../moteur/types";
-import { Bouton, champ, libelleMonture, sexeSymbole } from "../../ui";
+import type { Famille, Monture, Sauvegarde } from "../../moteur/types";
+import { Bouton, libelleMonture, sexeSymbole } from "../../ui";
 import { Etoile, ImageMonture } from "../arbre/commun";
+import { ClonagePropose } from "../etable/Clonage";
 import { CarteNaissance } from "./CarteNaissance";
 
 interface Props {
@@ -309,40 +309,5 @@ function PlanComplet({ famille, plan }: { famille: Famille; plan: ReturnType<typ
         </li>
       ))}
     </ol>
-  );
-}
-
-function ClonagePropose({ paire, setS }: { paire: PaireClonage; setS: Props["setS"] }) {
-  const [resultat, setResultat] = useState(paire.a.couleur);
-  const [sexe, setSexe] = useState<Sexe>(paire.a.sexe);
-  const f = paire.a.famille;
-  const valider = () => {
-    try {
-      setS((s) => cloner(s, paire.a.id, paire.b.id, { couleur: resultat, sexe }));
-    } catch (e) {
-      alert((e as Error).message);
-    }
-  };
-  return (
-    <li className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-bg-secondary p-2 text-sm">
-      <span className="flex flex-1 items-center gap-1">
-        <ImageMonture famille={f} id={paire.a.couleur} taille={24} />+<ImageMonture famille={f} id={paire.b.couleur} taille={24} />
-        <span className="ml-1 text-xs text-text-muted">{paire.memeCouleur ? "résultat certain" : "50/50"}</span>
-      </span>
-      <select className={champ} value={resultat} onChange={(e) => setResultat(e.target.value)} disabled={paire.memeCouleur}>
-        {[...new Set([paire.a.couleur, paire.b.couleur])].map((c) => (
-          <option key={c} value={c}>
-            {nomCouleur(f, c)}
-          </option>
-        ))}
-      </select>
-      <select className={champ} value={sexe} onChange={(e) => setSexe(e.target.value as Sexe)}>
-        <option value="F">♀</option>
-        <option value="M">♂</option>
-      </select>
-      <Bouton discret onClick={valider}>
-        Cloné
-      </Bouton>
-    </li>
   );
 }

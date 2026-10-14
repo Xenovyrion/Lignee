@@ -12,13 +12,14 @@ interface Props {
   s: Sauvegarde;
   setS: (f: (s: Sauvegarde) => Sauvegarde) => void;
   plan: Plan;
+  ouvrirFiche: (id: string) => void;
 }
 
 /**
  * Suivi des enclos : quelles montures remplissent leurs jauges, remplissage automatique avec les
  * montures à préparer, et fin de session (toutes fécondes, enclos vidé) en un clic.
  */
-export function Enclos({ famille, s, setS, plan }: Props) {
+export function Enclos({ famille, s, setS, plan, ouvrirFiche }: Props) {
   const nb = nombreEnclos(s.options.niveauEleveur);
   const palier = prochainPalierEnclos(s.options.niveauEleveur);
   const parEnclos = (k: number) => s.montures.filter((m) => m.enclos === k);
@@ -93,7 +94,7 @@ export function Enclos({ famille, s, setS, plan }: Props) {
                 {l.map((m) => (
                   <li key={m.id} className="flex items-center gap-2 text-sm">
                     <ImageMonture famille={m.famille} id={m.couleur} taille={26} />
-                    <span className="min-w-0 flex-1 truncate">
+                    <span className="min-w-0 flex-1 cursor-pointer truncate hover:text-accent" onClick={() => ouvrirFiche(m.id)} title="Ouvrir la fiche">
                       {nomCouleur(m.famille, m.couleur)}
                       {m.famille !== famille && <span className="text-xs text-text-muted"> ({NOMS_FAMILLE[m.famille]})</span>}
                     </span>

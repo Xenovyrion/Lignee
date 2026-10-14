@@ -10,6 +10,8 @@ import { ListeMontures } from "./ListeMontures";
 import { PanneauFiltres } from "./PanneauFiltres";
 import { SaisieRapide } from "./SaisieRapide";
 import { Enclos } from "./Enclos";
+import { FicheMonture } from "./FicheMonture";
+import { Steriles } from "./Steriles";
 import { VueCouleurs } from "./VueCouleurs";
 
 const CAPACITE_ETABLE = 500;
@@ -34,7 +36,9 @@ interface Props {
 export function Etable({ famille, s, setS }: Props) {
   const [filtre, setFiltre] = useState<Filtre>(filtreVide);
   const [tri, setTri] = useState<Tri>({ cle: "generation", sens: 1 });
-  const [vue, setVue] = useState<"couleurs" | "liste" | "enclos">("couleurs");
+  const [vue, setVue] = useState<"couleurs" | "liste" | "enclos" | "steriles">("couleurs");
+  const [ficheId, setFicheId] = useState<string | null>(null);
+  const fiche = s.montures.find((m) => m.id === ficheId);
   const [selection, setSelection] = useState<Set<string>>(new Set());
   const [saisie, setSaisie] = useState(false);
 
@@ -84,7 +88,8 @@ export function Etable({ famille, s, setS }: Props) {
 
   return (
     <div className="flex items-start gap-4">
-      {vue !== "enclos" && <PanneauFiltres famille={famille} montures={deLaFamille} reservees={reservees} filtre={filtre} setFiltre={setFiltre} />}
+      {fiche && <FicheMonture monture={fiche} s={s} setS={setS} plan={plan} fermer={() => setFicheId(null)} />}
+      {vue !== "enclos" && vue !== "steriles" && <PanneauFiltres famille={famille} montures={deLaFamille} reservees={reservees} filtre={filtre} setFiltre={setFiltre} />}
 
       <div className="flex min-w-0 flex-1 flex-col gap-3">
         <div className="flex flex-wrap items-center gap-3">
@@ -94,11 +99,15 @@ export function Etable({ famille, s, setS }: Props) {
                 ["couleurs", "Par couleur"],
                 ["liste", "Liste"],
                 ["enclos", "Enclos"],
+                ["steriles", "Stériles"],
               ] as const
             ).map(([v, l]) => (
               <button key={v} onClick={() => setVue(v)} className={`rounded-md px-3 py-1 ${vue === v ? "bg-bg-hover text-text-primary" : "text-text-secondary"}`}>
                 {l}
                 {v === "enclos" && s.montures.some((m) => m.enclos) && <span className="ml-1 text-xs text-accent">{s.montures.filter((m) => m.enclos).length}</span>}
+                {v === "steriles" && deLaFamille.some((m) => m.etat === "sterile") && (
+                  <span className="ml-1 text-xs text-status-err">{deLaFamille.filter((m) => m.etat === "sterile").length}</span>
+                )}
               </button>
             ))}
           </div>
@@ -125,7 +134,7 @@ export function Etable({ famille, s, setS }: Props) {
           {!saisie && <Bouton onClick={() => setSaisie(true)}>+ Ajouter des montures</Bouton>}
         </div>
 
-        {vue !== "enclos" && (
+        {vue !== "enclos" && vue !== "steriles" && (
           <div className="flex flex-wrap gap-1.5">
             {RACCOURCIS.map((r) => {
               const f = { ...filtreVide(), ...r.filtre };
@@ -175,8 +184,10 @@ export function Etable({ famille, s, setS }: Props) {
         )}
 
         <div className="overflow-hidden rounded-xl border border-border bg-bg-card">
-          {vue === "enclos" ? (
-            <Enclos famille={famille} s={s} setS={setS} plan={plan} />
+          {vue === "steriles" ? (
+            <Steriles famille={famille} s={s} setS={setS} ouvrirFiche={setFicheId} />
+          ) : vue === "enclos" ? (
+            <Enclos famille={famille} s={s} setS={setS} plan={plan} ouvrirFiche={setFicheId} />
           ) : vue === "couleurs" ? (
             <VueCouleurs
               besoins={besoins}
@@ -200,6 +211,7 @@ export function Etable({ famille, s, setS }: Props) {
               selection={selection}
               setSelection={setSelection}
               modifier={modifier}
+              ouvrirFiche={setFicheId}
             />
           )}
         </div>
