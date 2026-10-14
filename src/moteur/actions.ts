@@ -7,7 +7,7 @@ export const nouvelId = () => Math.random().toString(36).slice(2, 10);
 const maintenant = () => new Date().toISOString();
 
 export function sauvegardeVide(): Sauvegarde {
-  return { version: 1, montures: [], journal: [], obtenues: { dragodinde: [], muldo: [], volkorne: [] }, options: { takeza: false, niveauParDefaut: 100, afficherNom: false, langue: "fr", naissancesAnterieures: 0, niveauEleveur: 1 } };
+  return { version: 1, montures: [], journal: [], obtenues: { dragodinde: [], muldo: [], volkorne: [] }, options: { takeza: false, niveauParDefaut: 100, afficherNom: false, langue: "fr", naissancesAnterieures: 0, niveauEleveur: 1, modeSuivi: "simple" } };
 }
 
 function ajouterObtenue(s: Sauvegarde, f: Famille, c: string): Sauvegarde["obtenues"] {
@@ -22,7 +22,7 @@ export interface Bebe {
 }
 
 /** Enregistre un accouplement : parents stériles, bébé(s) créé(s), succès mis à jour, journal. */
-export function enregistrerNaissance(s: Sauvegarde, pereId: string, mereId: string, bebes: Bebe[], makina?: Makina): Sauvegarde {
+export function enregistrerNaissance(s: Sauvegarde, pereId: string, mereId: string, bebes: Bebe[], makina?: Makina, niveauBebes = 1): Sauvegarde {
   const pere = s.montures.find((m) => m.id === pereId);
   const mere = s.montures.find((m) => m.id === mereId);
   if (!pere || !mere) throw new Error("Parent introuvable");
@@ -37,7 +37,7 @@ export function enregistrerNaissance(s: Sauvegarde, pereId: string, mereId: stri
     famille: f,
     couleur: couleur(f, b.couleur).id,
     sexe: b.sexe,
-    niveau: 1,
+    niveau: niveauBebes,
     etat: "fertile",
     capacite: b.capacite,
     parents: [pere.couleur, mere.couleur],

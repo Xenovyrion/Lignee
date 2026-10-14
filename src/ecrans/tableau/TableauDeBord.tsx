@@ -2,8 +2,9 @@ import { Fragment, useMemo, useState, type ReactNode } from "react";
 import { conseiller, prochainObjectif } from "../../moteur/conseils";
 import { couleur, NOMS_FAMILLE, nomCouleur, objectifs } from "../../moteur/donnees";
 import { planifier, suggererClonages, type Source } from "../../moteur/planificateur";
+import { rendreFecondes } from "../../moteur/etable";
 import { nomSuccesGeneration } from "../../moteur/succes";
-import type { Famille, Monture, Sauvegarde } from "../../moteur/types";
+import type { Famille, Monture, Sauvegarde, Sexe } from "../../moteur/types";
 import { Bouton, libelleMonture, sexeSymbole } from "../../ui";
 import { Etoile, ImageMonture } from "../arbre/commun";
 import { ClonagePropose } from "../etable/Clonage";
@@ -66,6 +67,14 @@ export function TableauDeBord({ famille, s, setS }: Props) {
   const enEnclos: Monture[] = [];
   for (const a of c.ordre) for (const m of a.aPreparer) if (!enEnclos.some((x) => x.id === m.id)) enEnclos.push(m);
   const sousNiveau = c.ordre.filter((a) => a.niveauConseille).length;
+  const simple = s.options.modeSuivi === "simple";
+  // Mode simple : montures à préparer regroupées par couleur et sexe.
+  const groupes = new Map<string, { couleur: string; sexe: Sexe; ids: string[] }>();
+  for (const m of enEnclos) {
+    const k = `${m.couleur}/${m.sexe}`;
+    if (!groupes.has(k)) groupes.set(k, { couleur: m.couleur, sexe: m.sexe, ids: [] });
+    groupes.get(k)!.ids.push(m.id);
+  }
 
   if (plan.etapes.length === 0)
     return (
@@ -161,7 +170,7 @@ export function TableauDeBord({ famille, s, setS }: Props) {
       {/* Tuiles */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
         <Tuile valeur={c.ordre.filter((a) => !a.aPreparer.length).length} libelle="prêts à accoupler" teinte="#22c55e" cible="naissances" />
-        <Tuile valeur={enEnclos.length} libelle="montures à mettre en enclos" teinte="#d4a017" cible="enclos" />
+        <Tuile valeur={enEnclos.length} libelle={simple ? "montures à préparer" : "montures à mettre en enclos"} teinte="#d4a017" cible="enclos" />
         <Tuile valeur={c.captures.reduce((x, y) => x + y.nombre, 0)} libelle="captures à faire" teinte="#60a5fa" cible="captures" />
         <Tuile valeur={clonages.length} libelle="clonages possibles" teinte="#a78bfa" cible="clonages" />
         <Tuile valeur={c.blocages.length} libelle="blocages" teinte="#f97316" cible="blocages" />
@@ -211,10 +220,29 @@ export function TableauDeBord({ famille, s, setS }: Props) {
 
           <Cadre
             id="enclos"
-            titre={`Mettre en enclos (${enEnclos.length})`}
-            sous={enEnclos.length ? `Remplir Endurance, Maturité et Amour · ≈ ${Math.ceil(enEnclos.length / 10)} enclos de 10 · à gérer dans Étable → Enclos` : undefined}
+            titre={simple ? `À préparer (${enEnclos.length})` : `Mettre en enclos (${enEnclos.length})`}
+            sous={enEnclos.length ? (simple ? `Remplis Endurance, Maturité et Amour en jeu, puis clique « ✓ Prêtes » · ≈ ${Math.ceil(enEnclos.length / 10)} enclos de 10` : `Remplir Endurance, Maturité et Amour · ≈ ${Math.ceil(enEnclos.length / 10)} enclos de 10 · à gérer dans Étable → Enclos`) : undefined}
           >
-            {enEnclos.length ? (
+            {simple && enEnclos.length ? (
+              <ul className="flex flex-col gap-1.5 text-sm">
+                {[...groupes.values()].map((g) => (
+                  <li key={`${g.couleur}/${g.sexe}`} className="flex items-center gap-2">
+                    <ImageMonture famille={famille} id={g.couleur} taille={26} />
+                    <span className="flex-1">
+                      {nomCouleur(famille, g.couleur)} <span className={g.sexe === "M" ? "text-sky-400" : "text-pink-400"}>{sexeSymbole(g.sexe)}</span>
+                      <span className="text-text-secondary"> × {g.ids.length}</span>
+                    </span>
+                    <Bouton
+                      discret
+                      onClick={() => setS((s) => rendreFecondes(s, famille, g.couleur, g.sexe, g.ids.length, new Set(g.ids)))}
+                      title="Jauges remplies en jeu : passer ces montures en « Féconde »"
+                    >
+                      ✓ Prêtes
+                    </Bouton>
+                  </li>
+                ))}
+              </ul>
+            ) : enEnclos.length ? (
               <ul className="flex flex-col gap-1 text-sm">
                 {enEnclos.map((m) => (
                   <li key={m.id} className="flex items-center gap-2">

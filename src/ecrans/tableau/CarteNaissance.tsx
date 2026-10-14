@@ -80,7 +80,7 @@ function FormResultat(p: { famille: Famille; pere: Monture; mere: Monture; makin
   const maj = (i: number, champs: Partial<Bebe>) => setBebes(bebes.map((b, j) => (j === i ? { ...b, ...champs } : b)));
   const valider = () => {
     try {
-      p.setS((s) => enregistrerNaissance(s, p.pere.id, p.mere.id, bebes, makina || undefined));
+      p.setS((s) => enregistrerNaissance(s, p.pere.id, p.mere.id, bebes, makina || undefined, s.options.modeSuivi === "simple" ? s.options.niveauParDefaut : 1));
       p.fermer();
     } catch (err) {
       alert((err as Error).message);

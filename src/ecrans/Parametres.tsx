@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { nombreEnclos, prochainPalierEnclos } from "../moteur/etable";
+import { appliquerNiveauUnique, nombreEnclos, prochainPalierEnclos } from "../moteur/etable";
 import type { Options, Sauvegarde } from "../moteur/types";
 import { Carte, champ } from "../ui";
 
@@ -46,19 +46,56 @@ export function Parametres({ s, setS }: Props) {
         </Ligne>
       </Carte>
       <Carte titre="Étable">
-        <Ligne titre="Niveau par défaut" aide="Niveau proposé pour les nouvelles montures, et appliqué par le bouton « Mettre au niveau » de l'étable.">
+        <Ligne
+          titre="Mode de suivi"
+          aide={
+            o.modeSuivi === "simple"
+              ? "Simple : tu saisis des nombres par couleur, sexe et état (fertile, féconde, stérile), avec un seul niveau pour toutes tes montures."
+              : "Détaillé : chaque monture a son niveau, son enclos et sa fiche ; vue Liste et suivi des enclos."
+          }
+        >
+          <div className="flex rounded-lg border border-border-light p-0.5 text-sm">
+            {(
+              [
+                ["simple", "Simple"],
+                ["detaille", "Détaillé"],
+              ] as const
+            ).map(([v, l]) => (
+              <button
+                key={v}
+                onClick={() => setS((s) => ({ ...(v === "simple" ? appliquerNiveauUnique(s, s.options.niveauParDefaut) : s), options: { ...s.options, modeSuivi: v } }))}
+                className={`rounded-md px-3 py-1 ${o.modeSuivi === v ? "bg-accent-dim text-accent" : "text-text-secondary"}`}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
+        </Ligne>
+        <Ligne
+          titre={o.modeSuivi === "simple" ? "Niveau de tes montures" : "Niveau par défaut"}
+          aide={
+            o.modeSuivi === "simple"
+              ? "Niveau de tes montures au moment des accouplements : il s'applique à toutes et sert à calculer les probabilités (167 + Optimakina = 100 %)."
+              : "Niveau proposé pour les nouvelles montures, et appliqué par le bouton « Mettre au niveau » de l'étable."
+          }
+        >
           <input
             type="number"
             min={1}
             max={200}
             className={`${champ} w-24`}
             value={o.niveauParDefaut}
-            onChange={(e) => maj({ niveauParDefaut: Math.max(1, Math.min(200, Number(e.target.value) || 1)) })}
+            onChange={(e) => {
+              const n = Math.max(1, Math.min(200, Number(e.target.value) || 1));
+              setS((s) => ({ ...(s.options.modeSuivi === "simple" ? appliquerNiveauUnique(s, n) : s), options: { ...s.options, niveauParDefaut: n } }));
+            }}
           />
         </Ligne>
-        <Ligne titre="Afficher le nom des montures" aide="Ajoute une colonne « Nom » modifiable dans l'étable.">
-          <input type="checkbox" className="h-4 w-4 accent-accent" checked={o.afficherNom} onChange={(e) => maj({ afficherNom: e.target.checked })} />
-        </Ligne>
+        {o.modeSuivi === "detaille" && (
+          <Ligne titre="Afficher le nom des montures" aide="Ajoute une colonne « Nom » modifiable dans l'étable.">
+            <input type="checkbox" className="h-4 w-4 accent-accent" checked={o.afficherNom} onChange={(e) => maj({ afficherNom: e.target.checked })} />
+          </Ligne>
+        )}
       </Carte>
       <Carte titre="Accouplements">
         <Ligne titre="Bonus Almanax Takeza actif" aide="+20 % de chances d'obtenir la génération cible, les jours où l'Almanax le propose.">

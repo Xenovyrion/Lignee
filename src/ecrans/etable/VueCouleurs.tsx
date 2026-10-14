@@ -1,6 +1,6 @@
 import { couleurs } from "../../moteur/donnees";
 import type { BesoinCouleur } from "../../moteur/etable";
-import type { Famille, Monture, Sexe } from "../../moteur/types";
+import type { Etat, Famille, Monture, Sexe } from "../../moteur/types";
 import { COULEURS, ImageMonture } from "../arbre/commun";
 
 interface Props {
@@ -10,6 +10,55 @@ interface Props {
   ajouter: (couleur: string, sexe: Sexe) => void;
   retirer: (couleur: string, sexe: Sexe) => void;
   ouvrirCouleur: (couleur: string) => void;
+  /** Mode simple : stock saisi par sexe et état. */
+  simple?: { stock: (c: string, sexe: Sexe, etat: Etat) => number; ajuster: (c: string, sexe: Sexe, etat: Etat, delta: number) => void };
+}
+
+const ETATS_SIMPLE: [Etat, string, string][] = [
+  ["fertile", "Fertile", "#60a5fa"],
+  ["feconde", "Féconde", "#22c55e"],
+  ["sterile", "Stérile", "#ef4444"],
+];
+
+/** Tableau 2 × 3 (sexe × état) avec −/+ dans chaque case. */
+function GrilleStock({ c, simple }: { c: string; simple: NonNullable<Props["simple"]> }) {
+  return (
+    <table className="w-full text-center text-xs" onClick={(e) => e.stopPropagation()}>
+      <thead>
+        <tr className="text-[11px]">
+          <th className="w-6" />
+          {ETATS_SIMPLE.map(([e, l, t]) => (
+            <th key={e} className="pb-1 font-medium" style={{ color: t }}>
+              {l}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {(["M", "F"] as Sexe[]).map((sexe) => (
+          <tr key={sexe}>
+            <td className={`text-base ${sexe === "M" ? "text-sky-400" : "text-pink-400"}`}>{sexe === "M" ? "♂" : "♀"}</td>
+            {ETATS_SIMPLE.map(([etat]) => {
+              const n = simple.stock(c, sexe, etat);
+              return (
+                <td key={etat} className="p-0.5">
+                  <div className="flex items-center justify-between rounded-md border border-border bg-bg-card">
+                    <button disabled={!n} onClick={() => simple.ajuster(c, sexe, etat, -1)} className="px-1.5 py-0.5 text-text-muted hover:text-text-primary disabled:opacity-25" title="Retirer une monture">
+                      −
+                    </button>
+                    <span className={`font-bold ${n ? "text-text-primary" : "text-text-muted"}`}>{n}</span>
+                    <button onClick={() => simple.ajuster(c, sexe, etat, 1)} className="px-1.5 py-0.5 text-text-muted hover:text-text-primary" title="Ajouter une monture">
+                      +
+                    </button>
+                  </div>
+                </td>
+              );
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
 }
 
 const Pastille = ({ n, fond }: { n: number; fond: string }) => (
@@ -19,7 +68,7 @@ const Pastille = ({ n, fond }: { n: number; fond: string }) => (
 );
 
 /** Une carte par couleur, regroupées par génération : stock comparé aux besoins du plan, ajout et retrait en un clic. */
-export function VueCouleurs({ famille, montures, besoins, ajouter, retirer, ouvrirCouleur }: Props) {
+export function VueCouleurs({ famille, montures, besoins, ajouter, retirer, ouvrirCouleur, simple }: Props) {
   const presentes = new Set(montures.map((m) => m.couleur));
   const liste = couleurs(famille).filter((c) => presentes.has(c.id));
   if (liste.length === 0) return <p className="p-4 text-sm text-text-muted">Aucune monture ne correspond aux filtres.</p>;
@@ -68,9 +117,9 @@ export function VueCouleurs({ famille, montures, besoins, ajouter, retirer, ouvr
                 return (
                   <div
                     key={c.id}
-                    onClick={() => ouvrirCouleur(c.id)}
-                    title="Voir ces montures dans la liste"
-                    className="flex cursor-pointer flex-col gap-2 rounded-xl border border-border bg-bg-secondary p-2.5 transition hover:border-border-light hover:bg-bg-hover"
+                    onClick={() => !simple && ouvrirCouleur(c.id)}
+                    title={simple ? undefined : "Voir ces montures dans la liste"}
+                    className={`flex flex-col gap-2 rounded-xl border border-border bg-bg-secondary p-2.5 transition ${simple ? "" : "cursor-pointer hover:border-border-light hover:bg-bg-hover"}`}
                   >
                     <div className="flex items-center gap-2">
                       <ImageMonture famille={famille} id={c.id} taille={52} />
@@ -79,13 +128,13 @@ export function VueCouleurs({ famille, montures, besoins, ajouter, retirer, ouvr
                         <div className="mt-1 flex items-center gap-1.5">
                           <Pastille n={n.males} fond={COULEURS.males} />
                           <Pastille n={n.femelles} fond={COULEURS.femelles} />
-                          <span className="text-[11px] text-text-muted">niv. ≤ {n.niveauMax}</span>
+                          {!simple && <span className="text-[11px] text-text-muted">niv. ≤ {n.niveauMax}</span>}
                         </div>
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-1 text-[11px]">
-                      {n.fecondes > 0 && <span className="rounded bg-status-ok/15 px-1.5 text-status-ok">{n.fecondes} féconde{n.fecondes > 1 ? "s" : ""}</span>}
-                      {n.steriles > 0 && <span className="rounded bg-status-err/15 px-1.5 text-status-err">{n.steriles} stérile{n.steriles > 1 ? "s" : ""}</span>}
+                      {!simple && n.fecondes > 0 && <span className="rounded bg-status-ok/15 px-1.5 text-status-ok">{n.fecondes} féconde{n.fecondes > 1 ? "s" : ""}</span>}
+                      {!simple && n.steriles > 0 && <span className="rounded bg-status-err/15 px-1.5 text-status-err">{n.steriles} stérile{n.steriles > 1 ? "s" : ""}</span>}
                       {b && b.utilisees > 0 && <span className="rounded bg-accent-dim px-1.5 text-accent">{b.utilisees} pour le plan</span>}
                       {b && b.libres > 0 && (
                         <span className="rounded bg-bg-hover px-1.5 text-text-secondary" title="Montures que le plan n'utilise pas : à garder en réserve, vendre ou recycler">
@@ -98,13 +147,17 @@ export function VueCouleurs({ famille, montures, besoins, ajouter, retirer, ouvr
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center justify-end gap-1">
-                      <Bouton c={c.id} s="M" signe="−" actif={n.males > 0} />
-                      <Bouton c={c.id} s="M" signe="+" />
-                      <span className="w-1.5" />
-                      <Bouton c={c.id} s="F" signe="−" actif={n.femelles > 0} />
-                      <Bouton c={c.id} s="F" signe="+" />
-                    </div>
+                    {simple ? (
+                      <GrilleStock c={c.id} simple={simple} />
+                    ) : (
+                      <div className="flex items-center justify-end gap-1">
+                        <Bouton c={c.id} s="M" signe="−" actif={n.males > 0} />
+                        <Bouton c={c.id} s="M" signe="+" />
+                        <span className="w-1.5" />
+                        <Bouton c={c.id} s="F" signe="−" actif={n.femelles > 0} />
+                        <Bouton c={c.id} s="F" signe="+" />
+                      </div>
+                    )}
                   </div>
                 );
               })}

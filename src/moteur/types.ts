@@ -54,8 +54,13 @@ export interface Sauvegarde {
 
 export interface Options {
   takeza: boolean;
-  /** Niveau proposé pour les nouvelles montures saisies. */
+  /**
+   * Mode simple : un seul niveau pour toutes les montures (celui-ci).
+   * Mode détaillé : niveau proposé pour les nouvelles montures saisies.
+   */
   niveauParDefaut: number;
+  /** Simple : stock saisi en nombres par couleur, sexe et état. Détaillé : chaque monture (niveau, enclos…). */
+  modeSuivi: "simple" | "detaille";
   /** Affiche la colonne « Nom » dans l'étable. */
   afficherNom: boolean;
   langue: "fr";
