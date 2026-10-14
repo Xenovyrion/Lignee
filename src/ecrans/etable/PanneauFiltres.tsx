@@ -10,6 +10,8 @@ interface Props {
   reservees: Set<string>;
   filtre: Filtre;
   setFiltre: (f: Filtre) => void;
+  /** Mode simple : pas de filtre de niveau (niveau unique). */
+  sansNiveau?: boolean;
 }
 
 const basculer = <T,>(liste: T[], v: T) => (liste.includes(v) ? liste.filter((x) => x !== v) : [...liste, v]);
@@ -31,7 +33,7 @@ const Puce = ({ actif, onClick, children, n }: { actif: boolean; onClick: () => 
   </button>
 );
 
-export function PanneauFiltres({ famille, montures, reservees, filtre: f, setFiltre }: Props) {
+export function PanneauFiltres({ famille, montures, reservees, filtre: f, setFiltre, sansNiveau }: Props) {
   const maj = (champs: Partial<Filtre>) => setFiltre({ ...f, ...champs });
   const parGen = compter(montures, (m) => couleur(famille, m.couleur).generation);
   const parSexe = compter(montures, (m) => m.sexe);
@@ -81,13 +83,13 @@ export function PanneauFiltres({ famille, montures, reservees, filtre: f, setFil
         </div>
       </Section>
 
-      <Section titre="Niveau">
+      {!sansNiveau && <Section titre="Niveau">
         <div className="flex items-center gap-2 text-sm">
           <input type="number" min={1} max={200} className={`${champ} w-16`} value={f.niveauMin} onChange={(e) => maj({ niveauMin: Math.max(1, Math.min(200, Number(e.target.value) || 1)) })} />
           à
           <input type="number" min={1} max={200} className={`${champ} w-16`} value={f.niveauMax} onChange={(e) => maj({ niveauMax: Math.max(1, Math.min(200, Number(e.target.value) || 200)) })} />
         </div>
-      </Section>
+      </Section>}
 
       <Section titre="Plan d'élevage">
         <div className="flex flex-wrap gap-1">

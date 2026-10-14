@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { couleurs } from "./donnees";
-import { besoinsParCouleur, nombreEnclos, prochainPalierEnclos, ressourcesExtraction, roleDansLePlan } from "./etable";
+import { sauvegardeVide } from "./actions";
+import { ajusterStock, appliquerNiveauUnique, besoinsParCouleur, compterStock, nombreEnclos, prochainPalierEnclos, rendreFecondes, ressourcesExtraction, roleDansLePlan } from "./etable";
 import { planifier } from "./planificateur";
 import type { Monture, Sexe } from "./types";
 
@@ -33,6 +34,19 @@ describe("étable", () => {
     expect(roleDansLePlan(plan, libre.id)).toEqual([]);
     expect(ressourcesExtraction(m("amande", "F"))).toBe(0);
     expect(ressourcesExtraction(mere)).toBe(4);
+  });
+  it("mode simple : stock saisi en nombres par sexe et par état", () => {
+    let s = ajusterStock(sauvegardeVide(), "dragodinde", "indigo", "F", "fertile", 3, 167);
+    s = ajusterStock(s, "dragodinde", "indigo", "F", "sterile", 1, 167);
+    expect(compterStock(s.montures, "dragodinde", "indigo", "F", "fertile")).toBe(3);
+    expect(s.montures.every((x) => x.niveau === 167)).toBe(true);
+    s = ajusterStock(s, "dragodinde", "indigo", "F", "fertile", -1, 167);
+    expect(compterStock(s.montures, "dragodinde", "indigo", "F", "fertile")).toBe(2);
+    const utile = s.montures.find((x) => x.etat === "fertile")!.id;
+    const s2 = rendreFecondes(s, "dragodinde", "indigo", "F", 1, new Set([utile]));
+    expect(s2.montures.find((x) => x.id === utile)!.etat).toBe("feconde");
+    expect(compterStock(s2.montures, "dragodinde", "indigo", "F", "fertile")).toBe(1);
+    expect(appliquerNiveauUnique(s2, 120).montures.every((x) => x.niveau === 120)).toBe(true);
   });
   it("nombre d'enclos selon le niveau du métier Éleveur", () => {
     expect([1, 39, 40, 119, 120, 199, 200].map(nombreEnclos)).toEqual([1, 1, 2, 3, 4, 5, 6]);

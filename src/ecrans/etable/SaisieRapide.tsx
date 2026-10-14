@@ -17,12 +17,14 @@ interface Ligne {
 interface Props {
   famille: Famille;
   niveauDefaut: number;
+  /** Mode simple : niveau unique, pas de colonne Niveau. */
+  sansNiveau?: boolean;
   ajouter: (montures: Monture[]) => void;
   fermer: () => void;
 }
 
 /** Saisie en lot au clavier : couleur (suggestions), nombre de ♂ et de ♀, niveau, état. Entrée = ligne suivante. */
-export function SaisieRapide({ famille, niveauDefaut, ajouter, fermer }: Props) {
+export function SaisieRapide({ famille, niveauDefaut, sansNiveau, ajouter, fermer }: Props) {
   const nouvelleLigne = (modele?: Ligne): Ligne => ({
     cle: nouvelId(),
     texte: "",
@@ -67,7 +69,7 @@ export function SaisieRapide({ famille, niveauDefaut, ajouter, fermer }: Props) 
           famille,
           couleur: l.couleur!,
           sexe,
-          niveau: l.niveau,
+          niveau: sansNiveau ? niveauDefaut : l.niveau,
           etat: l.etat,
           origine: couleur(famille, l.couleur!).generation === 1 ? ("capture" as const) : ("saisie" as const),
           creeLe: maintenant,
@@ -116,7 +118,7 @@ export function SaisieRapide({ famille, niveauDefaut, ajouter, fermer }: Props) 
             <th className="pb-1">Couleur</th>
             <th className="text-sky-400">♂</th>
             <th className="text-pink-400">♀</th>
-            <th>Niveau</th>
+            {!sansNiveau && <th>Niveau</th>}
             <th>État</th>
             <th />
           </tr>
@@ -163,7 +165,7 @@ export function SaisieRapide({ famille, niveauDefaut, ajouter, fermer }: Props) 
                   />
                 </td>
               ))}
-              <td className="pr-2 align-top">
+              {!sansNiveau && <td className="pr-2 align-top">
                 <input
                   type="number"
                   min={1}
@@ -174,7 +176,7 @@ export function SaisieRapide({ famille, niveauDefaut, ajouter, fermer }: Props) 
                   onChange={(e) => maj(l.cle, { niveau: Math.max(1, Math.min(200, Number(e.target.value) || 1)) })}
                   onKeyDown={(e) => clavier(e, l.cle)}
                 />
-              </td>
+              </td>}
               <td className="pr-2 align-top">
                 <select className={champ} value={l.etat} onChange={(e) => maj(l.cle, { etat: e.target.value as Etat })} onKeyDown={(e) => clavier(e, l.cle)}>
                   {Object.entries(ETATS).map(([k, v]) => (
