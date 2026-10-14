@@ -21,7 +21,7 @@ export function App() {
   const props = { famille, s, setS: majS };
 
   return (
-    <div className="mx-auto flex max-w-[1500px] flex-col gap-4 p-6">
+    <div className="mx-auto flex max-w-[2200px] flex-col gap-4 p-6">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-2xl font-bold">
           Lignée <span className="text-sm font-normal text-text-muted">— pilotage d'élevage Dofus 3.7</span>

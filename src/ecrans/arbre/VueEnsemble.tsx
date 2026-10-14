@@ -1,8 +1,8 @@
-import { useMemo, useRef, useState, type PointerEvent, type WheelEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type PointerEvent, type WheelEvent } from "react";
 import { couleur, couleurs } from "../../moteur/donnees";
 import { CASE, dispositionArbre, lignee } from "../../moteur/genealogie";
 import type { Famille } from "../../moteur/types";
-import { teinte, type Statut } from "./commun";
+import { anneau, COULEURS, teinte, type Statut } from "./commun";
 
 interface Props {
   famille: Famille;
@@ -28,7 +28,21 @@ const branche = (a: { x: number; y: number }, b: { x: number; y: number }) => {
  * Au survol, la lignée s'allume jusqu'à la profondeur choisie. Molette = zoom, glisser = déplacer.
  */
 export function VueEnsemble({ famille, statut, profondeur, survol, setSurvol, choisir }: Props) {
-  const d = useMemo(() => dispositionArbre(famille), [famille]);
+  // Forme adaptée à l'écran : on essaie plusieurs largeurs de bouquets et on garde la disposition
+  // dont les proportions sont les plus proches de celles de la zone d'affichage.
+  const cadre = useRef<HTMLDivElement>(null);
+  const [ratio, setRatio] = useState(1.4);
+  useEffect(() => {
+    const el = cadre.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([e]) => e.contentRect.height > 0 && setRatio(Math.round((e.contentRect.width / e.contentRect.height) * 10) / 10));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const d = useMemo(() => {
+    const ecart = (x: ReturnType<typeof dispositionArbre>) => Math.abs(Math.log((x.largeur + 2 * MARGE) / (x.hauteur + 2 * MARGE) / ratio));
+    return [2, 3, 4, 5, 6].map((c) => dispositionArbre(famille, c)).reduce((a, b) => (ecart(b) < ecart(a) ? b : a));
+  }, [famille, ratio]);
   const [vue, setVue] = useState({ k: 1, x: 0, y: 0 });
   const glisse = useRef<{ x: number; y: number; bouge: boolean } | null>(null);
   const svg = useRef<SVGSVGElement>(null);
@@ -50,6 +64,11 @@ export function VueEnsemble({ famille, statut, profondeur, survol, setSurvol, ch
   );
 
   const mise = useMemo(() => (survol ? { ...lignee(famille, survol, profondeur), centre: survol } : null), [famille, survol, profondeur]);
+  // Zoom au survol : +25 % pour la couleur survolée, puis de moins en moins avec la distance de parenté.
+  const grossissement = (id: string) => {
+    const d = mise?.distance.get(id);
+    return d === undefined ? 1 : [1.25, 1.15, 1.08][d] ?? 1.04;
+  };
   const dansLignee = (id: string) => !mise || id === mise.centre || mise.ancetres.has(id) || mise.descendants.has(id);
   const active = (de: string, vers: string) =>
     !!mise && ((mise.ancetres.has(de) && (mise.ancetres.has(vers) || vers === mise.centre)) || ((de === mise.centre || mise.descendants.has(de)) && mise.descendants.has(vers)));
@@ -78,7 +97,7 @@ export function VueEnsemble({ famille, statut, profondeur, survol, setSurvol, ch
 
   const statutSurvol = survol ? couleur(famille, survol) : null;
   return (
-    <div className="relative h-full w-full">
+    <div ref={cadre} className="relative h-full w-full">
       <svg
         ref={svg}
         viewBox={`${-MARGE} ${-MARGE} ${d.largeur + 2 * MARGE} ${d.hauteur + 2 * MARGE}`}
@@ -104,7 +123,7 @@ export function VueEnsemble({ famille, statut, profondeur, survol, setSurvol, ch
           {d.niveaux.map(({ generation, y }) => (
             <g key={generation}>
               <line x1={-MARGE} x2={d.largeur + MARGE} y1={y} y2={y} stroke="rgba(255,255,255,0.035)" />
-              <text x={-MARGE + 6} y={y + 4} className="fill-text-muted text-[13px] font-semibold">
+              <text x={-MARGE + 6} y={y + 4} className="fill-text-muted text-[22px] font-semibold">
                 G{generation}
               </text>
             </g>
@@ -136,9 +155,13 @@ export function VueEnsemble({ famille, statut, profondeur, survol, setSurvol, ch
                   strokeDasharray={b.principale ? undefined : "6 4"}
                 />
               ))}
-          {couleurs(famille).map((c) => {
+          {/* Les couleurs mises en lumière sont dessinées en dernier pour passer au premier plan. */}
+          {[...couleurs(famille)]
+            .sort((a, b) => Number(!!mise && dansLignee(a.id)) - Number(!!mise && dansLignee(b.id)) || Number(a.id === survol) - Number(b.id === survol))
+            .map((c) => {
             const p = d.positions.get(c.id)!;
             const st = statut(c.id);
+            const aObtenir = !st.obtenue && st.males + st.femelles === 0;
             return (
               <g
                 key={c.id}
@@ -149,8 +172,53 @@ export function VueEnsemble({ famille, statut, profondeur, survol, setSurvol, ch
                 onPointerLeave={() => setSurvol(null)}
                 onClick={() => !glisse.current?.bouge && choisir(c.id)}
               >
-                <circle r={R} fill="#161b24" stroke={c.id === survol ? "#d4a017" : teinte(st)} strokeWidth={c.id === survol ? 3.5 : 2.5} />
-                {c.image && <image href={c.image} x={-R + 2} y={-R + 2} width={2 * R - 4} height={2 * R - 4} clipPath="url(#medaillon)" />}
+                <g style={{ transform: `scale(${grossissement(c.id)})`, transition: "transform 160ms ease-out" }}>
+                {anneau(st) && <circle r={R + 5} fill="none" stroke={anneau(st)!} strokeWidth={3} opacity={0.9} />}
+                <circle
+                  r={R}
+                  fill="#161b24"
+                  stroke={c.id === survol ? "#d4a017" : teinte(st)}
+                  strokeWidth={c.id === survol ? 3.5 : 2.5}
+                  strokeDasharray={st.obtenue || c.id === survol ? undefined : "5 4"}
+                />
+                {c.image && (
+                  <image
+                    href={c.image}
+                    x={-R + 2}
+                    y={-R + 2}
+                    width={2 * R - 4}
+                    height={2 * R - 4}
+                    clipPath="url(#medaillon)"
+                    style={aObtenir ? { filter: "grayscale(1)", opacity: 0.55 } : undefined}
+                  />
+                )}
+                {(st.plan === "pret" || st.plan === "preparer") && (
+                  <text x={R - 2} y={-R + 8} textAnchor="middle" fontSize={20} fill={COULEURS.prochaine} stroke="#0b0d12" strokeWidth={3} paintOrder="stroke" className="pointer-events-none">
+                    {st.plan === "pret" ? "★" : "☆"}
+                  </text>
+                )}
+                {(
+                  [
+                    [st.males, COULEURS.males, -R + 4],
+                    [st.femelles, COULEURS.femelles, R - 4],
+                  ] as const
+                ).map(([n, fond, x]) =>
+                  n > 0 ? (
+                    <g key={x} transform={`translate(${x} ${R - 4})`} className="pointer-events-none">
+                      <circle r={9} fill={fond} stroke="#0b0d12" strokeWidth={2} />
+                      <text y={4} textAnchor="middle" fontSize={11} fontWeight={700} fill="#fff">
+                        {n}
+                      </text>
+                    </g>
+                  ) : null,
+                )}
+                {/* Nom affiché sous les couleurs de la lignée mise en lumière */}
+                {mise && dansLignee(c.id) && (
+                  <text y={R + 14} textAnchor="middle" fontSize={12} fill="#e2e8f0" stroke="#0b0d12" strokeWidth={3} paintOrder="stroke" className="pointer-events-none">
+                    {c.nom}
+                  </text>
+                )}
+                </g>
               </g>
             );
           })}
