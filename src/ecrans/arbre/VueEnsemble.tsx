@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type PointerEvent, type WheelEven
 import { couleur, couleurs } from "../../moteur/donnees";
 import { CASE, dispositionArbre, lignee } from "../../moteur/genealogie";
 import type { Famille } from "../../moteur/types";
-import { anneau, COULEURS, teinte, type Statut } from "./commun";
+import { aFaireMaintenant, anneau, COULEURS, teinte, type Statut } from "./commun";
 
 interface Props {
   famille: Famille;
@@ -173,7 +173,7 @@ export function VueEnsemble({ famille, statut, profondeur, survol, setSurvol, ch
                 onClick={() => !glisse.current?.bouge && choisir(c.id)}
               >
                 <g style={{ transform: `scale(${grossissement(c.id)})`, transition: "transform 160ms ease-out" }}>
-                {anneau(st) && <circle r={R + 5} fill="none" stroke={anneau(st)!} strokeWidth={3} opacity={0.9} />}
+                {anneau(st) && <circle r={R + 5} fill="none" stroke={anneau(st)!} strokeWidth={2.5} strokeDasharray="5 3" />}
                 <circle
                   r={R}
                   fill="#161b24"
@@ -192,10 +192,14 @@ export function VueEnsemble({ famille, statut, profondeur, survol, setSurvol, ch
                     style={aObtenir ? { filter: "grayscale(1)", opacity: 0.55 } : undefined}
                   />
                 )}
-                {(st.plan === "pret" || st.plan === "preparer") && (
-                  <text x={R - 2} y={-R + 8} textAnchor="middle" fontSize={20} fill={COULEURS.prochaine} stroke="#0b0d12" strokeWidth={3} paintOrder="stroke" className="pointer-events-none">
-                    {st.plan === "pret" ? "★" : "☆"}
-                  </text>
+                {st.obtenue && c.generation > 1 && <circle cx={-R + 5} cy={-R + 5} r={6} fill={COULEURS.obtenue} stroke="#0b0d12" strokeWidth={2} className="pointer-events-none" />}
+                {aFaireMaintenant(st) && st.rang && (
+                  <g transform={`translate(${R - 3} ${-R + 3})`} className="pointer-events-none">
+                    <circle r={11} fill={st.plan === "pret" ? COULEURS.prochaine : "#161b24"} stroke={COULEURS.prochaine} strokeWidth={2.5} />
+                    <text y={4} textAnchor="middle" fontSize={12} fontWeight={800} fill={st.plan === "pret" ? "#0b0d12" : COULEURS.prochaine}>
+                      {st.rang}
+                    </text>
+                  </g>
                 )}
                 {(
                   [

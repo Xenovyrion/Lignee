@@ -40,6 +40,23 @@ describe("conseils d'actions", () => {
     const c = conseiller(planifier("dragodinde", [m("amande", "F")], []), {});
     expect(c.captures.some((x) => x.couleur === "doree" && x.sexe === "M")).toBe(true);
   });
+  it("priorité : terminer un succès de génération d'abord", () => {
+    // Toutes les G2-G4 obtenues sauf Amande et Indigo ; Pourpre (G5) débloque bien plus d'étapes.
+    const obtenues = jusquA(4).filter((c) => c !== "amande_indigo");
+    const etable = [m("amande", "M"), m("indigo", "F"), m("amande_rousse", "M"), m("ebene_indigo", "F")];
+    const c = conseiller(planifier("dragodinde", etable, obtenues), {});
+    expect(c.ordre[0].e.couleur).toBe("amande_indigo");
+    expect(c.ordre[0].termineSucces).toBe(true);
+    expect(c.ordre[0].rang).toBe(1);
+    expect(c.ordre.find((a) => a.e.couleur === "pourpre")!.rang).toBeGreaterThan(1);
+    expect(new Set(c.ordre.map((a) => a.e.couleur)).size).toBe(c.ordre.length);
+  });
+  it("priorité : à égalité de succès, ce qui est prêt passe avant ce qui est à préparer", () => {
+    const obtenues = [...jusquA(4).filter((c) => c !== "amande_indigo"), "pourpre"];
+    const etable = [m("amande", "M"), m("indigo", "F"), m("doree_rousse", "M", { etat: "fertile" }), m("ebene_indigo", "F")];
+    const c = conseiller(planifier("dragodinde", etable, obtenues), {});
+    expect(c.ordre.map((a) => a.e.couleur).slice(0, 2)).toEqual(["amande_indigo", "orchidee"]);
+  });
   it("signale un blocage de sexe", () => {
     const c = conseiller(planifier("dragodinde", [m("amande_rousse", "F"), m("ebene_indigo", "F")], jusquA(4)), {});
     expect(c.blocages.some((b) => b.e.couleur === "pourpre")).toBe(true);

@@ -2,7 +2,7 @@ import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { couleur } from "../../moteur/donnees";
 import { arbreAncetres, arbreDescendants, type Noeud } from "../../moteur/genealogie";
 import type { Famille } from "../../moteur/types";
-import { anneau, COULEURS, ImageMonture, teinte, type Statut } from "./commun";
+import { aFaireMaintenant, anneau, Etoile, ImageMonture, PointObtenue, teinte, type Statut } from "./commun";
 
 export type Sens = "ancetres" | "descendants";
 
@@ -67,18 +67,22 @@ export function ArbreCentre({ famille, racine, sens, zoom, profondeur, choix, se
         onPointerLeave={() => setSurvol(null)}
         onClick={() => !estRacine && recentrer(n.couleur)}
         title={estRacine ? undefined : "Centrer l'arbre sur cette couleur"}
-        style={{ borderColor: teinte(st), borderStyle: st.obtenue ? "solid" : "dashed", boxShadow: anneau(st) ? `0 0 0 3px ${anneau(st)}` : undefined }}
+        style={{ borderColor: teinte(st), borderStyle: st.obtenue ? "solid" : "dashed", outline: anneau(st) ? `2px dashed ${anneau(st)}` : undefined, outlineOffset: 3 }}
         className={`relative flex flex-col items-center rounded-xl border-2 bg-bg-card px-2 pb-1.5 pt-1 text-center transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/40 ${
           estRacine ? "w-40 ring-2 ring-accent/60" : "w-32 cursor-pointer"
         } ${n.dejaVu ? "opacity-60" : ""}`}
       >
         <span className="absolute left-1.5 top-1 text-[10px] text-text-muted">G{c.generation}</span>
-{(st.plan === "pret" || st.plan === "preparer") && (
-          <span className="absolute right-1.5 top-0 text-base" style={{ color: COULEURS.prochaine }} title={st.plan === "pret" ? "Prochaine naissance : parents prêts" : "Prochaine naissance : parents à préparer"}>
-            {st.plan === "pret" ? "★" : "☆"}
+{aFaireMaintenant(st) && st.rang && (
+          <span className="absolute -right-2 -top-2" title={`À faire maintenant, n°${st.rang}${st.plan === "preparer" ? " (parents à préparer)" : ""}`}>
+            <Etoile rang={st.rang} pret={st.plan === "pret"} />
           </span>
         )}
-        {st.obtenue && c.generation > 1 && !st.plan && <span className="absolute right-1.5 top-0.5 text-xs text-status-ok">✓</span>}
+        {st.obtenue && c.generation > 1 && (
+          <span className="absolute right-2 top-1.5" title="Déjà obtenue">
+            <PointObtenue />
+          </span>
+        )}
         <ImageMonture famille={famille} id={c.id} taille={estRacine ? 80 : 56} className={aObtenir ? "opacity-60 grayscale" : ""} />
         <div className="text-xs font-medium leading-tight">{c.nom}</div>
         {st.males + st.femelles > 0 && (

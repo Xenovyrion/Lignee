@@ -19,6 +19,10 @@ export interface ActionAccouplement {
   mere: Monture;
   /** Nombre d'étapes suivantes du plan qui dépendent de ce bébé. */
   debloque: number;
+  /** Dernière couleur manquante de sa génération : cette naissance termine un succès. */
+  termineSucces: boolean;
+  /** Rang conseillé parmi toutes les naissances faisables (1 = la plus utile). */
+  rang: number;
   makina: ConseilMakina;
   /** Montures dont les jauges sont à remplir avant l'accouplement. */
   aPreparer: Monture[];
@@ -41,6 +45,8 @@ export interface Blocage {
 
 export interface Conseils {
   prets: ActionAccouplement[];
+  /** Toutes les naissances faisables (prêtes ou à préparer), une par couleur, dans l'ordre conseillé. */
+  ordre: ActionAccouplement[];
   aPreparer: ActionAccouplement[];
   captures: ActionCapture[];
   /** Étapes qui attendent d'abord un clonage de deux stériles existants. */
@@ -84,6 +90,10 @@ export function conseiller(plan: Plan, options: Bonus & { takeza?: boolean }): C
     return (debloque[i] = vus.size);
   };
 
+  // Couleurs encore à obtenir par génération : chacune est une étape « succès » du plan.
+  const manquantesParGeneration = new Map<number, number>();
+  for (const e of plan.etapes) if (e.pour === "succes") manquantesParGeneration.set(e.generation, (manquantesParGeneration.get(e.generation) ?? 0) + 1);
+
   const estFrontiere = (p: Source) =>
     p.type === "monture" || p.type === "capture" || (p.type === "clone" && p.steriles.every((s) => "monture" in s));
 
@@ -113,6 +123,8 @@ export function conseiller(plan: Plan, options: Bonus & { takeza?: boolean }): C
         pere,
         mere,
         debloque: compter(i),
+        termineSucces: e.pour === "succes" && manquantesParGeneration.get(e.generation) === 1,
+        rang: 0,
         makina: conseillerMakina(pere.niveau, mere.niveau, e.sexeVoulu, takeza),
         aPreparer: [pere, mere].filter((m) => m.etat !== "feconde"),
         niveauConseille: seuil !== null && pere.niveau + mere.niveau < seuil ? seuil : null,
@@ -139,10 +151,19 @@ export function conseiller(plan: Plan, options: Bonus & { takeza?: boolean }): C
   });
 
   // Priorité : ce que l'accouplement fait avancer (son propre succès + les étapes qu'il débloque).
-  const valeur = (x: ActionAccouplement) => x.debloque + (x.e.pour === "succes" ? 1 : 0);
-  const priorite = (x: ActionAccouplement, y: ActionAccouplement) => valeur(y) - valeur(x) || y.e.generation - x.e.generation;
+  // Ordre conseillé : terminer un succès de génération, puis obtenir une nouvelle couleur, puis
+  // ce qui est prêt avant ce qui est à préparer, puis ce qui débloque le plus d'étapes.
+  const priorite = (x: ActionAccouplement, y: ActionAccouplement) =>
+    Number(y.termineSucces) - Number(x.termineSucces) ||
+    Number(y.e.pour === "succes") - Number(x.e.pour === "succes") ||
+    Number(!y.aPreparer.length) - Number(!x.aPreparer.length) ||
+    y.debloque - x.debloque ||
+    y.e.generation - x.e.generation;
+  const vues = new Set<string>();
+  const ordre = [...prets, ...aPreparer].sort(priorite).filter((a) => !vues.has(a.e.couleur) && vues.add(a.e.couleur));
+  ordre.forEach((a, i) => (a.rang = i + 1));
   prets.sort(priorite);
-  aPreparer.sort((x, y) => x.aPreparer.length - y.aPreparer.length || priorite(x, y));
+  aPreparer.sort(priorite);
 
-  return { prets, aPreparer, captures: [...captures.values()].sort((x, y) => y.nombre - x.nombre), clonagesUtiles, blocages };
+  return { prets, ordre, aPreparer, captures: [...captures.values()].sort((x, y) => y.nombre - x.nombre), clonagesUtiles, blocages };
 }

@@ -5,7 +5,7 @@ import { enfantsDe, lignee } from "../../moteur/genealogie";
 import { planifier } from "../../moteur/planificateur";
 import type { Famille, Sauvegarde } from "../../moteur/types";
 import { ArbreCentre, type Sens } from "./ArbreCentre";
-import { COULEURS, fabriquerStatut, ImageMonture, LegendeArbre, type RolePlan, type Statut } from "./commun";
+import { Etoile, fabriquerStatut, ImageMonture, LegendeArbre, type RolePlan, type Statut } from "./commun";
 import { VueEnsemble } from "./VueEnsemble";
 
 interface Props {
@@ -31,12 +31,12 @@ export function Arbre({ famille, s }: Props) {
     const c = conseiller(plan, { takeza: s.options.takeza });
     const roles = new Map<string, RolePlan>();
     for (const e of plan.etapes) if (e.pour === "intermediaire") roles.set(e.couleur, "produire");
-    for (const a of c.aPreparer) roles.set(a.e.couleur, "preparer");
-    for (const a of c.prets) roles.set(a.e.couleur, "pret");
-    // Une ligne par couleur, les prêtes d'abord.
-    const vues = new Set<string>();
-    const prochaines = [...c.prets, ...c.aPreparer].filter((a) => !vues.has(a.e.couleur) && vues.add(a.e.couleur));
-    return { statut: fabriquerStatut(famille, s.montures, s.obtenues[famille], roles), prochaines };
+    const rangs = new Map<string, number>();
+    for (const a of c.ordre) {
+      roles.set(a.e.couleur, a.aPreparer.length ? "preparer" : "pret");
+      rangs.set(a.e.couleur, a.rang);
+    }
+    return { statut: fabriquerStatut(famille, s.montures, s.obtenues[famille], roles, rangs), prochaines: c.ordre };
   }, [famille, s.montures, s.obtenues, s.options.takeza]);
 
   const centrer = (id: string) => {
@@ -205,7 +205,8 @@ function Detail({ famille, id, statut, centrer }: { famille: Famille; id: string
 function Prochaines({ famille, liste, centrer }: { famille: Famille; liste: ActionAccouplement[]; centrer: (id: string) => void }) {
   return (
     <div>
-      <div className="mb-1.5 text-[11px] font-semibold uppercase text-text-muted">Prochaines naissances ({liste.length})</div>
+      <div className="text-[11px] font-semibold uppercase text-text-muted">À faire maintenant ({liste.length})</div>
+      <p className="mb-2 text-[11px] text-text-muted">Naissances possibles avec ton étable, dans l'ordre conseillé.</p>
       {liste.length === 0 ? (
         <p className="text-xs text-text-muted">Aucune pour l'instant : voir les captures dans « Prochaines actions ».</p>
       ) : (
@@ -217,10 +218,17 @@ function Prochaines({ famille, liste, centrer }: { famille: Famille; liste: Acti
               className="flex items-center gap-2 rounded-md px-1.5 py-1 text-left text-sm hover:bg-bg-hover"
               title="Ouvrir son arbre"
             >
-              <span style={{ color: COULEURS.prochaine }}>{a.aPreparer.length ? "☆" : "★"}</span>
-              <ImageMonture famille={famille} id={a.e.couleur} taille={24} />
-              <span className="flex-1 truncate">{nomCouleur(famille, a.e.couleur)}</span>
-              <span className="text-[11px] text-text-muted">G{a.e.generation}</span>
+              <Etoile rang={a.rang} pret={!a.aPreparer.length} />
+              <ImageMonture famille={famille} id={a.e.couleur} taille={28} />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate">
+                  {nomCouleur(famille, a.e.couleur)} <span className="text-[11px] text-text-muted">G{a.e.generation}</span>
+                </span>
+                <span className={`block text-[11px] ${a.termineSucces ? "text-status-ok" : a.e.pour === "succes" ? "text-accent" : "text-text-muted"}`}>
+                  {a.termineSucces ? `termine le succès G${a.e.generation}` : a.e.pour === "succes" ? "nouvelle couleur" : "pour la suite"}
+                  {a.aPreparer.length ? " · parents à préparer" : ""}
+                </span>
+              </span>
             </button>
           ))}
         </div>
