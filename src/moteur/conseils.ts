@@ -41,6 +41,38 @@ export interface Blocage {
   etape: number;
   e: Etape;
   message: string;
+  /** Nombre d'étapes du plan touchées par ce même blocage. */
+  nombre: number;
+}
+
+export interface Objectif {
+  /** Génération du prochain succès à compléter. */
+  generation: number;
+  /** Couleurs de cette génération encore à obtenir. */
+  manquantes: string[];
+  /** Première couleur visée et étapes du plan qui y mènent, dans l'ordre (la dernière est la cible). */
+  cible: string;
+  chemin: number[];
+}
+
+/**
+ * Prochain objectif : le succès de plus basse génération encore incomplet, et le chemin (les étapes
+ * du plan dont dépend sa première couleur manquante) pour y arriver.
+ */
+export function prochainObjectif(plan: Plan): Objectif | null {
+  const succes = plan.etapes.map((e, i) => ({ e, i })).filter(({ e }) => e.pour === "succes");
+  if (!succes.length) return null;
+  const generation = Math.min(...succes.map(({ e }) => e.generation));
+  const dansGen = succes.filter(({ e }) => e.generation === generation);
+  const { e: cible, i: indice } = dansGen[0];
+  const chemin = new Set<number>();
+  const remonter = (i: number) => {
+    if (chemin.has(i)) return;
+    chemin.add(i);
+    for (const p of plan.etapes[i].parents) if (p.type === "naissance") remonter(p.etape);
+  };
+  remonter(indice);
+  return { generation, manquantes: dansGen.map(({ e }) => e.couleur), cible: cible.couleur, chemin: [...chemin].sort((a, b) => a - b) };
 }
 
 export interface Conseils {
@@ -112,6 +144,7 @@ export function conseiller(plan: Plan, options: Bonus & { takeza?: boolean }): C
         blocages.push({
           etape: i,
           e,
+          nombre: 1,
           message: `Deux parents ${a.monture.sexe === "M" ? "mâles" : "femelles"} disponibles : il faut ${a.monture.sexe === "M" ? "une femelle" : "un mâle"} de l'une des deux couleurs.`,
         });
         return;
@@ -165,5 +198,13 @@ export function conseiller(plan: Plan, options: Bonus & { takeza?: boolean }): C
   prets.sort(priorite);
   aPreparer.sort(priorite);
 
-  return { prets, ordre, aPreparer, captures: [...captures.values()].sort((x, y) => y.nombre - x.nombre), clonagesUtiles, blocages };
+  // Un même blocage (même couleur, même cause) n'est affiché qu'une fois.
+  const blocagesUniques = new Map<string, Blocage>();
+  for (const b of blocages) {
+    const k = `${b.e.couleur}|${b.message}`;
+    const deja = blocagesUniques.get(k);
+    if (deja) deja.nombre++;
+    else blocagesUniques.set(k, b);
+  }
+  return { prets, ordre, aPreparer, captures: [...captures.values()].sort((x, y) => y.nombre - x.nombre), clonagesUtiles, blocages: [...blocagesUniques.values()] };
 }
