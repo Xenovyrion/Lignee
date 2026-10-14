@@ -212,7 +212,7 @@ export function TableauDeBord({ famille, s, setS }: Props) {
           <Cadre
             id="enclos"
             titre={`Mettre en enclos (${enEnclos.length})`}
-            sous={enEnclos.length ? `Remplir Endurance, Maturité et Amour · ≈ ${Math.ceil(enEnclos.length / 10)} enclos de 10` : undefined}
+            sous={enEnclos.length ? `Remplir Endurance, Maturité et Amour · ≈ ${Math.ceil(enEnclos.length / 10)} enclos de 10 · à gérer dans Étable → Enclos` : undefined}
           >
             {enEnclos.length ? (
               <ul className="flex flex-col gap-1 text-sm">
@@ -222,6 +222,7 @@ export function TableauDeBord({ famille, s, setS }: Props) {
                     <span className="flex-1">{nomCouleur(famille, m.couleur)}</span>
                     <span className={m.sexe === "M" ? "text-sky-400" : "text-pink-400"}>{sexeSymbole(m.sexe)}</span>
                     <span className="w-14 text-right text-xs text-text-muted">niv. {m.niveau}</span>
+                    <span className="w-16 text-right text-xs">{m.enclos ? <span className="text-status-ok">enclos {m.enclos}</span> : <span className="text-text-muted">à placer</span>}</span>
                   </li>
                 ))}
               </ul>

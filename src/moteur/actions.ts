@@ -7,7 +7,7 @@ export const nouvelId = () => Math.random().toString(36).slice(2, 10);
 const maintenant = () => new Date().toISOString();
 
 export function sauvegardeVide(): Sauvegarde {
-  return { version: 1, montures: [], journal: [], obtenues: { dragodinde: [], muldo: [], volkorne: [] }, options: { takeza: false, niveauParDefaut: 100, afficherNom: false, langue: "fr", naissancesAnterieures: 0 } };
+  return { version: 1, montures: [], journal: [], obtenues: { dragodinde: [], muldo: [], volkorne: [] }, options: { takeza: false, niveauParDefaut: 100, afficherNom: false, langue: "fr", naissancesAnterieures: 0, niveauEleveur: 1 } };
 }
 
 function ajouterObtenue(s: Sauvegarde, f: Famille, c: string): Sauvegarde["obtenues"] {
@@ -48,7 +48,7 @@ export function enregistrerNaissance(s: Sauvegarde, pereId: string, mereId: stri
   for (const b of nes) obtenues = ajouterObtenue({ ...s, obtenues }, f, b.couleur);
   return {
     ...s,
-    montures: [...s.montures.map((m) => (m.id === pereId || m.id === mereId ? { ...m, etat: "sterile" as const } : m)), ...nes],
+    montures: [...s.montures.map((m) => (m.id === pereId || m.id === mereId ? { ...m, etat: "sterile" as const, enclos: undefined } : m)), ...nes],
     obtenues,
     journal: [...s.journal, { id: nouvelId(), date: maintenant(), famille: f, pereId, mereId, makina, bebeIds: nes.map((b) => b.id) }],
   };

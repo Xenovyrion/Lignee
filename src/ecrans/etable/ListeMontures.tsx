@@ -1,6 +1,7 @@
 import { couleur, nomCouleur } from "../../moteur/donnees";
 import type { Etat, Famille, Monture } from "../../moteur/types";
 import { BadgeSexe, champ, ETATS } from "../../ui";
+import { ImageMonture } from "../arbre/commun";
 import type { CleTri, Tri } from "./filtres";
 
 interface Props {
@@ -61,7 +62,11 @@ export function ListeMontures({ famille, montures, reservees, afficherNom, tri, 
             </td>
             <td className="text-text-muted">{couleur(famille, m.couleur).generation}</td>
             <td className="font-medium">
-              {nomCouleur(famille, m.couleur)}
+              <span className="inline-flex items-center gap-2 py-0.5">
+                <ImageMonture famille={famille} id={m.couleur} taille={28} />
+                {nomCouleur(famille, m.couleur)}
+              </span>
+              {m.enclos && <span className="ml-2 rounded bg-bg-hover px-1.5 text-xs text-text-secondary">enclos {m.enclos}</span>}
               {reservees.has(m.id) && (
                 <span className="ml-2 text-xs text-accent" title="Utilisée par le plan d'élevage">
                   ● plan
