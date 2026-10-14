@@ -5,6 +5,7 @@ import { couleur, nomCouleur } from "../../moteur/donnees";
 import { cible, probaCible } from "../../moteur/regles";
 import type { Famille, Makina, Monture, Sauvegarde, Sexe } from "../../moteur/types";
 import { Bouton, ChoixCouleur, champ, libelleMonture, pourcent } from "../../ui";
+import { Etoile } from "../arbre/commun";
 
 type SetS = (f: (s: Sauvegarde) => Sauvegarde) => void;
 
@@ -20,11 +21,14 @@ export function CarteAccouplement({ famille, a, setS }: { famille: Famille; a: A
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
+            {a.rang > 0 && <Etoile rang={a.rang} pret={pret} />}
             <span className="font-semibold">
               G{e.generation} {nomCouleur(famille, e.couleur)}
             </span>
-            {e.pour === "succes" ? (
-              <span className="rounded bg-accent-dim px-1.5 text-xs text-accent">succès</span>
+            {a.termineSucces ? (
+              <span className="rounded bg-status-ok/15 px-1.5 text-xs text-status-ok">termine le succès G{e.generation}</span>
+            ) : e.pour === "succes" ? (
+              <span className="rounded bg-accent-dim px-1.5 text-xs text-accent">nouvelle couleur</span>
             ) : (
               <span className="rounded bg-bg-hover px-1.5 text-xs text-text-muted">pour la suite</span>
             )}
