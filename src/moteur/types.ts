@@ -27,6 +27,8 @@ export interface Monture {
   /** Couleurs du père et de la mère (absent pour une monture capturée). */
   parents?: [string, string];
   nom?: string;
+  /** Enclos où la monture est placée (1 à 6), pour remplir ses jauges. */
+  enclos?: number;
   origine: "capture" | "naissance" | "saisie" | "clonage";
   creeLe: string;
 }
@@ -59,4 +61,6 @@ export interface Options {
   langue: "fr";
   /** Naissances faites avant d'utiliser l'outil (succès des 1 000 naissances). */
   naissancesAnterieures: number;
+  /** Niveau du métier Éleveur (détermine le nombre d'enclos : niveaux 1, 40, 80, 120, 160, 200). */
+  niveauEleveur: number;
 }

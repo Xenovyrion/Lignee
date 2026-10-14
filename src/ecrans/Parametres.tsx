@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { nombreEnclos, prochainPalierEnclos } from "../moteur/etable";
 import type { Options, Sauvegarde } from "../moteur/types";
 import { Carte, champ } from "../ui";
 
@@ -27,6 +28,21 @@ export function Parametres({ s, setS }: Props) {
           <select className={champ} value={o.langue} onChange={(e) => maj({ langue: e.target.value as Options["langue"] })}>
             <option value="fr">Français</option>
           </select>
+        </Ligne>
+      </Carte>
+      <Carte titre="Métier">
+        <Ligne
+          titre="Niveau du métier Éleveur"
+          aide={`Détermine le nombre d'enclos : ${nombreEnclos(o.niveauEleveur)} actuellement${prochainPalierEnclos(o.niveauEleveur) ? `, un de plus au niveau ${prochainPalierEnclos(o.niveauEleveur)}` : " (maximum)"}.`}
+        >
+          <input
+            type="number"
+            min={1}
+            max={200}
+            className={`${champ} w-24`}
+            value={o.niveauEleveur}
+            onChange={(e) => maj({ niveauEleveur: Math.max(1, Math.min(200, Number(e.target.value) || 1)) })}
+          />
         </Ligne>
       </Carte>
       <Carte titre="Étable">
