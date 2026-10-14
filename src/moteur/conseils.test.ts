@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { conseiller, conseillerMakina } from "./conseils";
+import { conseiller, conseillerMakina, prochainObjectif } from "./conseils";
 import { couleurs } from "./donnees";
 import { planifier } from "./planificateur";
 import type { Monture, Sexe } from "./types";
@@ -56,6 +56,25 @@ describe("conseils d'actions", () => {
     const etable = [m("amande", "M"), m("indigo", "F"), m("doree_rousse", "M", { etat: "fertile" }), m("ebene_indigo", "F")];
     const c = conseiller(planifier("dragodinde", etable, obtenues), {});
     expect(c.ordre.map((a) => a.e.couleur).slice(0, 2)).toEqual(["amande_indigo", "orchidee"]);
+  });
+  it("prochain objectif : succès de plus basse génération et chemin pour y arriver", () => {
+    // G2 à G5 obtenues mais plus de Pourpre en stock : la G6 exige de refaire Ébène-Indigo puis Pourpre.
+    const obtenues = jusquA(5);
+    const etable = [m("indigo", "M"), m("ebene", "F"), m("amande_rousse", "M"), m("doree", "F")];
+    const plan = planifier("dragodinde", etable, obtenues);
+    const o = prochainObjectif(plan)!;
+    expect(o.generation).toBe(6);
+    expect(o.manquantes).toHaveLength(11);
+    const couleursChemin = o.chemin.map((i) => plan.etapes[i].couleur);
+    expect(couleursChemin[couleursChemin.length - 1]).toBe(o.cible);
+    expect(new Set(couleursChemin).has("ebene_indigo") || new Set(couleursChemin).has("orchidee")).toBe(true);
+    expect(prochainObjectif(planifier("dragodinde", [], couleurs("dragodinde").map((c) => c.id)))).toBeNull();
+  });
+  it("blocages : un seul par couleur et par cause, avec le nombre d'étapes touchées", () => {
+    const etable = [m("amande_rousse", "F"), m("ebene_indigo", "F")];
+    const c = conseiller(planifier("dragodinde", etable, jusquA(4)), {});
+    const cles = c.blocages.map((b) => b.e.couleur + b.message);
+    expect(new Set(cles).size).toBe(cles.length);
   });
   it("signale un blocage de sexe", () => {
     const c = conseiller(planifier("dragodinde", [m("amande_rousse", "F"), m("ebene_indigo", "F")], jusquA(4)), {});

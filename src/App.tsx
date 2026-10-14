@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Actions } from "./ecrans/actions/Actions";
+import { TableauDeBord } from "./ecrans/tableau/TableauDeBord";
 import { Arbre } from "./ecrans/arbre/Arbre";
 import { Etable } from "./ecrans/etable/Etable";
 import { Parametres } from "./ecrans/Parametres";
@@ -50,7 +50,7 @@ export function App() {
         ))}
       </nav>
       {erreur && <div className="rounded-md bg-status-err/15 p-2 text-sm text-status-err">Sauvegarde impossible : {erreur}</div>}
-      {onglet === "actions" && <Actions {...props} />}
+      {onglet === "actions" && <TableauDeBord {...props} />}
       {onglet === "etable" && <Etable key={famille} {...props} />}
       {onglet === "arbre" && <Arbre key={famille} famille={famille} s={s} />}
       {onglet === "succes" && <Succes {...props} setFamille={setFamille} />}
