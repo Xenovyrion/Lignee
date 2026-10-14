@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { couleurs } from "./donnees";
-import { besoinsParCouleur, nombreEnclos, prochainPalierEnclos } from "./etable";
+import { besoinsParCouleur, nombreEnclos, prochainPalierEnclos, ressourcesExtraction, roleDansLePlan } from "./etable";
 import { planifier } from "./planificateur";
 import type { Monture, Sexe } from "./types";
 
@@ -22,6 +22,17 @@ describe("étable", () => {
     expect(b.get("pourpre")!.steriles).toBe(1);
     expect(b.get("pourpre")!.aProduire).toBeGreaterThan(0);
     expect(Object.keys(plan.captures).every((c) => b.get(c)!.aCapturer > 0)).toBe(true);
+  });
+  it("rôle d'une monture dans le plan et extraction", () => {
+    const obtenues = couleurs("dragodinde").filter((c) => c.generation <= 4).map((c) => c.id);
+    const pere = m("amande_rousse", "M");
+    const mere = m("ebene_indigo", "F");
+    const libre = m("ebene_indigo", "F", { niveau: 1 });
+    const plan = planifier("dragodinde", [pere, mere], obtenues);
+    expect(roleDansLePlan(plan, pere.id)[0].e.couleur).toBe("pourpre");
+    expect(roleDansLePlan(plan, libre.id)).toEqual([]);
+    expect(ressourcesExtraction(m("amande", "F"))).toBe(0);
+    expect(ressourcesExtraction(mere)).toBe(4);
   });
   it("nombre d'enclos selon le niveau du métier Éleveur", () => {
     expect([1, 39, 40, 119, 120, 199, 200].map(nombreEnclos)).toEqual([1, 1, 2, 3, 4, 5, 6]);

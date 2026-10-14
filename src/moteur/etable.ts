@@ -1,5 +1,6 @@
 // Bilan de l'étable : stock de chaque couleur comparé aux besoins du plan, et enclos.
-import type { Plan } from "./planificateur";
+import { couleur } from "./donnees";
+import type { Etape, Plan } from "./planificateur";
 import type { Famille, Monture } from "./types";
 
 export interface BesoinCouleur {
@@ -51,3 +52,20 @@ export const nombreEnclos = (niveauEleveur: number) => PALIERS_ENCLOS.filter((p)
 
 /** Prochain palier qui débloquera un enclos, s'il en reste. */
 export const prochainPalierEnclos = (niveauEleveur: number) => PALIERS_ENCLOS.find((p) => p > niveauEleveur) ?? null;
+
+/** Étapes du plan qui utilisent cette monture comme parent (en pratique, une au plus). */
+export function roleDansLePlan(plan: Plan, idMonture: string): { indice: number; e: Etape }[] {
+  return plan.etapes.flatMap((e, indice) => (e.parents.some((p) => p.type === "monture" && p.monture.id === idMonture) ? [{ indice, e }] : []));
+}
+
+export const RESSOURCE_EXTRACTION: Record<Famille, string> = {
+  dragodinde: "Neurone de dragodinde",
+  muldo: "Ambre de muldo",
+  volkorne: "Corne de volkorne",
+};
+
+/** Ressources rendues par l'extraction : une par génération ; les générations 1 ne s'extraient pas. */
+export const ressourcesExtraction = (m: Monture) => {
+  const g = couleur(m.famille, m.couleur).generation;
+  return g === 1 ? 0 : g;
+};
