@@ -30,7 +30,7 @@ export function ClonagePropose({ paire, setS }: { paire: PaireClonage; setS: (f:
         <span className="text-xs text-text-secondary">
           {sexeSymbole(paire.b.sexe)} {paire.b.niveau}
         </span>
-        <span className={`ml-1 rounded px-1.5 text-xs ${paire.memeCouleur ? "bg-status-ok/15 text-status-ok" : "bg-bg-hover text-text-muted"}`}>
+        <span className={`ml-1 rounded-sm px-1.5 text-xs ${paire.memeCouleur ? "bg-status-ok/15 text-status-ok" : "bg-bg-hover text-text-muted"}`}>
           {paire.memeCouleur ? "résultat certain" : "couleur 50/50"}
         </span>
       </span>

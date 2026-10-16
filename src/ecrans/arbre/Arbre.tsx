@@ -99,7 +99,7 @@ export function Arbre({ famille, s }: Props) {
             Profondeur
             <div className="flex rounded-lg border border-border-light p-0.5">
               {[1, 2, 3, Infinity].map((p) => (
-                <button key={p} onClick={() => setProfondeur(p)} className={`min-w-[2rem] rounded-md px-1.5 py-0.5 ${profondeur === p ? "bg-accent-dim text-accent" : "hover:bg-bg-hover"}`}>
+                <button key={p} onClick={() => setProfondeur(p)} className={`min-w-8 rounded-md px-1.5 py-0.5 ${profondeur === p ? "bg-accent-dim text-accent" : "hover:bg-bg-hover"}`}>
                   {p === Infinity ? "Tout" : p}
                 </button>
               ))}

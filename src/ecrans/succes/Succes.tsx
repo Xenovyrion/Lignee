@@ -212,7 +212,7 @@ export function Succes({ famille, setFamille, s, setS }: Props) {
 
 function CarteSucces({ titre, sousTitre, faites, total, valide, children }: { titre: string; sousTitre: string; faites: number; total: number; valide: boolean; children: React.ReactNode }) {
   return (
-    <section className={`rounded-xl border p-4 ${valide ? "border-status-ok/30 bg-status-ok/[0.03]" : "border-border bg-bg-card"}`}>
+    <section className={`rounded-xl border p-4 ${valide ? "border-status-ok/30 bg-status-ok/3" : "border-border bg-bg-card"}`}>
       <div className="mb-2 flex flex-wrap items-center gap-3">
         <div className="min-w-0 flex-1">
           <div className="font-semibold">{titre}</div>

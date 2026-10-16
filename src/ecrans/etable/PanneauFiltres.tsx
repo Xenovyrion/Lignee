@@ -107,7 +107,7 @@ export function PanneauFiltres({ famille, montures, reservees, filtre: f, setFil
           {couleurs(famille)
             .filter((c) => parCouleur.has(c.id) || f.couleurs.includes(c.id))
             .map((c) => (
-              <label key={c.id} className="flex cursor-pointer items-center gap-2 rounded px-1 py-0.5 text-sm hover:bg-bg-hover">
+              <label key={c.id} className="flex cursor-pointer items-center gap-2 rounded-sm px-1 py-0.5 text-sm hover:bg-bg-hover">
                 <input type="checkbox" className="accent-accent" checked={f.couleurs.includes(c.id)} onChange={() => maj({ couleurs: basculer(f.couleurs, c.id) })} />
                 <span className="flex-1 truncate">{c.nom}</span>
                 <span className="text-xs text-text-muted">{parCouleur.get(c.id) ?? 0}</span>

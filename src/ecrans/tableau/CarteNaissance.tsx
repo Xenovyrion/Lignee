@@ -43,8 +43,8 @@ export function CarteNaissance({ famille, a, prevues, setS }: { famille: Famille
               {nomCouleur(famille, e.couleur)} <span className="text-sm font-normal text-text-muted">G{e.generation}</span>
             </div>
             <div className="flex flex-wrap gap-1.5 text-xs">
-              <span className={`rounded px-1.5 ${a.termineSucces ? "bg-status-ok/15 text-status-ok" : e.pour === "succes" ? "bg-accent-dim text-accent" : "bg-bg-hover text-text-secondary"}`}>{raison}</span>
-              {prevues > 1 && <span className="rounded bg-bg-hover px-1.5 text-text-secondary"title="Naissances de cette couleur prévues sur l'ensemble du plan">{prevues} dans le plan</span>}
+              <span className={`rounded-sm px-1.5 ${a.termineSucces ? "bg-status-ok/15 text-status-ok" : e.pour === "succes" ? "bg-accent-dim text-accent" : "bg-bg-hover text-text-secondary"}`}>{raison}</span>
+              {prevues > 1 && <span className="rounded-sm bg-bg-hover px-1.5 text-text-secondary"title="Naissances de cette couleur prévues sur l'ensemble du plan">{prevues} dans le plan</span>}
               {e.sexeVoulu && <span className="text-text-secondary">viser {e.sexeVoulu === "M" ? "un mâle ♂" : "une femelle ♀"}</span>}
             </div>
             {a.debloque > 0 && <div className="text-[11px] text-text-muted">débloque {a.debloque} étape{a.debloque > 1 ? "s" : ""}</div>}

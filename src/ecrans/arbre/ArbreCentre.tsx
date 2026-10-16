@@ -93,11 +93,11 @@ export function ArbreCentre({ famille, racine, sens, zoom, profondeur, choix, se
         {n.dejaVu && <div className="text-[10px] text-text-muted">↺ détaillée ailleurs</div>}
         {sens === "ancetres" && !n.dejaVu && (n.nbRecettes ?? 0) > 1 && (
           <div className="mt-1 flex items-center gap-1 text-[10px] text-text-secondary" onClick={(e) => e.stopPropagation()}>
-            <button className="rounded px-1 hover:bg-bg-hover" onClick={() => changerRecette(-1)}>
+            <button className="rounded-sm px-1 hover:bg-bg-hover" onClick={() => changerRecette(-1)}>
               ◀
             </button>
             recette {(n.recette ?? 0) + 1}/{n.nbRecettes}
-            <button className="rounded px-1 hover:bg-bg-hover" onClick={() => changerRecette(1)}>
+            <button className="rounded-sm px-1 hover:bg-bg-hover" onClick={() => changerRecette(1)}>
               ▶
             </button>
           </div>
