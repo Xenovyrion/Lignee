@@ -18,6 +18,15 @@ export const NOM_META: Record<Famille, string> = {
 
 export const OBJECTIF_NAISSANCES = 1000;
 
+/** Succès « Général » : paliers de naissances (toutes familles), regroupés par un méta-succès. */
+export const PALIERS_NAISSANCES: [number, string][] = [
+  [1, "Elle a peut-être trop mangé ?"],
+  [10, "Matrone"],
+  [100, "Sage-femme"],
+  [1000, "Allez on pousse !"],
+];
+export const NOM_META_NAISSANCES = "L'éleveur c'est moi";
+
 export const nomSuccesGeneration = (f: Famille, g: number) => `${NOMS_FAMILLE[f]} : ${ORDINAUX[g]} génération`;
 
 export interface SuccesGeneration {
