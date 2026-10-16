@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { conseiller } from "../../moteur/conseils";
 import { couleur, FAMILLES, NOMS_FAMILLE } from "../../moteur/donnees";
 import { planifier } from "../../moteur/planificateur";
-import { bilan, naissances, OBJECTIF_NAISSANCES, type SuccesGeneration } from "../../moteur/succes";
+import { bilan, naissances, NOM_META_NAISSANCES, OBJECTIF_NAISSANCES, PALIERS_NAISSANCES, type SuccesGeneration } from "../../moteur/succes";
 import type { Famille, Sauvegarde } from "../../moteur/types";
 import { champ } from "../../ui";
 import { COULEURS, Etoile, ImageMonture, PointObtenue } from "../arbre/commun";
@@ -106,9 +106,19 @@ export function Succes({ famille, setFamille, s, setS }: Props) {
         <div className="flex items-center gap-4 rounded-xl border border-border bg-bg-card p-4">
           <Anneau valeur={total / OBJECTIF_NAISSANCES} />
           <div className="min-w-0 flex-1">
-            <div className="font-semibold">1 000 naissances</div>
+            <div className="font-semibold" title={`« ${NOM_META_NAISSANCES} » : obtenir les 4 paliers`}>
+              Naissances {total >= OBJECTIF_NAISSANCES && <span className="text-status-ok">✓</span>}
+            </div>
             <div className="text-sm text-text-secondary">
               {total.toLocaleString("fr-FR")} / 1 000 <span className="text-text-muted">toutes familles</span>
+            </div>
+            <div className="mt-1 flex flex-wrap gap-x-2 text-xs text-text-muted">
+              {PALIERS_NAISSANCES.map(([n, nom]) => (
+                <span key={n} title={nom} className={total >= n ? "text-status-ok" : ""}>
+                  {n.toLocaleString("fr-FR")}
+                  {total >= n ? " ✓" : ""}
+                </span>
+              ))}
             </div>
             <label className="mt-1 flex items-center gap-2 text-xs text-text-muted" title="Naissances déjà faites avant d'utiliser l'outil (visible dans le succès en jeu)">
               dont avant l'outil
