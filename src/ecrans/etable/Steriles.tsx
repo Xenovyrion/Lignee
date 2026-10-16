@@ -71,7 +71,7 @@ export function Steriles({ famille, s, setS, ouvrirFiche }: Props) {
                       disabled={!n}
                       onClick={() => extraire(m)}
                       title={n ? `Extraire : ${n} ${RESSOURCE_EXTRACTION[famille]}${n > 1 ? "s" : ""}` : "Les générations 1 ne s'extraient pas"}
-                      className="rounded border border-border-light px-1.5 text-xs text-text-secondary hover:border-status-err hover:text-status-err disabled:opacity-30"
+                      className="rounded-sm border border-border-light px-1.5 text-xs text-text-secondary hover:border-status-err hover:text-status-err disabled:opacity-30"
                     >
                       Extraire
                     </button>

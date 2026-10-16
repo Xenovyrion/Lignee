@@ -67,7 +67,7 @@ export function ListeMontures({ famille, montures, reservees, afficherNom, tri, 
                 <ImageMonture famille={famille} id={m.couleur} taille={28} />
                 {nomCouleur(famille, m.couleur)}
               </button>
-              {m.enclos && <span className="ml-2 rounded bg-bg-hover px-1.5 text-xs text-text-secondary">enclos {m.enclos}</span>}
+              {m.enclos && <span className="ml-2 rounded-sm bg-bg-hover px-1.5 text-xs text-text-secondary">enclos {m.enclos}</span>}
               {reservees.has(m.id) && (
                 <span className="ml-2 text-xs text-accent" title="Utilisée par le plan d'élevage">
                   ● plan
@@ -89,7 +89,7 @@ export function ListeMontures({ famille, montures, reservees, afficherNom, tri, 
             </td>
             <td>
               <select
-                className={`cursor-pointer rounded px-1.5 py-0.5 text-xs font-medium outline-none ${COULEUR_ETAT[m.etat]}`}
+                className={`cursor-pointer rounded-sm px-1.5 py-0.5 text-xs font-medium outline-hidden ${COULEUR_ETAT[m.etat]}`}
                 value={m.etat}
                 onChange={(e) => modifier(m.id, { etat: e.target.value as Etat })}
                 title="Changer l'état"

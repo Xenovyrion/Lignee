@@ -95,7 +95,7 @@ export function VueCouleurs({ famille, montures, besoins, ajouter, retirer, ouvr
         e.stopPropagation();
         (signe === "+" ? ajouter : retirer)(c, s);
       }}
-      className={`h-6 w-7 rounded border border-border-light text-xs hover:bg-bg-hover disabled:opacity-25 ${s === "M" ? "text-sky-400" : "text-pink-400"}`}
+      className={`h-6 w-7 rounded-sm border border-border-light text-xs hover:bg-bg-hover disabled:opacity-25 ${s === "M" ? "text-sky-400" : "text-pink-400"}`}
     >
       {signe}
       {s === "M" ? "♂" : "♀"}
@@ -133,16 +133,16 @@ export function VueCouleurs({ famille, montures, besoins, ajouter, retirer, ouvr
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-1 text-[11px]">
-                      {!simple && n.fecondes > 0 && <span className="rounded bg-status-ok/15 px-1.5 text-status-ok">{n.fecondes} féconde{n.fecondes > 1 ? "s" : ""}</span>}
-                      {!simple && n.steriles > 0 && <span className="rounded bg-status-err/15 px-1.5 text-status-err">{n.steriles} stérile{n.steriles > 1 ? "s" : ""}</span>}
-                      {b && b.utilisees > 0 && <span className="rounded bg-accent-dim px-1.5 text-accent">{b.utilisees} pour le plan</span>}
+                      {!simple && n.fecondes > 0 && <span className="rounded-sm bg-status-ok/15 px-1.5 text-status-ok">{n.fecondes} féconde{n.fecondes > 1 ? "s" : ""}</span>}
+                      {!simple && n.steriles > 0 && <span className="rounded-sm bg-status-err/15 px-1.5 text-status-err">{n.steriles} stérile{n.steriles > 1 ? "s" : ""}</span>}
+                      {b && b.utilisees > 0 && <span className="rounded-sm bg-accent-dim px-1.5 text-accent">{b.utilisees} pour le plan</span>}
                       {b && b.libres > 0 && (
-                        <span className="rounded bg-bg-hover px-1.5 text-text-secondary" title="Montures que le plan n'utilise pas : à garder en réserve, vendre ou recycler">
+                        <span className="rounded-sm bg-bg-hover px-1.5 text-text-secondary" title="Montures que le plan n'utilise pas : à garder en réserve, vendre ou recycler">
                           {b.libres} libre{b.libres > 1 ? "s" : ""}
                         </span>
                       )}
                       {manque > 0 && (
-                        <span className="rounded px-1.5" style={{ background: "rgba(249,115,22,0.15)", color: COULEURS.produire }} title="Prévu par le plan sur l'ensemble de l'élevage">
+                        <span className="rounded-sm px-1.5" style={{ background: "rgba(249,115,22,0.15)", color: COULEURS.produire }} title="Prévu par le plan sur l'ensemble de l'élevage">
                           {c.generation === 1 ? `${manque} à capturer` : `${manque} à faire naître`}
                         </span>
                       )}

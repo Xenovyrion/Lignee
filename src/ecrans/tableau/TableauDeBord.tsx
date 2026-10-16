@@ -98,7 +98,7 @@ export function TableauDeBord({ famille, s, setS }: Props) {
           <div className="flex flex-1 gap-1">
             {gens.map(({ g, faites, total }) => (
               <div key={g} className="flex-1" title={`G${g} : ${faites}/${total}`}>
-                <div className="h-2 overflow-hidden rounded bg-bg-hover">
+                <div className="h-2 overflow-hidden rounded-sm bg-bg-hover">
                   <div className={`h-full ${faites === total ? "bg-status-ok" : "bg-accent"}`} style={{ width: `${(100 * faites) / total}%` }} />
                 </div>
                 <div className={`mt-1 text-center text-xs ${faites === total ? "text-status-ok" : objectif?.generation === g ? "font-semibold text-accent" : "text-text-muted"}`}>G{g}</div>
@@ -114,7 +114,7 @@ export function TableauDeBord({ famille, s, setS }: Props) {
 
       {/* Prochain objectif et chemin */}
       {objectif && (
-        <section className="rounded-xl border border-accent/40 bg-gradient-to-br from-accent/10 to-transparent p-4">
+        <section className="rounded-xl border border-accent/40 bg-linear-to-br from-accent/10 to-transparent p-4">
           <div className="flex flex-wrap items-baseline gap-x-3">
             <span className="text-xs font-semibold uppercase tracking-wide text-accent">Prochain objectif</span>
             <h2 className="text-xl font-bold">{nomSuccesGeneration(famille, objectif.generation)}</h2>

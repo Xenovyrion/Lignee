@@ -25,7 +25,7 @@ export const Bouton = ({ children, discret, ...p }: { discret?: boolean } & Reac
   </button>
 );
 
-export const champ = "rounded-md border border-border-light bg-bg-secondary px-2 py-1.5 text-sm outline-none focus:border-accent";
+export const champ = "rounded-md border border-border-light bg-bg-secondary px-2 py-1.5 text-sm outline-hidden focus:border-accent";
 
 /** Liste déroulante des couleurs d'une famille, groupées par génération. */
 export function ChoixCouleur({ famille, vide, ...p }: { famille: Famille; vide?: string } & SelectHTMLAttributes<HTMLSelectElement>) {
