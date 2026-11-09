@@ -2,8 +2,9 @@
 
 @theme {
   --color-bg-primary: #0b0d12;
-  --color-bg-secondary: #11151c;
-  --color-bg-card: #161b24;
+  /* Panneaux : opacité réglable (--voile, posé par l'application, de 0 à 1). */
+  --color-bg-secondary: rgb(17 21 28 / calc(0.62 + var(--voile, 0.7) * 0.38));
+  --color-bg-card: rgb(22 27 36 / calc(0.55 + var(--voile, 0.7) * 0.45));
   --color-bg-hover: #1e2532;
 
   --color-accent: #d4a017;
@@ -273,4 +274,9 @@ body {
     animation: none !important;
     transition: none !important;
   }
+}
+/* Voile derrière le contenu de chaque écran (et la barre d'onglets). */
+.surface {
+  background-color: rgb(11 13 18 / calc(var(--voile, 0.7) * 0.8));
+  backdrop-filter: blur(6px);
 }

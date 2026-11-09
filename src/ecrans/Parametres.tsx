@@ -79,10 +79,18 @@ export function Parametres({ s, setS }: Props) {
           </div>
         </div>
         {o.fondEcran && (
-          <Ligne titre="Visibilité de l'image" aide={`${o.fondVisibilite} % : plus bas, le fond est plus sombre et le contenu plus lisible.`}>
-            <input type="range" min={10} max={80} step={5} className="w-48 accent-accent" value={o.fondVisibilite} onChange={(e) => maj({ fondVisibilite: Number(e.target.value) })} />
-          </Ligne>
+          <>
+            <Ligne titre="Visibilité de l'image" aide={`${o.fondVisibilite} % : plus bas, le fond est plus sombre et le contenu plus lisible.`}>
+              <input type="range" min={10} max={80} step={5} className="w-48 accent-accent" value={o.fondVisibilite} onChange={(e) => maj({ fondVisibilite: Number(e.target.value) })} />
+            </Ligne>
+            <Ligne titre="Flou de l'image" aide={o.fondFlou ? `${o.fondFlou} px : un peu de flou fait ressortir le contenu.` : "Aucun flou : l'image est nette."}>
+              <input type="range" min={0} max={12} step={1} className="w-48 accent-accent" value={o.fondFlou} onChange={(e) => maj({ fondFlou: Number(e.target.value) })} />
+            </Ligne>
+          </>
         )}
+        <Ligne titre="Opacité des panneaux" aide={`${o.voile} % : plus haut, les panneaux cachent davantage le fond et le texte est plus lisible.`}>
+          <input type="range" min={20} max={100} step={5} className="w-48 accent-accent" value={o.voile} onChange={(e) => maj({ voile: Number(e.target.value) })} />
+        </Ligne>
         <Ligne titre="Lucioles en fond d'écran" aide="Petites lueurs qui flottent lentement derrière le contenu.">
           <input type="checkbox" className="h-4 w-4 accent-accent" disabled={!o.animations} checked={o.particules && o.animations} onChange={(e) => maj({ particules: e.target.checked })} />
         </Ligne>
