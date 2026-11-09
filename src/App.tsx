@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TableauDeBord } from "./ecrans/tableau/TableauDeBord";
 import { Arbre } from "./ecrans/arbre/Arbre";
 import { Etable } from "./ecrans/etable/Etable";
@@ -7,11 +7,35 @@ import { Succes } from "./ecrans/succes/Succes";
 import { ImageMonture } from "./ecrans/arbre/commun";
 import { couleurs, FAMILLES, NOMS_FAMILLE, objectifs } from "./moteur/donnees";
 import { Logo } from "./Logo";
+import { Lucioles } from "./effets";
+import { urlFond } from "./fond";
 import type { Famille, Sauvegarde } from "./moteur/types";
 import { useSauvegarde } from "./stockage";
 
 const ONGLETS = { actions: "Prochaines actions", etable: "Étable", arbre: "Arbre", succes: "Succès", parametres: "Paramètres" } as const;
 type Onglet = keyof typeof ONGLETS;
+
+/** Image de fond choisie dans les Paramètres, assombrie pour garder le contenu lisible. */
+function FondEcran({ nom, visibilite }: { nom: string; visibilite: number }) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    let actuelle: string | null = null;
+    urlFond(nom)
+      .then((u) => setUrl((actuelle = u)))
+      .catch(() => setUrl(null));
+    return () => {
+      if (actuelle?.startsWith("blob:")) URL.revokeObjectURL(actuelle);
+    };
+  }, [nom]);
+  if (!url) return null;
+  return (
+    <div className="pointer-events-none fixed inset-0 -z-20" aria-hidden>
+      {/* Sans référent : les fonds d'Ankama ne s'affichent pas si la requête annonce un autre site. */}
+      <img src={url} alt="" referrerPolicy="no-referrer" className="absolute inset-0 h-full w-full object-cover" style={{ opacity: visibilite / 100 }} />
+      <div className="absolute inset-0 bg-linear-to-b from-bg-primary/30 via-transparent to-bg-primary/70" />
+    </div>
+  );
+}
 
 export function App() {
   const { s, setS, erreur } = useSauvegarde();
@@ -34,8 +58,10 @@ export function App() {
   const props = { famille, s, setS: majS };
 
   return (
-    <div className="mx-auto flex max-w-[2200px] flex-col gap-4 p-6">
-      <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-linear-to-r from-accent/12 via-bg-card to-bg-card px-5 py-4">
+    <div className={`mx-auto flex max-w-[2200px] flex-col gap-4 p-6 ${s.options.animations ? "" : "sans-animation"}`}>
+      <FondEcran nom={s.options.fondEcran} visibilite={s.options.fondVisibilite} />
+      {s.options.animations && s.options.particules && <Lucioles />}
+      <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-linear-to-r from-accent/8 via-bg-card/90 to-bg-card/90 px-5 py-4 backdrop-blur-sm">
         <div className="flex items-center gap-4">
           <Logo taille={56} />
           <div>

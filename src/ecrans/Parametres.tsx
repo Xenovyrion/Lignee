@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { appliquerNiveauUnique, nombreEnclos, prochainPalierEnclos } from "../moteur/etable";
 import type { Options, Sauvegarde } from "../moteur/types";
+import { choisirFond, FONDS_ANKAMA, idGalerie, SOURCE_FONDS, supprimerFond, valeurGalerie } from "../fond";
 import { Carte, champ } from "../ui";
 import { SectionSauvegardes } from "./SectionSauvegardes";
 
@@ -19,9 +20,21 @@ const Ligne = ({ titre, aide, children }: { titre: string; aide: string; childre
   </div>
 );
 
+const TuileFond = ({ titre, actif, onClick, children }: { titre: string; actif: boolean; onClick: () => void; children: ReactNode }) => (
+  <button onClick={onClick} title={titre} className={`group overflow-hidden rounded-lg border-2 text-left transition ${actif ? "border-accent" : "border-transparent hover:border-border-light"}`}>
+    <div className="aspect-video bg-bg-secondary">{children}</div>
+    <div className={`truncate px-1.5 py-1 text-[11px] ${actif ? "bg-accent-dim text-accent" : "bg-bg-secondary text-text-secondary"}`}>{titre}</div>
+  </button>
+);
+
 export function Parametres({ s, setS }: Props) {
   const o = s.options;
   const maj = (champs: Partial<Options>) => setS((s) => ({ ...s, options: { ...s.options, ...champs } }));
+  /** Change l'image de fond ; une image perso remplacée est supprimée du dossier de Lignée. */
+  const changerFond = (nom: string) => {
+    if (o.fondEcran && o.fondEcran !== nom) supprimerFond(o.fondEcran);
+    maj({ fondEcran: nom });
+  };
   return (
     <div className="flex flex-col gap-4">
       <Carte titre="Général">
@@ -29,6 +42,49 @@ export function Parametres({ s, setS }: Props) {
           <select className={champ} value={o.langue} onChange={(e) => maj({ langue: e.target.value as Options["langue"] })}>
             <option value="fr">Français</option>
           </select>
+        </Ligne>
+      </Carte>
+      <Carte titre="Apparence">
+        <Ligne titre="Animations" aide="Apparition des cartes, compteurs qui défilent, confettis et bandeau quand une couleur ou un succès est obtenu.">
+          <input type="checkbox" className="h-4 w-4 accent-accent" checked={o.animations} onChange={(e) => maj({ animations: e.target.checked })} />
+        </Ligne>
+        <div className="border-t border-border py-3">
+          <div className="text-sm font-medium">Image de fond</div>
+          <div className="mb-3 text-xs text-text-muted">
+            Fonds d'écran officiels publiés par Ankama (chargés depuis{" "}
+            <a href={SOURCE_FONDS} target="_blank" rel="noreferrer" className="text-accent hover:underline">
+              dofus.com
+            </a>
+            , connexion Internet nécessaire), ou une image de ton PC.
+          </div>
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-2">
+            <TuileFond titre="Aucune" actif={!o.fondEcran} onClick={() => changerFond("")}>
+              <span className="flex h-full items-center justify-center text-2xl text-text-muted">∅</span>
+            </TuileFond>
+            {FONDS_ANKAMA.map((f) => (
+              <TuileFond key={f.id} titre={f.titre} actif={idGalerie(o.fondEcran) === f.id} onClick={() => changerFond(valeurGalerie(f.id))}>
+                <img src={f.vignette} alt="" referrerPolicy="no-referrer" loading="lazy" className="h-full w-full object-cover" />
+              </TuileFond>
+            ))}
+            <TuileFond
+              titre={o.fondEcran && !idGalerie(o.fondEcran) ? "Mon image (changer…)" : "Mon image…"}
+              actif={!!o.fondEcran && !idGalerie(o.fondEcran)}
+              onClick={async () => {
+                const nom = await choisirFond();
+                if (nom) changerFond(nom);
+              }}
+            >
+              <span className="flex h-full items-center justify-center text-2xl text-text-muted">＋</span>
+            </TuileFond>
+          </div>
+        </div>
+        {o.fondEcran && (
+          <Ligne titre="Visibilité de l'image" aide={`${o.fondVisibilite} % : plus bas, le fond est plus sombre et le contenu plus lisible.`}>
+            <input type="range" min={10} max={80} step={5} className="w-48 accent-accent" value={o.fondVisibilite} onChange={(e) => maj({ fondVisibilite: Number(e.target.value) })} />
+          </Ligne>
+        )}
+        <Ligne titre="Lucioles en fond d'écran" aide="Petites lueurs qui flottent lentement derrière le contenu.">
+          <input type="checkbox" className="h-4 w-4 accent-accent" disabled={!o.animations} checked={o.particules && o.animations} onChange={(e) => maj({ particules: e.target.checked })} />
         </Ligne>
       </Carte>
       <Carte titre="Métier">

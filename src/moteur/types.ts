@@ -68,4 +68,12 @@ export interface Options {
   naissancesAnterieures: number;
   /** Niveau du métier Éleveur (détermine le nombre d'enclos : niveaux 1, 40, 80, 120, 160, 200). */
   niveauEleveur: number;
+  /** Effets animés du tableau de bord (apparitions, confettis…). */
+  animations: boolean;
+  /** Lucioles dorées en fond d'écran (si les animations sont actives). */
+  particules: boolean;
+  /** Image de fond choisie par l'utilisateur (fichier copié dans AppData), vide = aucune. */
+  fondEcran: string;
+  /** Visibilité de l'image de fond, en % (le reste est assombri pour garder la lisibilité). */
+  fondVisibilite: number;
 }

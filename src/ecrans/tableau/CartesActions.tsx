@@ -37,11 +37,13 @@ function CadreAction(p: {
   formulaire?: ReactNode;
 }) {
   const t = TYPES[p.type];
+  // La première action faisable est mise en avant : halo de sa couleur et numéro qui pulse.
+  const vedette = p.numero === 1 && !p.attente;
   return (
     <li
       id={p.id}
-      className={`scroll-mt-4 rounded-xl border p-3 ${p.attente ? "hachure border-border" : "border-border-light bg-bg-secondary"}`}
-      style={{ borderLeft: `4px solid ${p.attente ? "rgba(255,255,255,0.15)" : t.teinte}` }}
+      className={`apparition scroll-mt-4 rounded-xl border p-3 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(0,0,0,0.4)] ${p.attente ? "hachure border-border" : "border-border-light bg-bg-secondary"} ${vedette ? "halo" : ""}`}
+      style={{ borderLeft: `4px solid ${p.attente ? "rgba(255,255,255,0.15)" : t.teinte}`, animationDelay: `${Math.min(p.numero, 12) * 45}ms`, ["--halo" as string]: t.teinte }}
     >
       {p.attente && (
         <div className="mb-2 flex items-center gap-2 text-xs font-medium text-accent">
@@ -50,7 +52,7 @@ function CadreAction(p: {
         </div>
       )}
       <div className={`flex flex-wrap items-center gap-3 ${p.attente ? "opacity-55 grayscale-[40%]" : ""}`}>
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-black" style={{ background: t.teinte }}>
+        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-black ${vedette ? "pulsation" : ""}`} style={{ background: t.teinte }}>
           {p.numero}
         </span>
         <div className="flex w-24 shrink-0 flex-col">
@@ -69,6 +71,26 @@ function CadreAction(p: {
       {p.pied && <div className="mt-2 flex flex-wrap gap-x-4 pl-[8.5rem] text-xs text-text-muted">{p.pied}</div>}
       {p.formulaire}
     </li>
+  );
+}
+
+/** Mini-jauge circulaire de chance : rouge (30 %) → doré → vert (100 %). */
+function JaugeChance({ p }: { p: number }) {
+  const taille = 50;
+  const ep = 5;
+  const r = (taille - ep) / 2;
+  const c = 2 * Math.PI * r;
+  const teinte = `hsl(${Math.round(Math.max(0, Math.min(1, (p - 0.3) / 0.7)) * 120)} 75% 52%)`;
+  return (
+    <div className="relative" style={{ width: taille, height: taille }} title={`${pourcent(p)} de chances d'obtenir la couleur visée`}>
+      <svg width={taille} height={taille} className="-rotate-90">
+        <circle cx={taille / 2} cy={taille / 2} r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={ep} />
+        <circle cx={taille / 2} cy={taille / 2} r={r} fill="none" stroke={teinte} strokeWidth={ep} strokeLinecap="round" strokeDasharray={`${c * p} ${c}`} style={{ filter: `drop-shadow(0 0 4px ${teinte})` }} />
+      </svg>
+      <span className="absolute inset-0 flex items-center justify-center text-xs font-bold" style={{ color: teinte }}>
+        {Math.round(p * 100)}%
+      </span>
+    </div>
   );
 }
 
@@ -184,9 +206,13 @@ export function CarteNaissance({
       }
       droite={
         <>
-          <div className="text-right">
-            <div className={`text-2xl font-bold ${a.makina.chance >= 1 ? "text-status-ok" : a.makina.chance >= 0.8 ? "text-text-primary" : "text-status-warn"}`}>{pourcent(a.makina.chance)}</div>
-            <div className="text-xs text-text-secondary">avec {NOM_MAKINA[a.makina.makina]}</div>
+          <div className="flex items-center gap-2">
+            <JaugeChance p={a.makina.chance} />
+            <div className="text-xs text-text-secondary">
+              de réussite
+              <br />
+              avec {NOM_MAKINA[a.makina.makina]}
+            </div>
           </div>
           <Bouton discret={!pret || ouvert} onClick={() => setOuvert(!ouvert)}>
             {ouvert ? "Annuler" : "Enregistrer"}
