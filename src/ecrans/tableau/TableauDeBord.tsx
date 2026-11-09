@@ -41,6 +41,49 @@ const Tuile = ({ valeur, libelle, teinte, cible }: { valeur: number; libelle: st
   </button>
 );
 
+/** Anneau de progression global : couleurs obtenues / total. */
+function AnneauTotal({ faites, total }: { faites: number; total: number }) {
+  const taille = 92;
+  const ep = 9;
+  const r = (taille - ep) / 2;
+  const c = 2 * Math.PI * r;
+  const v = total ? faites / total : 0;
+  return (
+    <div className="flex items-center gap-3">
+      <div className="relative" style={{ width: taille, height: taille }}>
+        <svg width={taille} height={taille} className="-rotate-90">
+          <defs>
+            <linearGradient id="degrade-total" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#facc15" />
+              <stop offset="100%" stopColor={v >= 1 ? "#4ade80" : "#d4a017"} />
+            </linearGradient>
+          </defs>
+          <circle cx={taille / 2} cy={taille / 2} r={r} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth={ep} />
+          <circle
+            cx={taille / 2}
+            cy={taille / 2}
+            r={r}
+            fill="none"
+            stroke="url(#degrade-total)"
+            strokeWidth={ep}
+            strokeLinecap="round"
+            strokeDasharray={`${c * v} ${c}`}
+            style={{ transition: "stroke-dasharray 700ms ease-out", filter: "drop-shadow(0 0 6px rgba(212,160,23,0.45))" }}
+          />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-xl font-bold leading-5 text-accent">{faites}</span>
+          <span className="text-[11px] text-text-muted">/ {total}</span>
+        </div>
+      </div>
+      <div>
+        <div className="text-2xl font-bold">{Math.floor(v * 100)} %</div>
+        <div className="text-xs text-text-secondary">couleurs obtenues</div>
+      </div>
+    </div>
+  );
+}
+
 export function TableauDeBord({ famille, s, setS }: Props) {
   const plan = useMemo(() => planifier(famille, s.montures, s.obtenues[famille]), [famille, s.montures, s.obtenues]);
   const c = useMemo(() => conseiller(plan, { takeza: s.options.takeza }), [plan, s.options.takeza]);
@@ -81,30 +124,42 @@ export function TableauDeBord({ famille, s, setS }: Props) {
     <div className="flex flex-col gap-4">
       {/* Progression */}
       <div className="rounded-xl border border-border bg-bg-card p-4">
-        <div className="flex flex-wrap items-end gap-x-6 gap-y-3">
-          <div>
-            <div className="text-3xl font-semibold text-accent">
-              {obtenues.size}
-              <span className="text-lg text-text-muted">/{objectifs(famille).length}</span>
-            </div>
-            <div className="text-xs text-text-secondary">couleurs obtenues</div>
-          </div>
-          <div className="flex flex-1 gap-1">
-            {gens.map(({ g, faites, total }) => (
-              <div key={g} className="flex-1" title={`G${g} : ${faites}/${total}`}>
-                <div className="h-2 overflow-hidden rounded-sm bg-bg-hover">
-                  <div className={`h-full ${faites === total ? "bg-status-ok" : "bg-accent"}`} style={{ width: `${(100 * faites) / total}%` }} />
+        <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+          <AnneauTotal faites={obtenues.size} total={objectifs(famille).length} />
+          <div className="flex min-w-[320px] flex-1 gap-2">
+            {gens.map(({ g, faites, total }) => {
+              const fini = faites === total;
+              const courante = objectif?.generation === g;
+              return (
+                <div key={g} className="flex-1" title={`${nomSuccesGeneration(famille, g)} : ${faites}/${total}`}>
+                  <div className={`mb-1 text-center text-xs font-semibold ${fini ? "text-status-ok" : courante ? "text-accent" : "text-text-muted"}`}>G{g}</div>
+                  <div className={`relative h-3 overflow-hidden rounded-full bg-white/5 ring-1 ring-white/5 ${courante ? "ring-accent/60" : ""}`}>
+                    <div
+                      className={`h-full rounded-full transition-[width] duration-700 ${courante ? "barre-active" : ""}`}
+                      style={{
+                        width: `${Math.max(faites ? 8 : 0, (100 * faites) / total)}%`,
+                        background: fini ? "linear-gradient(90deg,#15803d,#4ade80)" : "linear-gradient(90deg,#a16207,#facc15)",
+                        boxShadow: faites ? `0 0 10px ${fini ? "rgba(74,222,128,0.45)" : "rgba(250,204,21,0.35)"}` : undefined,
+                      }}
+                    />
+                  </div>
+                  <div className={`mt-1 text-center text-[11px] ${fini ? "text-status-ok" : "text-text-muted"}`}>{fini ? "✓" : `${faites}/${total}`}</div>
                 </div>
-                <div className={`mt-1 text-center text-xs ${faites === total ? "text-status-ok" : objectif?.generation === g ? "font-semibold text-accent" : "text-text-muted"}`}>G{g}</div>
+              );
+            })}
+          </div>
+          <div className="flex gap-2 text-center">
+            {[
+              [plan.etapes.length, "naissances"],
+              [plan.clonages, "clonages"],
+              [nbCaptures, "captures"],
+              [totalSeances, "séances"],
+            ].map(([n, l]) => (
+              <div key={l} className="rounded-lg bg-bg-secondary px-3 py-1.5" title={l === "séances" ? "Une séance = tous les accouplements faisables en même temps ; la suivante utilise leurs bébés" : `${l} restant(e)s dans le plan`}>
+                <div className="text-lg font-bold leading-6">{n}</div>
+                <div className="text-[10px] uppercase tracking-wide text-text-muted">{l}</div>
               </div>
             ))}
-          </div>
-          <div className="text-right text-xs text-text-secondary">
-            Reste : <b className="text-text-primary">{plan.etapes.length}</b> naissances · <b className="text-text-primary">{nbCaptures}</b> captures ·{" "}
-            <b className="text-text-primary">{plan.clonages}</b> clonages
-            <div title="Une séance = tous les accouplements faisables en même temps ; la suivante utilise leurs bébés">
-              en ≈ <b className="text-text-primary">{totalSeances}</b> séances
-            </div>
           </div>
         </div>
       </div>
@@ -195,7 +250,7 @@ export function TableauDeBord({ famille, s, setS }: Props) {
       {/* Toutes les actions de la séance, dans l'ordre */}
       <Cadre
         id="actions"
-        titre={`À faire maintenant : ${actions.length} action${actions.length > 1 ? "s" : ""}`}
+        titre={`Prochaines étapes : ${actions.length} action${actions.length > 1 ? "s" : ""}`}
         sous={`Séance 1 sur ≈ ${totalSeances}. Dans l'ordre : ${[
           compte("naissance") && "naissances",
           compte("clonage") && "clonages",
@@ -210,7 +265,7 @@ export function TableauDeBord({ famille, s, setS }: Props) {
             {actions.map((x) => {
               const id = `action-${x.numero}`;
               if (x.type === "naissance")
-                return <CarteNaissance key={id} id={id} numero={x.numero} famille={famille} a={x.a} prevues={prevues(x.a.e.couleur)} setS={setS} niveauBebes={niveauNouvelles} />;
+                return <CarteNaissance key={id} id={id} numero={x.numero} famille={famille} a={x.a} prevues={prevues(x.a.e.couleur)} setS={setS} niveauBebes={niveauNouvelles} etapePreparer={premier("preparer")} />;
               if (x.type === "clonage") return <CarteClonage key={id} id={id} numero={x.numero} famille={famille} g={x.g} setS={setS} />;
               if (x.type === "preparer") return <CartePreparer key={id} id={id} numero={x.numero} famille={famille} groupes={x.groupes} setS={setS} />;
               return <CarteCapture key={id} id={id} numero={x.numero} famille={famille} capture={x.capture} setS={setS} niveau={niveauNouvelles} />;

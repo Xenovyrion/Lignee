@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { couleurs } from "../../moteur/donnees";
 import type { BesoinCouleur } from "../../moteur/etable";
 import type { Etat, Famille, Monture, Sexe } from "../../moteur/types";
@@ -11,7 +12,12 @@ interface Props {
   retirer: (couleur: string, sexe: Sexe) => void;
   ouvrirCouleur: (couleur: string) => void;
   /** Mode simple : stock saisi par sexe et état. */
-  simple?: { stock: (c: string, sexe: Sexe, etat: Etat) => number; ajuster: (c: string, sexe: Sexe, etat: Etat, delta: number) => void };
+  simple?: {
+    stock: (c: string, sexe: Sexe, etat: Etat) => number;
+    ajuster: (c: string, sexe: Sexe, etat: Etat, delta: number) => void;
+    /** Passe une fertile en féconde (jauges remplies). */
+    rendrePrete: (c: string, sexe: Sexe) => void;
+  };
 }
 
 const ETATS_SIMPLE: [Etat, string, string][] = [
@@ -28,9 +34,12 @@ function GrilleStock({ c, simple }: { c: string; simple: NonNullable<Props["simp
         <tr className="text-[11px]">
           <th className="w-6" />
           {ETATS_SIMPLE.map(([e, l, t]) => (
-            <th key={e} className="pb-1 font-medium" style={{ color: t }}>
-              {l}
-            </th>
+            <Fragment key={e}>
+              <th className="pb-1 font-medium" style={{ color: t }}>
+                {l}
+              </th>
+              {e === "fertile" && <th className="w-4" />}
+            </Fragment>
           ))}
         </tr>
       </thead>
@@ -41,17 +50,36 @@ function GrilleStock({ c, simple }: { c: string; simple: NonNullable<Props["simp
             {ETATS_SIMPLE.map(([etat]) => {
               const n = simple.stock(c, sexe, etat);
               return (
-                <td key={etat} className="p-0.5">
-                  <div className="flex items-center justify-between rounded-md border border-border bg-bg-card">
-                    <button disabled={!n} onClick={() => simple.ajuster(c, sexe, etat, -1)} className="px-1.5 py-0.5 text-text-muted hover:text-text-primary disabled:opacity-25" title="Retirer une monture">
-                      −
-                    </button>
-                    <span className={`font-bold ${n ? "text-text-primary" : "text-text-muted"}`}>{n}</span>
-                    <button onClick={() => simple.ajuster(c, sexe, etat, 1)} className="px-1.5 py-0.5 text-text-muted hover:text-text-primary" title="Ajouter une monture">
-                      +
-                    </button>
-                  </div>
-                </td>
+                <Fragment key={etat}>
+                  <td className="p-0.5">
+                    <div className="flex items-center justify-between rounded-md border border-border bg-bg-card">
+                      <button
+                        disabled={!n}
+                        onClick={() => simple.ajuster(c, sexe, etat, -1)}
+                        className="px-1.5 py-0.5 text-text-muted hover:text-text-primary disabled:opacity-25"
+                        title="Retirer une monture"
+                      >
+                        −
+                      </button>
+                      <span className={`font-bold ${n ? "text-text-primary" : "text-text-muted"}`}>{n}</span>
+                      <button onClick={() => simple.ajuster(c, sexe, etat, 1)} className="px-1.5 py-0.5 text-text-muted hover:text-text-primary" title="Ajouter une monture">
+                        +
+                      </button>
+                    </div>
+                  </td>
+                  {etat === "fertile" && (
+                    <td>
+                      <button
+                        disabled={!n}
+                        onClick={() => simple.rendrePrete(c, sexe)}
+                        className="rounded-full px-0.5 text-sm leading-4 text-status-ok hover:bg-status-ok/20 disabled:opacity-0"
+                        title="Jauges remplies : passer une fertile en féconde"
+                      >
+                        →
+                      </button>
+                    </td>
+                  )}
+                </Fragment>
               );
             })}
           </tr>
@@ -62,7 +90,13 @@ function GrilleStock({ c, simple }: { c: string; simple: NonNullable<Props["simp
 }
 
 const Pastille = ({ n, fond }: { n: number; fond: string }) => (
-  <span className="inline-flex h-6 min-w-[26px] items-center justify-center rounded-full px-1.5 text-xs font-bold text-white" style={{ background: n ? fond : "rgba(255,255,255,0.08)", color: n ? "#fff" : "#64748b" }}>
+  <span
+    className="inline-flex h-6 min-w-[26px] items-center justify-center rounded-full px-1.5 text-xs font-bold text-white"
+    style={{
+      background: n ? fond : "rgba(255,255,255,0.08)",
+      color: n ? "#fff" : "#64748b",
+    }}
+  >
     {n}
   </span>
 );
@@ -133,8 +167,16 @@ export function VueCouleurs({ famille, montures, besoins, ajouter, retirer, ouvr
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-1 text-[11px]">
-                      {!simple && n.fecondes > 0 && <span className="rounded-sm bg-status-ok/15 px-1.5 text-status-ok">{n.fecondes} féconde{n.fecondes > 1 ? "s" : ""}</span>}
-                      {!simple && n.steriles > 0 && <span className="rounded-sm bg-status-err/15 px-1.5 text-status-err">{n.steriles} stérile{n.steriles > 1 ? "s" : ""}</span>}
+                      {!simple && n.fecondes > 0 && (
+                        <span className="rounded-sm bg-status-ok/15 px-1.5 text-status-ok">
+                          {n.fecondes} féconde{n.fecondes > 1 ? "s" : ""}
+                        </span>
+                      )}
+                      {!simple && n.steriles > 0 && (
+                        <span className="rounded-sm bg-status-err/15 px-1.5 text-status-err">
+                          {n.steriles} stérile{n.steriles > 1 ? "s" : ""}
+                        </span>
+                      )}
                       {b && b.utilisees > 0 && <span className="rounded-sm bg-accent-dim px-1.5 text-accent">{b.utilisees} pour le plan</span>}
                       {b && b.libres > 0 && (
                         <span className="rounded-sm bg-bg-hover px-1.5 text-text-secondary" title="Montures que le plan n'utilise pas : à garder en réserve, vendre ou recycler">
@@ -142,7 +184,14 @@ export function VueCouleurs({ famille, montures, besoins, ajouter, retirer, ouvr
                         </span>
                       )}
                       {manque > 0 && (
-                        <span className="rounded-sm px-1.5" style={{ background: "rgba(249,115,22,0.15)", color: COULEURS.produire }} title="Prévu par le plan sur l'ensemble de l'élevage">
+                        <span
+                          className="rounded-sm px-1.5"
+                          style={{
+                            background: "rgba(249,115,22,0.15)",
+                            color: COULEURS.produire,
+                          }}
+                          title="Prévu par le plan sur l'ensemble de l'élevage"
+                        >
                           {c.generation === 1 ? `${manque} à capturer` : `${manque} à faire naître`}
                         </span>
                       )}
