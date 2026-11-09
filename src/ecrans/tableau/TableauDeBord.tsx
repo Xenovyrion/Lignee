@@ -1,22 +1,18 @@
 import { Fragment, useMemo, useState, type ReactNode } from "react";
-import { conseiller, prochainObjectif } from "../../moteur/conseils";
+import { actionsMaintenant, conseiller, prochainObjectif, seancesDesEtapes, seancesSuivantes } from "../../moteur/conseils";
 import { couleur, NOMS_FAMILLE, nomCouleur, objectifs } from "../../moteur/donnees";
-import { planifier, suggererClonages, type Source } from "../../moteur/planificateur";
-import { rendreFecondes } from "../../moteur/etable";
+import { planifier, regrouperClonages, suggererClonages, type Source } from "../../moteur/planificateur";
 import { nomSuccesGeneration } from "../../moteur/succes";
-import type { Famille, Monture, Sauvegarde, Sexe } from "../../moteur/types";
+import type { Famille, Sauvegarde } from "../../moteur/types";
 import { Bouton, libelleMonture, sexeSymbole } from "../../ui";
 import { Etoile, ImageMonture } from "../arbre/commun";
-import { ClonagePropose } from "../etable/Clonage";
-import { CarteNaissance } from "./CarteNaissance";
+import { CarteCapture, CarteClonage, CarteNaissance, CartePreparer, TYPES } from "./CartesActions";
 
 interface Props {
   famille: Famille;
   s: Sauvegarde;
   setS: (f: (s: Sauvegarde) => Sauvegarde) => void;
 }
-
-const LIMITE = 6;
 
 const Cadre = ({ id, titre, sous, children, droite, ton }: { id?: string; titre: string; sous?: string; children: ReactNode; droite?: ReactNode; ton?: "alerte" }) => (
   <section id={id} className={`scroll-mt-4 rounded-xl border p-4 ${ton === "alerte" ? "border-status-warn/40 bg-status-warn/5" : "border-border bg-bg-card"}`}>
@@ -49,8 +45,12 @@ export function TableauDeBord({ famille, s, setS }: Props) {
   const plan = useMemo(() => planifier(famille, s.montures, s.obtenues[famille]), [famille, s.montures, s.obtenues]);
   const c = useMemo(() => conseiller(plan, { takeza: s.options.takeza }), [plan, s.options.takeza]);
   const objectif = useMemo(() => prochainObjectif(plan), [plan]);
-  const clonages = useMemo(() => suggererClonages(s.montures.filter((m) => m.famille === famille)), [famille, s.montures]);
-  const [tout, setTout] = useState(false);
+  const clonages = useMemo(() => regrouperClonages(suggererClonages(s.montures.filter((m) => m.famille === famille))), [famille, s.montures]);
+  const actions = useMemo(() => actionsMaintenant(c, clonages), [c, clonages]);
+  const numSeance = useMemo(() => seancesDesEtapes(plan), [plan]);
+  const suivantes = useMemo(() => seancesSuivantes(plan), [plan]);
+  const totalSeances = Math.max(1, ...numSeance);
+  const [toutesSeances, setToutesSeances] = useState(false);
   const [planOuvert, setPlanOuvert] = useState(false);
 
   const obtenues = new Set(s.obtenues[famille]);
@@ -60,21 +60,15 @@ export function TableauDeBord({ famille, s, setS }: Props) {
   });
   const nbCaptures = Object.values(plan.captures).reduce((a, b) => a + b, 0);
   const prevues = (couleurId: string) => plan.etapes.filter((e) => e.couleur === couleurId).length;
-  const rangDe = new Map(c.ordre.map((a) => [a.e.couleur, a]));
+  const rangDe = new Map([...c.ordre].reverse().map((a) => [a.e.couleur, a])); // la carte prête l'emporte
   const bloquees = new Set(c.blocages.map((b) => b.e.couleur));
 
-  // Montures à mettre en enclos (jauges à remplir), une seule fois chacune, dans l'ordre des priorités.
-  const enEnclos: Monture[] = [];
-  for (const a of c.ordre) for (const m of a.aPreparer) if (!enEnclos.some((x) => x.id === m.id)) enEnclos.push(m);
-  const sousNiveau = c.ordre.filter((a) => a.niveauConseille).length;
   const simple = s.options.modeSuivi === "simple";
-  // Mode simple : montures à préparer regroupées par couleur et sexe.
-  const groupes = new Map<string, { couleur: string; sexe: Sexe; ids: string[] }>();
-  for (const m of enEnclos) {
-    const k = `${m.couleur}/${m.sexe}`;
-    if (!groupes.has(k)) groupes.set(k, { couleur: m.couleur, sexe: m.sexe, ids: [] });
-    groupes.get(k)!.ids.push(m.id);
-  }
+  const niveauNouvelles = simple ? s.options.niveauParDefaut : 1;
+  const nbPrets = c.ordre.filter((a) => !a.aPreparer.length).reduce((n, a) => n + a.nombre, 0);
+  const compte = (t: string) => actions.filter((x) => x.type === t).length;
+  const premier = (t: string) => actions.find((x) => x.type === t)?.numero;
+  const nbAPreparer = actions.reduce((n, x) => n + (x.type === "preparer" ? x.groupes.reduce((k, g) => k + g.montures.length, 0) : 0), 0);
 
   if (plan.etapes.length === 0)
     return (
@@ -108,6 +102,9 @@ export function TableauDeBord({ famille, s, setS }: Props) {
           <div className="text-right text-xs text-text-secondary">
             Reste : <b className="text-text-primary">{plan.etapes.length}</b> naissances · <b className="text-text-primary">{nbCaptures}</b> captures ·{" "}
             <b className="text-text-primary">{plan.clonages}</b> clonages
+            <div title="Une séance = tous les accouplements faisables en même temps ; la suivante utilise leurs bébés">
+              en ≈ <b className="text-text-primary">{totalSeances}</b> séances
+            </div>
           </div>
         </div>
       </div>
@@ -144,7 +141,7 @@ export function TableauDeBord({ famille, s, setS }: Props) {
                     <ImageMonture famille={famille} id={e.couleur} taille={48} className={a || estCible ? "" : "opacity-60"} />
                     <span className="text-[11px] font-medium leading-tight">{nomCouleur(famille, e.couleur)}</span>
                     <span className={`text-[10px] ${a ? (a.aPreparer.length ? "text-accent" : "text-status-ok") : bloquees.has(e.couleur) ? "text-status-warn" : "text-text-muted"}`}>
-                      {a ? (a.aPreparer.length ? "à préparer" : "prête") : bloquees.has(e.couleur) ? "bloquée" : "ensuite"}
+                      {a ? (a.aPreparer.length ? "à préparer" : "maintenant") : bloquees.has(e.couleur) ? "bloquée" : `séance ${numSeance[i]}`}
                     </span>
                   </div>
                 </Fragment>
@@ -167,135 +164,100 @@ export function TableauDeBord({ famille, s, setS }: Props) {
         </section>
       )}
 
-      {/* Tuiles */}
+      {/* Tuiles : raccourcis vers la première action de chaque type */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-        <Tuile valeur={c.ordre.filter((a) => !a.aPreparer.length).length} libelle="prêts à accoupler" teinte="#22c55e" cible="naissances" />
-        <Tuile valeur={enEnclos.length} libelle={simple ? "montures à préparer" : "montures à mettre en enclos"} teinte="#d4a017" cible="enclos" />
-        <Tuile valeur={c.captures.reduce((x, y) => x + y.nombre, 0)} libelle="captures à faire" teinte="#60a5fa" cible="captures" />
-        <Tuile valeur={clonages.length} libelle="clonages possibles" teinte="#a78bfa" cible="clonages" />
+        <Tuile valeur={nbPrets} libelle="accouplements prêts" teinte={TYPES.naissance.teinte} cible={`action-${premier("naissance")}`} />
+        <Tuile valeur={clonages.reduce((n, g) => n + g.paires.length, 0)} libelle="clonages possibles" teinte={TYPES.clonage.teinte} cible={`action-${premier("clonage")}`} />
+        <Tuile valeur={nbAPreparer} libelle="montures à préparer" teinte={TYPES.preparer.teinte} cible={`action-${premier("preparer")}`} />
+        <Tuile valeur={c.captures.reduce((x, y) => x + y.nombre, 0)} libelle="captures à faire" teinte={TYPES.capture.teinte} cible={`action-${premier("capture")}`} />
         <Tuile valeur={c.blocages.length} libelle="blocages" teinte="#f97316" cible="blocages" />
       </div>
 
-      <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_400px]">
-        {/* Naissances conseillées, une carte par couleur */}
-        <Cadre id="naissances" titre={`Naissances à faire (${c.ordre.length})`} sous="Dans l'ordre conseillé : terminer un succès, nouvelle couleur, puis ce qui débloque la suite.">
-          {c.ordre.length ? (
-            <>
-              <ul className="flex flex-col gap-2">
-                {(tout ? c.ordre : c.ordre.slice(0, LIMITE)).map((a) => (
-                  <CarteNaissance key={a.e.couleur} famille={famille} a={a} prevues={prevues(a.e.couleur)} setS={setS} />
+      {c.blocages.length > 0 && (
+        <Cadre id="blocages" titre={`Blocages (${c.blocages.length})`} ton="alerte">
+          <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+            {c.blocages.map((b) => (
+              <li key={b.etape} className="flex items-start gap-2">
+                <ImageMonture famille={famille} id={b.e.couleur} taille={28} />
+                <span>
+                  <b>
+                    G{b.e.generation} {nomCouleur(famille, b.e.couleur)}
+                  </b>
+                  {b.nombre > 1 && <span className="text-text-muted"> (×{b.nombre})</span>}
+                  <span className="block text-xs text-text-secondary">{b.message}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Cadre>
+      )}
+
+      {/* Toutes les actions de la séance, dans l'ordre */}
+      <Cadre
+        id="actions"
+        titre={`À faire maintenant : ${actions.length} action${actions.length > 1 ? "s" : ""}`}
+        sous={`Séance 1 sur ≈ ${totalSeances}. Dans l'ordre : ${[
+          compte("naissance") && "naissances",
+          compte("clonage") && "clonages",
+          compte("preparer") && "jauges à remplir",
+          compte("capture") && "captures",
+        ]
+          .filter(Boolean)
+          .join(", ")}. Enregistre chaque résultat : le plan se recalcule.`}
+      >
+        {actions.length ? (
+          <ul className="flex flex-col gap-2">
+            {actions.map((x) => {
+              const id = `action-${x.numero}`;
+              if (x.type === "naissance")
+                return <CarteNaissance key={id} id={id} numero={x.numero} famille={famille} a={x.a} prevues={prevues(x.a.e.couleur)} setS={setS} niveauBebes={niveauNouvelles} />;
+              if (x.type === "clonage") return <CarteClonage key={id} id={id} numero={x.numero} famille={famille} g={x.g} setS={setS} />;
+              if (x.type === "preparer") return <CartePreparer key={id} id={id} numero={x.numero} famille={famille} groupes={x.groupes} setS={setS} />;
+              return <CarteCapture key={id} id={id} numero={x.numero} famille={famille} capture={x.capture} setS={setS} niveau={niveauNouvelles} />;
+            })}
+          </ul>
+        ) : (
+          <p className="text-sm text-text-muted">Rien à faire avec l'étable actuelle.</p>
+        )}
+      </Cadre>
+
+      {/* Séances suivantes */}
+      {suivantes.length > 0 && (
+        <Cadre
+          titre="Et ensuite"
+          sous="Chaque séance utilise les bébés de la précédente (et les clones de leurs parents devenus stériles). Prévision si tout réussit, recalculée après chaque naissance."
+        >
+          <ol className="flex flex-col gap-2">
+            {(toutesSeances ? suivantes : suivantes.slice(0, 3)).map((x) => (
+              <li key={x.numero} className="flex flex-wrap items-center gap-1.5 border-t border-border pt-2 text-sm">
+                <span className="w-24 font-semibold text-text-secondary">Séance {x.numero}</span>
+                {x.naissances.map((n) => (
+                  <span
+                    key={n.couleur}
+                    className={`flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-xs ${n.succes ? "border-accent/50 text-text-primary" : "border-border-light text-text-secondary"}`}
+                    title={n.succes ? "Nouvelle couleur pour un succès" : "Intermédiaire, sert de parent plus tard"}
+                  >
+                    <ImageMonture famille={famille} id={n.couleur} taille={20} />
+                    {nomCouleur(famille, n.couleur)}
+                    {n.nombre > 1 && <b>×{n.nombre}</b>}
+                    {n.succes && <span className="text-accent">★</span>}
+                  </span>
                 ))}
-              </ul>
-              {c.ordre.length > LIMITE && (
-                <button className="mt-2 text-sm text-accent hover:underline" onClick={() => setTout(!tout)}>
-                  {tout ? "Réduire" : `Voir les ${c.ordre.length - LIMITE} autres`}
-                </button>
-              )}
-            </>
-          ) : (
-            <p className="text-sm text-text-muted">Aucune naissance possible avec l'étable actuelle : commence par les captures.</p>
+                {x.clonages > 0 && (
+                  <span className="text-xs text-text-muted">
+                    + {x.clonages} clonage{x.clonages > 1 ? "s" : ""} avant
+                  </span>
+                )}
+              </li>
+            ))}
+          </ol>
+          {suivantes.length > 3 && (
+            <button className="mt-2 text-sm text-accent hover:underline" onClick={() => setToutesSeances(!toutesSeances)}>
+              {toutesSeances ? "Réduire" : `Voir les ${suivantes.length - 3} séances suivantes`}
+            </button>
           )}
         </Cadre>
-
-        {/* Listes d'actions */}
-        <div className="flex flex-col gap-4">
-          {c.blocages.length > 0 && (
-            <Cadre id="blocages" titre={`Blocages (${c.blocages.length})`} ton="alerte">
-              <ul className="flex flex-col gap-2 text-sm">
-                {c.blocages.map((b) => (
-                  <li key={b.etape} className="flex items-start gap-2">
-                    <ImageMonture famille={famille} id={b.e.couleur} taille={28} />
-                    <span>
-                      <b>
-                        G{b.e.generation} {nomCouleur(famille, b.e.couleur)}
-                      </b>
-                      {b.nombre > 1 && <span className="text-text-muted"> (×{b.nombre})</span>}
-                      <span className="block text-xs text-text-secondary">{b.message}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </Cadre>
-          )}
-
-          <Cadre
-            id="enclos"
-            titre={simple ? `À préparer (${enEnclos.length})` : `Mettre en enclos (${enEnclos.length})`}
-            sous={enEnclos.length ? (simple ? `Remplis Endurance, Maturité et Amour en jeu, puis clique « ✓ Prêtes » · ≈ ${Math.ceil(enEnclos.length / 10)} enclos de 10` : `Remplir Endurance, Maturité et Amour · ≈ ${Math.ceil(enEnclos.length / 10)} enclos de 10 · à gérer dans Étable → Enclos`) : undefined}
-          >
-            {simple && enEnclos.length ? (
-              <ul className="flex flex-col gap-1.5 text-sm">
-                {[...groupes.values()].map((g) => (
-                  <li key={`${g.couleur}/${g.sexe}`} className="flex items-center gap-2">
-                    <ImageMonture famille={famille} id={g.couleur} taille={26} />
-                    <span className="flex-1">
-                      {nomCouleur(famille, g.couleur)} <span className={g.sexe === "M" ? "text-sky-400" : "text-pink-400"}>{sexeSymbole(g.sexe)}</span>
-                      <span className="text-text-secondary"> × {g.ids.length}</span>
-                    </span>
-                    <Bouton
-                      discret
-                      onClick={() => setS((s) => rendreFecondes(s, famille, g.couleur, g.sexe, g.ids.length, new Set(g.ids)))}
-                      title="Jauges remplies en jeu : passer ces montures en « Féconde »"
-                    >
-                      ✓ Prêtes
-                    </Bouton>
-                  </li>
-                ))}
-              </ul>
-            ) : enEnclos.length ? (
-              <ul className="flex flex-col gap-1 text-sm">
-                {enEnclos.map((m) => (
-                  <li key={m.id} className="flex items-center gap-2">
-                    <ImageMonture famille={famille} id={m.couleur} taille={24} />
-                    <span className="flex-1">{nomCouleur(famille, m.couleur)}</span>
-                    <span className={m.sexe === "M" ? "text-sky-400" : "text-pink-400"}>{sexeSymbole(m.sexe)}</span>
-                    <span className="w-14 text-right text-xs text-text-muted">niv. {m.niveau}</span>
-                    <span className="w-16 text-right text-xs">{m.enclos ? <span className="text-status-ok">enclos {m.enclos}</span> : <span className="text-text-muted">à placer</span>}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-sm text-text-muted">Rien à préparer : les montures utiles sont déjà fécondes.</p>
-            )}
-            {sousNiveau > 0 && (
-              <p className="mt-2 text-xs text-text-muted">
-                {sousNiveau} accouplement{sousNiveau > 1 ? "s" : ""} sous 100 % : monte les niveaux (Mangeoire) pour atteindre {c.ordre.find((a) => a.niveauConseille)?.niveauConseille} niveaux
-                cumulés.
-              </p>
-            )}
-          </Cadre>
-
-          <Cadre id="captures" titre="À capturer" sous={nbCaptures ? `Total sur tout le plan : ${nbCaptures}` : undefined}>
-            {c.captures.length ? (
-              <ul className="flex flex-col gap-1 text-sm">
-                {c.captures.map((x) => (
-                  <li key={`${x.couleur}/${x.sexe}`} className="flex items-center gap-2">
-                    <ImageMonture famille={famille} id={x.couleur} taille={24} />
-                    <span className="flex-1">
-                      {nomCouleur(famille, x.couleur)} {x.sexe && <span className={x.sexe === "M" ? "text-sky-400" : "text-pink-400"}>{sexeSymbole(x.sexe)}</span>}
-                    </span>
-                    <span className="text-text-secondary">× {x.nombre}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-sm text-text-muted">Aucune capture nécessaire pour les prochaines étapes.</p>
-            )}
-          </Cadre>
-
-          <Cadre id="clonages" titre={`Clonages possibles (${clonages.length})`} sous={c.clonagesUtiles ? `${c.clonagesUtiles} étape(s) du plan attendent un clonage` : undefined}>
-            {clonages.length ? (
-              <ul className="flex flex-col gap-2">
-                {clonages.map((p) => (
-                  <ClonagePropose key={`${p.a.id}-${p.b.id}`} paire={p} setS={setS} />
-                ))}
-              </ul>
-            ) : (
-              <p className="text-sm text-text-muted">Aucune paire de stériles de même génération.</p>
-            )}
-          </Cadre>
-        </div>
-      </div>
+      )}
 
       <Cadre
         titre="Plan complet"

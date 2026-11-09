@@ -94,7 +94,10 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
   function prendre(c: string, sexe?: Sexe): Source {
     const reelles = stock.get(c);
     if (reelles?.length) {
-      const i = sexe ? Math.max(0, reelles.findIndex((m) => m.sexe === sexe)) : 0;
+      // Sans sexe imposé, prendre dans le sexe le plus nombreux pour garder des couples possibles.
+      const males = reelles.filter((m) => m.sexe === "M").length;
+      const voulu = sexe ?? (males * 2 > reelles.length ? "M" : males * 2 < reelles.length ? "F" : undefined);
+      const i = voulu ? Math.max(0, reelles.findIndex((m) => m.sexe === voulu)) : 0;
       const [m] = reelles.splice(i, 1);
       reservees.add(m.id);
       memo = new Map();
@@ -185,6 +188,16 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
       .filter((m) => m.famille === famille && peutSAccoupler(m) && `${m.couleur}/${m.sexe}` === cle)
       .sort((a, b) => b.niveau - a.niveau || Number(b.etat === "feconde") - Number(a.etat === "feconde"));
     places.sort((x, y) => importance[y.etape] - importance[x.etape] || x.etape - y.etape);
+    // À niveau égal, les montures déjà fécondes vont aux accouplements faisables tout de suite
+    // (l'autre parent existe aussi), pas à une étape lointaine.
+    const faisable = (p: { etape: number }) => etapes[p.etape].parents.every((x) => x.type === "monture");
+    for (let debut = 0; debut < places.length; ) {
+      let fin = debut;
+      while (fin < places.length && candidates[fin].niveau === candidates[debut].niveau) fin++;
+      const tranche = places.slice(debut, fin).sort((x, y) => Number(faisable(y)) - Number(faisable(x)));
+      places.splice(debut, tranche.length, ...tranche);
+      debut = fin;
+    }
     places.forEach(({ etape, cote }, k) => {
       const ancienne = etapes[etape].parents[cote] as { monture: Monture };
       reservees.delete(ancienne.monture.id);
@@ -244,4 +257,23 @@ export function suggererClonages(montures: Monture[]): PaireClonage[] {
     }
   }
   return paires;
+}
+
+export interface GroupeClonage {
+  couleurs: [string, string];
+  memeCouleur: boolean;
+  paires: PaireClonage[];
+}
+
+/** Regroupe les clonages proposés par couleurs de stériles (A + A, ou A + B). */
+export function regrouperClonages(paires: PaireClonage[]): GroupeClonage[] {
+  const groupes = new Map<string, GroupeClonage>();
+  for (const p of paires) {
+    const couleurs = [p.a.couleur, p.b.couleur].sort() as [string, string];
+    const k = couleurs.join("+");
+    const g = groupes.get(k) ?? { couleurs, memeCouleur: p.memeCouleur, paires: [] };
+    g.paires.push(p);
+    groupes.set(k, g);
+  }
+  return [...groupes.values()].sort((x, y) => Number(y.memeCouleur) - Number(x.memeCouleur) || y.paires.length - x.paires.length);
 }
