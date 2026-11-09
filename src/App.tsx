@@ -15,9 +15,20 @@ export function App() {
   const { s, setS, erreur } = useSauvegarde();
   const [famille, setFamille] = useState<Famille>("dragodinde");
   const [onglet, setOnglet] = useState<Onglet>("actions");
+  // Annulation : états précédents de la session (une saisie erronée se défait en un clic).
+  const [historique, setHistorique] = useState<Sauvegarde[]>([]);
   if (!s) return <div className="p-6 text-text-muted">Chargement…</div>;
 
-  const majS = (f: (x: Sauvegarde) => Sauvegarde) => setS((x) => (x ? f(x) : x));
+  const majS = (f: (x: Sauvegarde) => Sauvegarde) => {
+    setHistorique((h) => [...h.slice(-29), s]);
+    setS((x) => (x ? f(x) : x));
+  };
+  const annuler = () => {
+    const precedent = historique[historique.length - 1];
+    if (!precedent) return;
+    setHistorique((h) => h.slice(0, -1));
+    setS(() => precedent);
+  };
   const props = { famille, s, setS: majS };
 
   return (
@@ -27,6 +38,14 @@ export function App() {
           Lignée <span className="text-sm font-normal text-text-muted">— pilotage d'élevage Dofus 3.7</span>
         </h1>
         <div className="flex gap-2">
+          <button
+            onClick={annuler}
+            disabled={!historique.length}
+            title={historique.length ? `Annuler la dernière modification (${historique.length} possible${historique.length > 1 ? "s" : ""})` : "Rien à annuler"}
+            className="rounded-lg border border-border-light px-3 py-1.5 text-sm text-text-secondary hover:bg-bg-hover disabled:opacity-30"
+          >
+            ↶ Annuler
+          </button>
           {FAMILLES.map((f) => (
             <button
               key={f}
