@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { sauvegardeVide } from "./moteur/actions";
 import type { Sauvegarde } from "./moteur/types";
+import { copieAutomatique } from "./sauvegardes";
 
 const FICHIER = "lignee-sauvegarde.json";
 const enTauri = typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
@@ -40,7 +41,10 @@ export function useSauvegarde() {
   const minuteur = useRef<number>();
 
   useEffect(() => {
-    lire().then(setS);
+    lire().then((s) => {
+      setS(s);
+      copieAutomatique(s).catch((e) => console.error("Copie automatique impossible", e));
+    });
   }, []);
 
   useEffect(() => {

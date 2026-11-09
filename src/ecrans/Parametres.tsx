@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { appliquerNiveauUnique, nombreEnclos, prochainPalierEnclos } from "../moteur/etable";
 import type { Options, Sauvegarde } from "../moteur/types";
 import { Carte, champ } from "../ui";
+import { SectionSauvegardes } from "./SectionSauvegardes";
 
 interface Props {
   s: Sauvegarde;
@@ -97,6 +98,7 @@ export function Parametres({ s, setS }: Props) {
           </Ligne>
         )}
       </Carte>
+      <SectionSauvegardes s={s} setS={setS} />
       <Carte titre="Accouplements">
         <Ligne titre="Bonus Almanax Takeza actif" aide="+20 % de chances d'obtenir la génération cible, les jours où l'Almanax le propose.">
           <input type="checkbox" className="h-4 w-4 accent-accent" checked={o.takeza} onChange={(e) => maj({ takeza: e.target.checked })} />
