@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { conseiller, conseillerMakina, prochainObjectif } from "./conseils";
+import { clonerPlusieurs, enregistrerNaissances, sauvegardeVide } from "./actions";
+import { actionsMaintenant, conseiller, conseillerMakina, prochainObjectif, seancesDesEtapes, seancesSuivantes } from "./conseils";
 import { couleurs } from "./donnees";
-import { planifier } from "./planificateur";
+import { planifier, regrouperClonages, suggererClonages } from "./planificateur";
 import type { Monture, Sexe } from "./types";
 
 let n = 0;
@@ -79,5 +80,56 @@ describe("conseils d'actions", () => {
   it("signale un blocage de sexe", () => {
     const c = conseiller(planifier("dragodinde", [m("amande_rousse", "F"), m("ebene_indigo", "F")], jusquA(4)), {});
     expect(c.blocages.some((b) => b.e.couleur === "pourpre")).toBe(true);
+  });
+});
+
+describe("séances", () => {
+  it("regroupe les accouplements identiques et numérote les séances", () => {
+    // 2 couples Ebène × Indigo faisables tout de suite ; leurs bébés servent à la séance suivante.
+    const etable = [m("ebene", "M"), m("ebene", "M"), m("indigo", "F"), m("indigo", "F"), m("doree_rousse", "F"), m("amande_rousse", "F")];
+    const plan = planifier("dragodinde", etable, jusquA(5).filter((x) => !["ebene_indigo", "orchidee", "pourpre"].includes(x)));
+    const c = conseiller(plan, {});
+    const ei = c.ordre.filter((a) => a.e.couleur === "ebene_indigo");
+    expect(ei).toHaveLength(1);
+    expect(ei[0].nombre).toBe(2);
+    const num = seancesDesEtapes(plan);
+    for (const a of c.ordre) expect(num[a.etape]).toBe(1);
+    const suivantes = seancesSuivantes(plan);
+    expect(suivantes[0].numero).toBe(2);
+    expect(suivantes.every((s, i) => i === 0 || s.numero > suivantes[i - 1].numero)).toBe(true);
+  });
+});
+
+describe("actions groupées", () => {
+  it("enregistre plusieurs naissances et clonages d'un coup", () => {
+    let s = sauvegardeVide();
+    s = { ...s, montures: [m("ebene", "M"), m("ebene", "M"), m("indigo", "F"), m("indigo", "F")] };
+    const [p1, p2, f1, f2] = s.montures.map((x) => x.id);
+    const bebes = [
+      { couleur: "ebene_indigo", sexe: "M" as Sexe },
+      { couleur: "ebene_indigo", sexe: "F" as Sexe },
+      { couleur: "ebene", sexe: "F" as Sexe },
+    ];
+    s = enregistrerNaissances(s, [{ pereId: p1, mereId: f1 }, { pereId: p2, mereId: f2 }], bebes);
+    expect(s.montures.filter((x) => x.etat === "sterile")).toHaveLength(4);
+    expect(s.montures.filter((x) => x.origine === "naissance")).toHaveLength(3);
+    expect(() => enregistrerNaissances(s, [{ pereId: p1, mereId: f1 }], bebes)).toThrow();
+    const groupes = regrouperClonages(suggererClonages(s.montures));
+    const ebene = groupes.find((g) => g.memeCouleur && g.couleurs[0] === "ebene")!;
+    expect(ebene.paires).toHaveLength(1);
+    s = clonerPlusieurs(s, ebene.paires.map((p) => ({ idA: p.a.id, idB: p.b.id })), [{ couleur: "ebene", sexe: "M" }]);
+    expect(s.montures.filter((x) => x.couleur === "ebene" && x.etat === "fertile")).toHaveLength(2);
+  });
+  it("numérote naissances prêtes, puis préparation, puis naissances en attente", () => {
+    const tout = jusquA(10).filter((x) => x !== "ebene_indigo");
+    // Féconde prête utilisée en priorité, même à niveau égal.
+    const pret = conseiller(planifier("dragodinde", [m("ebene", "M", { etat: "fertile" }), m("ebene", "M"), m("indigo", "F")], tout), {});
+    expect(actionsMaintenant(pret, []).map((x) => x.type)).toEqual(["naissance"]);
+    // Parent à préparer : la préparation passe avant la naissance qui l'attend.
+    const attente = conseiller(planifier("dragodinde", [m("ebene", "M", { etat: "fertile" }), m("indigo", "F")], tout), {});
+    const liste = actionsMaintenant(attente, []);
+    expect(liste.map((x) => x.type)).toEqual(["preparer", "naissance"]);
+    expect(liste.map((x) => x.numero)).toEqual([1, 2]);
+    expect((liste[1] as { a: { rang: number } }).a.rang).toBe(2);
   });
 });

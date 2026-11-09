@@ -1,7 +1,7 @@
 // Transforme le plan en liste d'actions concrètes : ce qui est prêt, ce qu'il faut préparer,
 // capturer ou cloner, et ce qui bloque. Seules les étapes de la « frontière » sont traitées :
 // celles dont aucun parent n'attend une naissance planifiée plus tôt.
-import type { Etape, Plan, Source } from "./planificateur";
+import type { Etape, GroupeClonage, Plan, Source } from "./planificateur";
 import { probaCible, sommeNiveauxPour100, type Bonus } from "./regles";
 import type { Makina, Monture, Sexe } from "./types";
 
@@ -23,6 +23,10 @@ export interface ActionAccouplement {
   termineSucces: boolean;
   /** Rang conseillé parmi toutes les naissances faisables (1 = la plus utile). */
   rang: number;
+  /** Nombre d'accouplements identiques (mêmes couleurs de parents) faisables maintenant, celui-ci compris. */
+  nombre: number;
+  /** Les couples de parents de ces accouplements identiques. */
+  paires: { pere: Monture; mere: Monture }[];
   makina: ConseilMakina;
   /** Montures dont les jauges sont à remplir avant l'accouplement. */
   aPreparer: Monture[];
@@ -73,6 +77,47 @@ export function prochainObjectif(plan: Plan): Objectif | null {
   };
   remonter(indice);
   return { generation, manquantes: dansGen.map(({ e }) => e.couleur), cible: cible.couleur, chemin: [...chemin].sort((a, b) => a - b) };
+}
+
+/** Une séance à venir : les naissances possibles une fois la séance précédente terminée. */
+export interface Seance {
+  numero: number;
+  naissances: { couleur: string; nombre: number; succes: boolean }[];
+  clonages: number;
+}
+
+/**
+ * Séance de chaque étape du plan : 1 = faisable maintenant, puis 1 + la séance la plus tardive
+ * dont elle attend un bébé (ou les stériles à cloner).
+ */
+export function seancesDesEtapes(plan: Plan): number[] {
+  const seance: number[] = [];
+  plan.etapes.forEach((e, i) => {
+    let s = 1;
+    for (const p of e.parents) {
+      if (p.type === "naissance") s = Math.max(s, seance[p.etape] + 1);
+      if (p.type === "clone") for (const st of p.steriles) if ("apresEtape" in st) s = Math.max(s, seance[st.apresEtape] + 1);
+    }
+    seance[i] = s;
+  });
+  return seance;
+}
+
+/** Résumé des séances suivantes (à partir de la 2ᵉ). */
+export function seancesSuivantes(plan: Plan): Seance[] {
+  const num = seancesDesEtapes(plan);
+  const seances = new Map<number, Seance>();
+  plan.etapes.forEach((e, i) => {
+    if (num[i] === 1) return;
+    const s = seances.get(num[i]) ?? { numero: num[i], naissances: [], clonages: 0 };
+    seances.set(num[i], s);
+    const n = s.naissances.find((x) => x.couleur === e.couleur);
+    if (n) n.nombre++;
+    else s.naissances.push({ couleur: e.couleur, nombre: 1, succes: e.pour === "succes" });
+    s.clonages += e.parents.filter((p) => p.type === "clone").length;
+  });
+  for (const s of seances.values()) s.naissances.sort((a, b) => Number(b.succes) - Number(a.succes) || b.nombre - a.nombre);
+  return [...seances.values()].sort((a, b) => a.numero - b.numero);
 }
 
 export interface Conseils {
@@ -158,6 +203,8 @@ export function conseiller(plan: Plan, options: Bonus & { takeza?: boolean }): C
         debloque: compter(i),
         termineSucces: e.pour === "succes" && manquantesParGeneration.get(e.generation) === 1,
         rang: 0,
+        nombre: 1,
+        paires: [{ pere, mere }],
         makina: conseillerMakina(pere.niveau, mere.niveau, e.sexeVoulu, takeza),
         aPreparer: [pere, mere].filter((m) => m.etat !== "feconde"),
         niveauConseille: seuil !== null && pere.niveau + mere.niveau < seuil ? seuil : null,
@@ -192,8 +239,19 @@ export function conseiller(plan: Plan, options: Bonus & { takeza?: boolean }): C
     Number(!y.aPreparer.length) - Number(!x.aPreparer.length) ||
     y.debloque - x.debloque ||
     y.e.generation - x.e.generation;
-  const vues = new Set<string>();
-  const ordre = [...prets, ...aPreparer].sort(priorite).filter((a) => !vues.has(a.e.couleur) && vues.add(a.e.couleur));
+  // Accouplements identiques (même bébé, même couleur de père et de mère, même préparation) regroupés.
+  const cle = (a: ActionAccouplement) => `${a.aPreparer.length ? "A" : "P"}|${a.e.couleur}|${a.pere.couleur}>${a.mere.couleur}`;
+  const parCle = new Map<string, ActionAccouplement>();
+  for (const a of [...prets, ...aPreparer].sort(priorite)) {
+    const deja = parCle.get(cle(a));
+    if (deja) {
+      deja.nombre++;
+      deja.paires.push(...a.paires);
+      for (const m of a.aPreparer) deja.aPreparer.push(m);
+    } else parCle.set(cle(a), a);
+  }
+  // Ce qui est prêt d'abord (tri stable : l'ordre de priorité est conservé).
+  const ordre = [...parCle.values()].sort((x, y) => Number(!!x.aPreparer.length) - Number(!!y.aPreparer.length));
   ordre.forEach((a, i) => (a.rang = i + 1));
   prets.sort(priorite);
   aPreparer.sort(priorite);
@@ -207,4 +265,38 @@ export function conseiller(plan: Plan, options: Bonus & { takeza?: boolean }): C
     else blocagesUniques.set(k, b);
   }
   return { prets, ordre, aPreparer, captures: [...captures.values()].sort((x, y) => y.nombre - x.nombre), clonagesUtiles, blocages: [...blocagesUniques.values()] };
+}
+
+type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
+
+/** Une action de la séance en cours, numérotée dans l'ordre conseillé. */
+export type ActionMaintenant =
+  | { type: "naissance"; numero: number; a: ActionAccouplement }
+  | { type: "clonage"; numero: number; g: GroupeClonage }
+  | { type: "preparer"; numero: number; groupes: { couleur: string; sexe: Sexe; montures: Monture[] }[] }
+  | { type: "capture"; numero: number; capture: ActionCapture };
+
+/**
+ * Liste unique des actions à faire maintenant : naissances prêtes, clonages (instantanés), jauges
+ * à remplir, captures, puis les naissances qui attendent cette préparation. Fixe aussi le rang
+ * des naissances sur ce numéro (étoiles de l'arbre et du chemin).
+ */
+export function actionsMaintenant(c: Conseils, clonages: GroupeClonage[]): ActionMaintenant[] {
+  const liste: ActionMaintenant[] = [];
+  const ajouter = (x: DistributiveOmit<ActionMaintenant, "numero">) => liste.push({ ...x, numero: liste.length + 1 } as ActionMaintenant);
+  for (const a of c.ordre) if (!a.aPreparer.length) ajouter({ type: "naissance", a });
+  for (const g of clonages) ajouter({ type: "clonage", g });
+  const groupes = new Map<string, { couleur: string; sexe: Sexe; montures: Monture[] }>();
+  for (const a of c.ordre)
+    for (const m of a.aPreparer) {
+      const k = `${m.couleur}/${m.sexe}`;
+      const g = groupes.get(k) ?? { couleur: m.couleur, sexe: m.sexe, montures: [] };
+      if (!g.montures.some((x) => x.id === m.id)) g.montures.push(m);
+      groupes.set(k, g);
+    }
+  if (groupes.size) ajouter({ type: "preparer", groupes: [...groupes.values()] });
+  for (const capture of c.captures) ajouter({ type: "capture", capture });
+  for (const a of c.ordre) if (a.aPreparer.length) ajouter({ type: "naissance", a });
+  for (const x of liste) if (x.type === "naissance") x.a.rang = x.numero;
+  return liste;
 }

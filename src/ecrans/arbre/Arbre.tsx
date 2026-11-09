@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { couleur, nomCouleur } from "../../moteur/donnees";
-import { conseiller, type ActionAccouplement } from "../../moteur/conseils";
+import { actionsMaintenant, conseiller, type ActionAccouplement } from "../../moteur/conseils";
 import { enfantsDe, lignee } from "../../moteur/genealogie";
-import { planifier } from "../../moteur/planificateur";
+import { planifier, regrouperClonages, suggererClonages } from "../../moteur/planificateur";
 import type { Famille, Sauvegarde } from "../../moteur/types";
 import { ArbreCentre, type Sens } from "./ArbreCentre";
 import { Etoile, fabriquerStatut, ImageMonture, LegendeArbre, type RolePlan, type Statut } from "./commun";
@@ -29,10 +29,13 @@ export function Arbre({ famille, s }: Props) {
   const { statut, prochaines } = useMemo(() => {
     const plan = planifier(famille, s.montures, s.obtenues[famille]);
     const c = conseiller(plan, { takeza: s.options.takeza });
+    // Même numérotation que « À faire maintenant » (clonages compris).
+    actionsMaintenant(c, regrouperClonages(suggererClonages(s.montures.filter((m) => m.famille === famille))));
     const roles = new Map<string, RolePlan>();
     for (const e of plan.etapes) if (e.pour === "intermediaire") roles.set(e.couleur, "produire");
     const rangs = new Map<string, number>();
     for (const a of c.ordre) {
+      if (rangs.has(a.e.couleur)) continue; // la carte prête passe avant celle à préparer
       roles.set(a.e.couleur, a.aPreparer.length ? "preparer" : "pret");
       rangs.set(a.e.couleur, a.rang);
     }
@@ -213,7 +216,7 @@ function Prochaines({ famille, liste, centrer }: { famille: Famille; liste: Acti
         <div className="flex flex-col gap-1">
           {liste.map((a) => (
             <button
-              key={a.e.couleur}
+              key={a.etape}
               onClick={() => centrer(a.e.couleur)}
               className="flex items-center gap-2 rounded-md px-1.5 py-1 text-left text-sm hover:bg-bg-hover"
               title="Ouvrir son arbre"

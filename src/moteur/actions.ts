@@ -75,3 +75,30 @@ export function cloner(s: Sauvegarde, idA: string, idB: string, resultat: { coul
   };
   return { ...s, montures: [...s.montures.filter((m) => m.id !== idA && m.id !== idB), clone] };
 }
+
+/**
+ * Enregistre plusieurs accouplements d'un coup : `paires` (une par accouplement fait) et tous les
+ * bébés obtenus. Chaque accouplement reçoit un bébé, les bébés en plus (Reproducteur) sont donnés
+ * en second aux premiers accouplements.
+ */
+export function enregistrerNaissances(
+  s: Sauvegarde,
+  paires: { pereId: string; mereId: string }[],
+  bebes: Bebe[],
+  makina?: Makina,
+  niveauBebes = 1,
+): Sauvegarde {
+  const n = paires.length;
+  if (n === 0) throw new Error("Aucun accouplement");
+  if (bebes.length < n || bebes.length > 2 * n) throw new Error(`${n} accouplement(s) : entre ${n} et ${2 * n} bébés`);
+  return paires.reduce(
+    (acc, p, i) => enregistrerNaissance(acc, p.pereId, p.mereId, [bebes[i], ...(n + i < bebes.length ? [bebes[n + i]] : [])], makina, niveauBebes),
+    s,
+  );
+}
+
+/** Enregistre plusieurs clonages : une paire de stériles par clone obtenu, dans l'ordre. */
+export function clonerPlusieurs(s: Sauvegarde, paires: { idA: string; idB: string }[], resultats: { couleur: string; sexe: Sexe }[]): Sauvegarde {
+  if (resultats.length !== paires.length) throw new Error("Un résultat par clonage");
+  return paires.reduce((acc, p, i) => cloner(acc, p.idA, p.idB, resultats[i]), s);
+}
