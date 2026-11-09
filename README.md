@@ -3,6 +3,9 @@
 Outil de pilotage de l'élevage pour **Dofus 3.7** (Dragodindes, Muldos, Volkornes) : il calcule quoi accoupler, quoi capturer et quoi cloner pour obtenir tous les succès de génération.
 
 > Projet de fan, non affilié à Ankama. Dofus est une marque d'Ankama Games.
+> Les images des montures (via [DofusDB](https://dofusdb.fr)) et les fonds d'écran proposés dans les Paramètres
+> ([wallpapers officiels](https://www.dofus.com/fr/mmorpg/medias/wallpapers)) sont © Ankama : ils ne sont pas
+> inclus dans ce dépôt, l'application les charge depuis leur site d'origine.
 
 ## Ce que fait l'outil
 
