@@ -112,3 +112,28 @@ body {
 .arbre {
   --branche: rgba(212, 160, 23, 0.45);
 }
+
+/* Action pas encore faisable : fond hachuré. */
+.hachure {
+  background-color: var(--color-bg-secondary);
+  background-image: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.045) 0 8px, transparent 8px 18px);
+}
+
+/* Génération en cours dans la barre de progression : rayures animées. */
+.barre-active {
+  background-size: 200% 100%;
+  position: relative;
+}
+.barre-active::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.22) 0 6px, transparent 6px 12px);
+  background-size: 34px 34px;
+  animation: defiler 1.2s linear infinite;
+}
+@keyframes defiler {
+  to {
+    background-position: 34px 0;
+  }
+}

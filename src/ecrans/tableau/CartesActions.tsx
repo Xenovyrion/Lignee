@@ -29,7 +29,8 @@ function CadreAction(p: {
   numero: number;
   type: keyof typeof TYPES;
   nombre?: number;
-  attente?: boolean;
+  /** Action pas encore faisable : fond hachuré et bandeau avec ce texte. */
+  attente?: string;
   children: ReactNode;
   droite?: ReactNode;
   pied?: ReactNode;
@@ -37,8 +38,18 @@ function CadreAction(p: {
 }) {
   const t = TYPES[p.type];
   return (
-    <li id={p.id} className={`scroll-mt-4 rounded-xl border bg-bg-secondary p-3 ${p.attente ? "border-border opacity-60" : "border-border-light"}`} style={{ borderLeft: `4px solid ${t.teinte}` }}>
-      <div className="flex flex-wrap items-center gap-3">
+    <li
+      id={p.id}
+      className={`scroll-mt-4 rounded-xl border p-3 ${p.attente ? "hachure border-border" : "border-border-light bg-bg-secondary"}`}
+      style={{ borderLeft: `4px solid ${p.attente ? "rgba(255,255,255,0.15)" : t.teinte}` }}
+    >
+      {p.attente && (
+        <div className="mb-2 flex items-center gap-2 text-xs font-medium text-accent">
+          <span className="rounded-full border border-accent/40 bg-bg-primary/80 px-2 py-0.5">⏳ Pas encore faisable</span>
+          <span className="text-text-secondary">{p.attente}</span>
+        </div>
+      )}
+      <div className={`flex flex-wrap items-center gap-3 ${p.attente ? "opacity-55 grayscale-[40%]" : ""}`}>
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-black" style={{ background: t.teinte }}>
           {p.numero}
         </span>
@@ -136,7 +147,26 @@ const Parent = ({ famille, couleurId, sexe, niveau }: { famille: Famille; couleu
   </div>
 );
 
-export function CarteNaissance({ id, numero, famille, a, prevues, setS, niveauBebes }: { id?: string; numero: number; famille: Famille; a: ActionAccouplement; prevues: number; setS: SetS; niveauBebes: number }) {
+export function CarteNaissance({
+  id,
+  numero,
+  famille,
+  a,
+  prevues,
+  setS,
+  niveauBebes,
+  etapePreparer,
+}: {
+  id?: string;
+  numero: number;
+  famille: Famille;
+  a: ActionAccouplement;
+  prevues: number;
+  setS: SetS;
+  niveauBebes: number;
+  /** Numéro de l'étape « Préparer » dont dépend cette naissance. */
+  etapePreparer?: number;
+}) {
   const [ouvert, setOuvert] = useState(false);
   const pret = a.aPreparer.length === 0;
   const { e } = a;
@@ -147,7 +177,11 @@ export function CarteNaissance({ id, numero, famille, a, prevues, setS, niveauBe
       numero={numero}
       type="naissance"
       nombre={a.nombre}
-      attente={!pret}
+      attente={
+        pret
+          ? undefined
+          : `Remplir d'abord les jauges de : ${[...new Set(a.aPreparer.map((m) => `${nomCouleur(famille, m.couleur)} ${sexeSymbole(m.sexe)}`))].join(", ")}${etapePreparer ? ` (étape ${etapePreparer})` : ""}.`
+      }
       droite={
         <>
           <div className="text-right">
@@ -161,7 +195,6 @@ export function CarteNaissance({ id, numero, famille, a, prevues, setS, niveauBe
       }
       pied={
         <>
-          {!pret && <span className="text-accent">Après la préparation des parents (jauges)</span>}
           {a.makina.makina === "animakina" && <span>Animakina : {a.makina.raison}</span>}
           {a.niveauConseille && (
             <span>

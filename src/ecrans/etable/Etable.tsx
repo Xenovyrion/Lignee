@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { nouvelId } from "../../moteur/actions";
 import { couleur, FAMILLES, NOMS_FAMILLE } from "../../moteur/donnees";
-import { ajusterStock, besoinsParCouleur, compterStock } from "../../moteur/etable";
+import { ajusterStock, besoinsParCouleur, compterStock, rendreFecondes } from "../../moteur/etable";
 import { planifier } from "../../moteur/planificateur";
 import type { Etat, Famille, Monture, Sauvegarde, Sexe } from "../../moteur/types";
 import { Bouton, champ, ETATS } from "../../ui";
@@ -200,7 +200,7 @@ export function Etable({ famille, s, setS }: Props) {
               montures={affichees}
               ajouter={ajouterUne}
               retirer={retirerUne}
-              simple={simple ? { stock: (c, sexe, etat) => compterStock(s.montures, famille, c, sexe, etat), ajuster: (c, sexe, etat, delta) => setS((s) => ajusterStock(s, famille, c, sexe, etat, delta, niveauDefaut)) } : undefined}
+              simple={simple ? { stock: (c, sexe, etat) => compterStock(s.montures, famille, c, sexe, etat), ajuster: (c, sexe, etat, delta) => setS((s) => ajusterStock(s, famille, c, sexe, etat, delta, niveauDefaut)), rendrePrete: (c, sexe) => setS((s) => rendreFecondes(s, famille, c, sexe, 1)) } : undefined}
               ouvrirCouleur={(c) => {
                 setFiltre({ ...filtre, couleurs: [c] });
                 setVue("liste");
