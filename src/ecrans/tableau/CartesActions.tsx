@@ -199,11 +199,14 @@ export function CarteNaissance({ id, numero, famille, a, prevues, setS, niveauBe
 }
 
 function FormNaissances({ famille, a, setS, niveauBebes, fermer }: { famille: Famille; a: ActionAccouplement; setS: SetS; niveauBebes: number; fermer: () => void }) {
-  const [n, setN] = useState(a.nombre);
+  // Par défaut 1 bébé par accouplement ; avec Reproducteur, le nombre d'accouplements est saisi à part.
+  const [reproducteur, setReproducteur] = useState(false);
+  const [nSaisi, setN] = useState(a.nombre);
   const [lignes, setLignes] = useState<Ligne[]>([{ couleur: a.e.couleur, ...repartir(a.nombre, a.e.sexeVoulu) }]);
   const [makina, setMakina] = useState<Makina | "">(a.makina.makina);
   const bebes = total(lignes);
-  const ok = bebes >= n && bebes <= 2 * n;
+  const n = reproducteur ? nSaisi : Math.min(bebes, a.nombre);
+  const ok = n >= 1 && bebes >= n && bebes <= 2 * n;
   const valider = () => {
     try {
       const paires = a.paires.slice(0, n).map((p) => ({ pereId: p.pere.id, mereId: p.mere.id }));
@@ -215,10 +218,21 @@ function FormNaissances({ famille, a, setS, niveauBebes, fermer }: { famille: Fa
   };
   return (
     <Formulaire>
+      <div className="text-text-secondary">
+        Bébés obtenus <span className="text-xs text-text-muted">— un par accouplement fait (échec = la couleur réellement obtenue)</span>
+      </div>
+      <SaisieResultats famille={famille} lignes={lignes} setLignes={setLignes} />
       <div className="flex flex-wrap items-center gap-3">
-        <span className="text-text-secondary">Accouplements faits</span>
-        <Compteur valeur={n} setValeur={setN} min={1} max={a.nombre} />
-        <span className="text-xs text-text-muted">sur {a.nombre} proposés</span>
+        <label className="flex items-center gap-2 text-xs text-text-secondary">
+          <input type="checkbox" checked={reproducteur} onChange={(e) => setReproducteur(e.target.checked)} />
+          Reproducteur (2 bébés pour un accouplement)
+        </label>
+        {reproducteur && (
+          <>
+            <span className="text-text-secondary">Accouplements faits</span>
+            <Compteur valeur={nSaisi} setValeur={setN} min={1} max={a.nombre} />
+          </>
+        )}
         <label className="ml-4 flex items-center gap-2 text-text-secondary">
           Makina
           <select className={champ} value={makina} onChange={(e) => setMakina(e.target.value as Makina | "")}>
@@ -231,15 +245,17 @@ function FormNaissances({ famille, a, setS, niveauBebes, fermer }: { famille: Fa
           </select>
         </label>
       </div>
-      <div className="text-text-secondary">Bébés obtenus</div>
-      <SaisieResultats famille={famille} lignes={lignes} setLignes={setLignes} />
       <div className="flex flex-wrap items-center gap-3">
         <Bouton onClick={valider} disabled={!ok}>
           Valider
         </Bouton>
         <span className={`text-xs ${ok ? "text-text-muted" : "text-status-warn"}`}>
           {bebes} bébé{bebes > 1 ? "s" : ""} pour {n} accouplement{n > 1 ? "s" : ""}
-          {ok ? " · les parents passent stériles, les nouvelles couleurs sont cochées." : ` : il en faut entre ${n} et ${2 * n} (2 par accouplement avec Reproducteur).`}
+          {ok
+            ? ` · ${2 * n} parents passent stériles, les nouvelles couleurs sont cochées.`
+            : bebes > a.nombre && !reproducteur
+              ? ` : ${a.nombre} accouplements au plus ici (coche Reproducteur si un accouplement a donné 2 bébés).`
+              : ` : il en faut entre ${n} et ${2 * n}.`}
         </span>
       </div>
     </Formulaire>
