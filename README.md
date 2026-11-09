@@ -9,7 +9,7 @@ Outil de pilotage de l'élevage pour **Dofus 3.7** (Dragodindes, Muldos, Volkorn
 
 ## Ce que fait l'outil
 
-- **Prochaines actions** : les accouplements réalisables tout de suite avec ton étable, la probabilité d'obtenir la génération cible et le niveau à atteindre pour 100 %. L'outil liste aussi les captures et les clonages à faire, puis le plan complet jusqu'à la génération 10.
+- **Tableau de bord** : les prochaines étapes dans l'ordre (naissances, clonages, jauges à remplir, captures), avec la probabilité d'obtenir la couleur visée, puis les séances suivantes jusqu'à la génération 10.
 - **Étable** : une fiche par monture (couleur, sexe, niveau, état, couleur des parents).
 - **Succès** : les 294 couleurs à faire naître, cochées automatiquement à chaque naissance enregistrée.
 

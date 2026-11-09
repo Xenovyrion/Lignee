@@ -1,10 +1,9 @@
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { actionsMaintenant, conseiller, prochainObjectif, seancesDesEtapes, seancesSuivantes } from "../../moteur/conseils";
 import { couleur, NOMS_FAMILLE, nomCouleur, objectifs } from "../../moteur/donnees";
-import { planifier, regrouperClonages, suggererClonages, type Source } from "../../moteur/planificateur";
+import { planifier, regrouperClonages, suggererClonages } from "../../moteur/planificateur";
 import { nomSuccesGeneration } from "../../moteur/succes";
 import type { Famille, Sauvegarde } from "../../moteur/types";
-import { Bouton, libelleMonture, sexeSymbole } from "../../ui";
 import { Etoile, ImageMonture } from "../arbre/commun";
 import { Bandeau, Confettis, Nombre, useCompteur } from "../../effets";
 import { IconeBlocage, IconeCapture, IconeClonage, IconeNaissance, IconePreparer } from "../../icones";
@@ -107,7 +106,6 @@ export function TableauDeBord({ famille, s, setS }: Props) {
   const suivantes = useMemo(() => seancesSuivantes(plan), [plan]);
   const totalSeances = Math.max(1, ...numSeance);
   const [toutesSeances, setToutesSeances] = useState(false);
-  const [planOuvert, setPlanOuvert] = useState(false);
 
   // Nouvelle couleur obtenue → confettis ; génération complétée → bandeau « Succès obtenu ».
   const [confettis, setConfettis] = useState(0);
@@ -358,46 +356,6 @@ export function TableauDeBord({ famille, s, setS }: Props) {
           )}
         </Cadre>
       )}
-
-      <Cadre
-        titre="Plan complet"
-        sous="Suppose 100 % de réussite ; recalculé après chaque naissance. ♂/♀ : sexe à viser pour l'étape suivante."
-        droite={
-          <Bouton discret onClick={() => setPlanOuvert(!planOuvert)}>
-            {planOuvert ? "Masquer" : `Afficher les ${plan.etapes.length} étapes`}
-          </Bouton>
-        }
-      >
-        {planOuvert && <PlanComplet famille={famille} plan={plan} />}
-      </Cadre>
     </div>
-  );
-}
-
-function PlanComplet({ famille, plan }: { famille: Famille; plan: ReturnType<typeof planifier> }) {
-  const libelle = (src: Source) =>
-    src.type === "monture"
-      ? libelleMonture(src.monture)
-      : src.type === "capture"
-        ? `${nomCouleur(famille, src.couleur)} à capturer`
-        : src.type === "clone"
-          ? `clone de 2 ${nomCouleur(famille, src.couleur)} stériles`
-          : `bébé de l'étape ${src.etape + 1}`;
-  return (
-    <ol className="flex flex-col text-sm">
-      {plan.etapes.map((e, i) => (
-        <li key={i} className="flex gap-2 border-t border-border py-1">
-          <span className="w-10 text-text-muted">{i + 1}.</span>
-          <span className={`w-24 text-xs leading-5 ${e.pour === "succes" ? "text-accent" : "text-text-muted"}`}>{e.pour === "succes" ? "succès" : "pour la suite"}</span>
-          <span className="w-56 font-medium">
-            G{e.generation} {couleur(famille, e.couleur).nom} {e.sexeVoulu ? sexeSymbole(e.sexeVoulu) : ""}
-          </span>
-          <span className="text-text-secondary">
-            {libelle(e.parents[0])} × {libelle(e.parents[1])}
-            {e.alerteSexe && <span className="ml-2 text-status-warn">⚠ même sexe</span>}
-          </span>
-        </li>
-      ))}
-    </ol>
   );
 }

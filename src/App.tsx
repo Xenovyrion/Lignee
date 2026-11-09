@@ -13,7 +13,7 @@ import { urlFond } from "./fond";
 import type { Famille, Sauvegarde } from "./moteur/types";
 import { useSauvegarde } from "./stockage";
 
-const ONGLETS = { actions: "Prochaines actions", etable: "Étable", arbre: "Arbre", succes: "Succès", parametres: "Paramètres" } as const;
+const ONGLETS = { actions: "Tableau de bord", etable: "Étable", arbre: "Arbre", succes: "Succès", parametres: "Paramètres" } as const;
 type Onglet = keyof typeof ONGLETS;
 const ICONES_ONGLETS = { actions: IconeActions, etable: IconeEtable, arbre: IconeArbre, succes: IconeSucces, parametres: IconeParametres };
 
@@ -68,7 +68,7 @@ export function App() {
       {/* En-tête sans cadre : logo et titre flottent sur le fond, avec une ombre portée pour rester lisibles. */}
       <header className="flex flex-wrap items-center justify-between gap-4 px-1">
         <div className="flex items-center gap-4">
-          <Logo taille={68} />
+          <Logo taille={68} anime />
           <h1 className="text-4xl font-extrabold tracking-tight" style={{ textShadow: "0 2px 12px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9)" }}>
             Lign<span className="text-amber-400">é</span>e
           </h1>
