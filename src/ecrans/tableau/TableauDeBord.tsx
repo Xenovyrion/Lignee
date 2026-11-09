@@ -7,6 +7,7 @@ import type { Famille, Sauvegarde } from "../../moteur/types";
 import { Bouton, libelleMonture, sexeSymbole } from "../../ui";
 import { Etoile, ImageMonture } from "../arbre/commun";
 import { Bandeau, Confettis, Nombre, useCompteur } from "../../effets";
+import { IconeBlocage, IconeCapture, IconeClonage, IconeNaissance, IconePreparer } from "../../icones";
 import { CarteCapture, CarteClonage, CarteNaissance, CartePreparer, TYPES } from "./CartesActions";
 
 const LIMITE_FRISE = 6;
@@ -18,7 +19,7 @@ interface Props {
 }
 
 const Cadre = ({ id, titre, sous, children, droite, ton }: { id?: string; titre: string; sous?: string; children: ReactNode; droite?: ReactNode; ton?: "alerte" }) => (
-  <section id={id} className={`scroll-mt-4 rounded-xl border p-4 ${ton === "alerte" ? "border-status-warn/40 bg-status-warn/5" : "border-border bg-bg-card/85 backdrop-blur-sm"}`}>
+  <section id={id} className={`scroll-mt-4 rounded-xl border p-4 ${ton === "alerte" ? "border-status-warn/40 bg-status-warn/5" : "border-border bg-bg-card"}`}>
     <div className="mb-3 flex items-start justify-between gap-2">
       <div>
         <h2 className="font-semibold">{titre}</h2>
@@ -31,7 +32,7 @@ const Cadre = ({ id, titre, sous, children, droite, ton }: { id?: string; titre:
 );
 
 /** Tuile chiffrée cliquable qui mène à sa section. */
-const Tuile = ({ valeur, libelle, teinte, cible, icone }: { valeur: number; libelle: string; teinte: string; cible: string; icone: string }) => (
+const Tuile = ({ valeur, libelle, teinte, cible, icone }: { valeur: number; libelle: string; teinte: string; cible: string; icone: ReactNode }) => (
   <button
     onClick={() => document.getElementById(cible)?.scrollIntoView({ behavior: "smooth" })}
     className="group flex items-center gap-3 rounded-xl border border-border px-4 py-3 text-left transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(0,0,0,0.4)]"
@@ -40,7 +41,7 @@ const Tuile = ({ valeur, libelle, teinte, cible, icone }: { valeur: number; libe
       background: valeur ? `linear-gradient(135deg, ${teinte}26, var(--color-bg-card) 65%)` : "var(--color-bg-card)",
     }}
   >
-    <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-2xl transition group-hover:scale-110 ${valeur ? "" : "opacity-40 grayscale"}`} style={{ background: `${teinte}22` }}>
+    <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition group-hover:scale-110 ${valeur ? "" : "opacity-40 grayscale"}`} style={{ background: `${teinte}22`, color: teinte, boxShadow: valeur ? `inset 0 0 0 1px ${teinte}55` : undefined }}>
       {icone}
     </span>
     <span className="flex flex-col">
@@ -155,7 +156,7 @@ export function TableauDeBord({ famille, s, setS }: Props) {
       <Confettis declencheur={confettis} />
       <Bandeau message={bandeau} fermer={fermerBandeau} />
       {/* Progression */}
-      <div className="rounded-xl border border-border bg-bg-card/85 p-4 backdrop-blur-sm">
+      <div className="rounded-xl border border-border bg-bg-card p-4">
         <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
           <AnneauTotal faites={obtenues.size} total={objectifs(famille).length} />
           <div className="flex min-w-[320px] flex-1 gap-2">
@@ -258,11 +259,11 @@ export function TableauDeBord({ famille, s, setS }: Props) {
 
       {/* Tuiles : raccourcis vers la première action de chaque type */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-        <Tuile valeur={nbPrets} icone="🥚" libelle="accouplements prêts" teinte={TYPES.naissance.teinte} cible={`action-${premier("naissance")}`} />
-        <Tuile valeur={clonages.reduce((n, g) => n + g.paires.length, 0)} icone="🧬" libelle="clonages possibles" teinte={TYPES.clonage.teinte} cible={`action-${premier("clonage")}`} />
-        <Tuile valeur={nbAPreparer} icone="⏳" libelle="montures à préparer" teinte={TYPES.preparer.teinte} cible={`action-${premier("preparer")}`} />
-        <Tuile valeur={c.captures.reduce((x, y) => x + y.nombre, 0)} icone="🕸️" libelle="captures à faire" teinte={TYPES.capture.teinte} cible={`action-${premier("capture")}`} />
-        <Tuile valeur={c.blocages.length} icone="⚠️" libelle="blocages" teinte="#f97316" cible="blocages" />
+        <Tuile valeur={nbPrets} icone={<IconeNaissance taille={24} />} libelle="accouplements prêts" teinte={TYPES.naissance.teinte} cible={`action-${premier("naissance")}`} />
+        <Tuile valeur={clonages.reduce((n, g) => n + g.paires.length, 0)} icone={<IconeClonage taille={24} />} libelle="clonages possibles" teinte={TYPES.clonage.teinte} cible={`action-${premier("clonage")}`} />
+        <Tuile valeur={nbAPreparer} icone={<IconePreparer taille={24} />} libelle="montures à préparer" teinte={TYPES.preparer.teinte} cible={`action-${premier("preparer")}`} />
+        <Tuile valeur={c.captures.reduce((x, y) => x + y.nombre, 0)} icone={<IconeCapture taille={24} />} libelle="captures à faire" teinte={TYPES.capture.teinte} cible={`action-${premier("capture")}`} />
+        <Tuile valeur={c.blocages.length} icone={<IconeBlocage taille={24} />} libelle="blocages" teinte="#f97316" cible="blocages" />
       </div>
 
       {c.blocages.length > 0 && (

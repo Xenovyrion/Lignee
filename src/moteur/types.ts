@@ -76,4 +76,8 @@ export interface Options {
   fondEcran: string;
   /** Visibilité de l'image de fond, en % (le reste est assombri pour garder la lisibilité). */
   fondVisibilite: number;
+  /** Flou de l'image de fond, en pixels. */
+  fondFlou: number;
+  /** Opacité des panneaux, en % (plus haut = plus opaque, plus lisible). */
+  voile: number;
 }
