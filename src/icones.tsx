@@ -52,7 +52,7 @@ export const IconeBlocage = (p: P) => (
   </Icone>
 );
 
-/** Prochaines actions : cible. */
+/** Tableau de bord : cible. */
 export const IconeActions = (p: P) => (
   <Icone {...p}>
     <circle cx="12" cy="12" r="9" />

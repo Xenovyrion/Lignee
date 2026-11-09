@@ -211,7 +211,7 @@ function Prochaines({ famille, liste, centrer }: { famille: Famille; liste: Acti
       <div className="text-[11px] font-semibold uppercase text-text-muted">À faire maintenant ({liste.length})</div>
       <p className="mb-2 text-[11px] text-text-muted">Naissances possibles avec ton étable, dans l'ordre conseillé.</p>
       {liste.length === 0 ? (
-        <p className="text-xs text-text-muted">Aucune pour l'instant : voir les captures dans « Prochaines actions ».</p>
+        <p className="text-xs text-text-muted">Aucune pour l'instant : voir les captures dans le « Tableau de bord ».</p>
       ) : (
         <div className="flex flex-col gap-1">
           {liste.map((a) => (

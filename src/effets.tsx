@@ -83,10 +83,10 @@ export function Bandeau({ message, fermer }: { message: string | null; fermer: (
 /** Lucioles dorées qui flottent lentement derrière le contenu. */
 export function Lucioles() {
   const [points] = useState(() =>
-    Array.from({ length: 22 }, () => ({
+    Array.from({ length: 55 }, () => ({
       left: Math.random() * 100,
       top: Math.random() * 100,
-      taille: 2 + Math.random() * 3,
+      taille: 2 + Math.random() * 3.5,
       duree: 14 + Math.random() * 16,
       delai: -Math.random() * 30,
     })),
