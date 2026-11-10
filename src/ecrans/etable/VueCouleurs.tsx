@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import { couleurs } from "../../moteur/donnees";
 import type { BesoinCouleur } from "../../moteur/etable";
 import type { Etat, Famille, Monture, Sexe } from "../../moteur/types";
+import { TitreSection } from "../../ui";
 import { COULEURS, ImageMonture } from "../arbre/commun";
 
 interface Props {
@@ -140,11 +141,11 @@ export function VueCouleurs({ famille, montures, besoins, ajouter, retirer, ouvr
     <div className="flex flex-col gap-4 p-3">
       {gens.map((g) => (
         <div key={g}>
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-muted">Génération {g}</div>
+          <TitreSection>Génération {g}</TitreSection>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(230px,1fr))] gap-2">
             {liste
               .filter((c) => c.generation === g)
-              .map((c) => {
+              .map((c, i) => {
                 const n = compter(c.id);
                 const b = besoins.get(c.id);
                 const manque = b ? (c.generation === 1 ? b.aCapturer : b.aProduire) : 0;
@@ -153,7 +154,12 @@ export function VueCouleurs({ famille, montures, besoins, ajouter, retirer, ouvr
                     key={c.id}
                     onClick={() => !simple && ouvrirCouleur(c.id)}
                     title={simple ? undefined : "Voir ces montures dans la liste"}
-                    className={`flex flex-col gap-2 rounded-xl border border-border bg-bg-secondary p-2.5 transition ${simple ? "" : "cursor-pointer hover:border-border-light hover:bg-bg-hover"}`}
+                    className={`apparition flex flex-col gap-2 rounded-xl border border-border bg-bg-secondary p-2.5 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(0,0,0,0.4)] ${simple ? "" : "cursor-pointer hover:border-border-light"}`}
+                    style={{
+                      animationDelay: `${Math.min(i, 12) * 35}ms`,
+                      // Liseré du haut : orange s'il reste des montures à obtenir, couleur du thème si le plan s'en sert.
+                      borderTop: `3px solid ${manque > 0 ? COULEURS.produire : b && b.utilisees > 0 ? "var(--color-accent)" : "rgba(255,255,255,0.08)"}`,
+                    }}
                   >
                     <div className="flex items-center gap-2">
                       <ImageMonture famille={famille} id={c.id} taille={52} />

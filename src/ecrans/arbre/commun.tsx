@@ -44,7 +44,7 @@ export const COULEURS = {
   obtenue: "#22c55e",
   contour: "rgba(255,255,255,0.32)",
   verrouillee: "rgba(255,255,255,0.22)",
-  prochaine: "#facc15",
+  prochaine: "var(--color-accent-clair)",
   produire: "#f97316",
   males: "#0ea5e9",
   femelles: "#ec4899",

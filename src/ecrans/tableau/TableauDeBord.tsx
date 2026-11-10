@@ -37,10 +37,10 @@ const Tuile = ({ valeur, libelle, teinte, cible, icone }: { valeur: number; libe
     className="group flex items-center gap-3 rounded-xl border border-border px-4 py-3 text-left transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(0,0,0,0.4)]"
     style={{
       borderTop: `3px solid ${valeur ? teinte : "rgba(255,255,255,0.08)"}`,
-      background: valeur ? `linear-gradient(135deg, ${teinte}26, var(--color-bg-card) 65%)` : "var(--color-bg-card)",
+      background: valeur ? `linear-gradient(135deg, color-mix(in srgb, ${teinte} 15%, transparent), var(--color-bg-card) 65%)` : "var(--color-bg-card)",
     }}
   >
-    <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition group-hover:scale-110 ${valeur ? "" : "opacity-40 grayscale"}`} style={{ background: `${teinte}22`, color: teinte, boxShadow: valeur ? `inset 0 0 0 1px ${teinte}55` : undefined }}>
+    <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition group-hover:scale-110 ${valeur ? "" : "opacity-40 grayscale"}`} style={{ background: `color-mix(in srgb, ${teinte} 13%, transparent)`, color: teinte, boxShadow: valeur ? `inset 0 0 0 1px color-mix(in srgb, ${teinte} 33%, transparent)` : undefined }}>
       {icone}
     </span>
     <span className="flex flex-col">
@@ -66,8 +66,8 @@ function AnneauTotal({ faites, total }: { faites: number; total: number }) {
         <svg width={taille} height={taille} className="-rotate-90">
           <defs>
             <linearGradient id="degrade-total" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#facc15" />
-              <stop offset="100%" stopColor={v >= 1 ? "#4ade80" : "#d4a017"} />
+              <stop offset="0%" style={{ stopColor: "var(--color-accent-clair)" }} />
+              <stop offset="100%" style={{ stopColor: v >= 1 ? "#4ade80" : "var(--color-accent)" }} />
             </linearGradient>
           </defs>
           <circle cx={taille / 2} cy={taille / 2} r={r} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth={ep} />
@@ -80,7 +80,7 @@ function AnneauTotal({ faites, total }: { faites: number; total: number }) {
             strokeWidth={ep}
             strokeLinecap="round"
             strokeDasharray={`${c * v} ${c}`}
-            style={{ transition: "stroke-dasharray 700ms ease-out", filter: "drop-shadow(0 0 6px rgba(212,160,23,0.45))" }}
+            style={{ transition: "stroke-dasharray 700ms ease-out", filter: "drop-shadow(0 0 6px color-mix(in srgb, var(--color-accent) 45%, transparent))" }}
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -169,8 +169,8 @@ export function TableauDeBord({ famille, s, setS }: Props) {
                       className={`croitre brillance h-full rounded-full transition-[width] duration-700 ${courante ? "barre-active" : ""}`}
                       style={{
                         width: `${Math.max(faites ? 8 : 0, (100 * faites) / total)}%`,
-                        background: fini ? "linear-gradient(90deg,#15803d,#4ade80)" : "linear-gradient(90deg,#a16207,#facc15)",
-                        boxShadow: faites ? `0 0 10px ${fini ? "rgba(74,222,128,0.45)" : "rgba(250,204,21,0.35)"}` : undefined,
+                        background: fini ? "linear-gradient(90deg,#15803d,#4ade80)" : "linear-gradient(90deg,var(--color-accent-fonce),var(--color-accent-clair))",
+                        boxShadow: faites ? `0 0 10px ${fini ? "rgba(74,222,128,0.45)" : "color-mix(in srgb, var(--color-accent-clair) 35%, transparent)"}` : undefined,
                       }}
                     />
                   </div>

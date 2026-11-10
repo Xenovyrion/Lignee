@@ -4,6 +4,8 @@ import type { Options, Sauvegarde } from "../moteur/types";
 import { choisirFond, FONDS_ANKAMA, idGalerie, SOURCE_FONDS, supprimerFond, valeurGalerie } from "../fond";
 import { Carte, champ } from "../ui";
 import { SectionSauvegardes } from "./SectionSauvegardes";
+import { fondDuTheme, themeParId, THEMES, type Theme } from "../themes";
+import { useNotifier } from "../notifications";
 
 interface Props {
   s: Sauvegarde;
@@ -35,6 +37,14 @@ export function Parametres({ s, setS }: Props) {
     if (o.fondEcran && o.fondEcran !== nom) supprimerFond(o.fondEcran);
     maj({ fondEcran: nom });
   };
+  const themeActuel = themeParId(o.theme);
+  const notifier = useNotifier();
+  /** Applique un thème : sa palette et son fond d'écran avec ses réglages. */
+  const appliquerTheme = (t: Theme) => {
+    if (o.fondEcran && o.fondEcran !== t.fond) supprimerFond(o.fondEcran);
+    notifier(`Thème « ${t.nom} » appliqué`, { ton: "info", annulable: true });
+    maj({ theme: t.id, fondEcran: t.fond, fondVisibilite: t.visibilite, fondFlou: t.flou });
+  };
   return (
     <div className="flex flex-col gap-4">
       <Carte titre="Général">
@@ -45,6 +55,56 @@ export function Parametres({ s, setS }: Props) {
         </Ligne>
       </Carte>
       <Carte titre="Apparence">
+        <div className="pb-3">
+          <div className="flex items-baseline gap-2">
+            <span className="text-sm font-medium">Thème</span>
+            {!fondDuTheme(themeActuel, o) && (
+              <span className="text-xs text-text-muted">
+                · personnalisé (fond modifié){" "}
+                <button className="text-accent hover:underline" onClick={() => appliquerTheme(themeActuel)}>
+                  rétablir le fond du thème
+                </button>
+              </span>
+            )}
+          </div>
+          <div className="mb-3 text-xs text-text-muted">Couleurs de l'application et fond d'écran assorti, appliqués en un clic. Tu peux ensuite changer le fond ou les réglages à ta guise.</div>
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(190px,1fr))] gap-3">
+            {THEMES.map((t) => {
+              const actif = t.id === themeActuel.id;
+              const vignette = FONDS_ANKAMA.find((f) => valeurGalerie(f.id) === t.fond)?.vignette;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => appliquerTheme(t)}
+                  className="group relative aspect-video overflow-hidden rounded-xl border-2 text-left transition hover:-translate-y-0.5"
+                  style={{ borderColor: actif ? t.accent : "transparent", boxShadow: actif ? `0 0 18px color-mix(in srgb, ${t.accent} 45%, transparent)` : undefined }}
+                >
+                  {vignette ? (
+                    <img src={vignette} alt="" referrerPolicy="no-referrer" className="absolute inset-0 h-full w-full object-cover" />
+                  ) : (
+                    <div className="absolute inset-0" style={{ background: `radial-gradient(circle at 20% 20%, ${t.lueur1.replace(/[\d.]+\)$/, "0.5)")}, #0b0d12 70%)` }} />
+                  )}
+                  <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/30 to-transparent" />
+                  <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-2">
+                    <div>
+                      <div className="font-semibold" style={{ color: t.clair }}>
+                        {t.nom}
+                      </div>
+                      <div className="mt-1 flex gap-1">
+                        {[t.accent, t.clair, t.accent2].map((c) => (
+                          <span key={c} className="h-3 w-3 rounded-full ring-1 ring-black/40" style={{ background: c }} />
+                        ))}
+                      </div>
+                    </div>
+                    <span className="rounded-md px-2 py-0.5 text-[11px] font-semibold" style={{ background: `linear-gradient(${t.clair}, ${t.accent})`, color: t.texte }}>
+                      {actif ? "✓ Actif" : "Appliquer"}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
         <Ligne titre="Animations" aide="Apparition des cartes, compteurs qui défilent, confettis et bandeau quand une couleur ou un succès est obtenu.">
           <input type="checkbox" className="h-4 w-4 accent-accent" checked={o.animations} onChange={(e) => maj({ animations: e.target.checked })} />
         </Ligne>

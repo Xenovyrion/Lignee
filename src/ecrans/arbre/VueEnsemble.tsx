@@ -136,7 +136,7 @@ export function VueEnsemble({ famille, statut, profondeur, survol, setSurvol, ch
                 key={`p-${b.de}-${b.vers}`}
                 d={b.chemin}
                 fill="none"
-                stroke={b.tronc ? "#8a6a2c" : "rgba(212,160,23,0.38)"}
+                style={{ stroke: b.tronc ? "var(--color-accent-fonce)" : "color-mix(in srgb, var(--color-accent) 38%, transparent)" }}
                 strokeWidth={b.tronc ? 6 : 1.6}
                 strokeLinecap="round"
                 opacity={mise ? 0.18 : 1}
@@ -150,7 +150,7 @@ export function VueEnsemble({ famille, statut, profondeur, survol, setSurvol, ch
                   key={`a-${b.de}-${b.vers}`}
                   d={b.chemin}
                   fill="none"
-                  stroke={mise.ancetres.has(b.de) ? "#d4a017" : "#60a5fa"}
+                  style={{ stroke: mise.ancetres.has(b.de) ? "var(--color-accent)" : "#60a5fa" }}
                   strokeWidth={2.5}
                   strokeDasharray={b.principale ? undefined : "6 4"}
                 />
@@ -177,7 +177,7 @@ export function VueEnsemble({ famille, statut, profondeur, survol, setSurvol, ch
                 <circle
                   r={R}
                   fill="#161b24"
-                  stroke={c.id === survol ? "#d4a017" : teinte(st)}
+                  style={{ stroke: c.id === survol ? "var(--color-accent)" : teinte(st) }}
                   strokeWidth={c.id === survol ? 3.5 : 2.5}
                   strokeDasharray={st.obtenue || c.id === survol ? undefined : "5 4"}
                 />
@@ -195,8 +195,8 @@ export function VueEnsemble({ famille, statut, profondeur, survol, setSurvol, ch
                 {st.obtenue && c.generation > 1 && <circle cx={-R + 5} cy={-R + 5} r={6} fill={COULEURS.obtenue} stroke="#0b0d12" strokeWidth={2} className="pointer-events-none" />}
                 {aFaireMaintenant(st) && st.rang && (
                   <g transform={`translate(${R - 3} ${-R + 3})`} className="pointer-events-none">
-                    <circle r={11} fill={st.plan === "pret" ? COULEURS.prochaine : "#161b24"} stroke={COULEURS.prochaine} strokeWidth={2.5} />
-                    <text y={4} textAnchor="middle" fontSize={12} fontWeight={800} fill={st.plan === "pret" ? "#0b0d12" : COULEURS.prochaine}>
+                    <circle r={11} style={{ fill: st.plan === "pret" ? COULEURS.prochaine : "#161b24", stroke: COULEURS.prochaine }} strokeWidth={2.5} />
+                    <text y={4} textAnchor="middle" fontSize={12} fontWeight={800} style={{ fill: st.plan === "pret" ? "#0b0d12" : COULEURS.prochaine }}>
                       {st.rang}
                     </text>
                   </g>
