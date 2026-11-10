@@ -4,7 +4,7 @@ import { couleur, FAMILLES, NOMS_FAMILLE } from "../../moteur/donnees";
 import { planifier } from "../../moteur/planificateur";
 import { bilan, naissances, NOM_META_NAISSANCES, OBJECTIF_NAISSANCES, PALIERS_NAISSANCES, type SuccesGeneration } from "../../moteur/succes";
 import type { Famille, Sauvegarde } from "../../moteur/types";
-import { champ } from "../../ui";
+import { champ, Segments } from "../../ui";
 import { COULEURS, Etoile, ImageMonture, PointObtenue } from "../arbre/commun";
 
 interface Props {
@@ -29,11 +29,10 @@ function Anneau({ valeur, taille = 64, epaisseur = 7 }: { valeur: number; taille
         cy={taille / 2}
         r={r}
         fill="none"
-        stroke={fini ? COULEURS.obtenue : "#d4a017"}
         strokeWidth={epaisseur}
         strokeLinecap="round"
         strokeDasharray={`${c * Math.min(1, valeur)} ${c}`}
-        style={{ transition: "stroke-dasharray 400ms ease-out" }}
+        style={{ stroke: fini ? COULEURS.obtenue : "var(--color-accent)", transition: "stroke-dasharray 400ms ease-out" }}
       />
       <text x="50%" y="50%" dominantBaseline="central" textAnchor="middle" transform={`rotate(90 ${taille / 2} ${taille / 2})`} className="fill-text-primary text-[13px] font-bold">
         {Math.floor(valeur * 100)}%
@@ -44,7 +43,7 @@ function Anneau({ valeur, taille = 64, epaisseur = 7 }: { valeur: number; taille
 
 const Barre = ({ valeur }: { valeur: number }) => (
   <div className="h-1.5 overflow-hidden rounded-full bg-bg-hover">
-    <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(100, valeur * 100)}%`, background: valeur >= 1 ? COULEURS.obtenue : "#d4a017" }} />
+    <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(100, valeur * 100)}%`, background: valeur >= 1 ? COULEURS.obtenue : "var(--color-accent)" }} />
   </div>
 );
 
@@ -145,19 +144,15 @@ export function Succes({ famille, setFamille, s, setS }: Props) {
           {b.validees}/9 succès de génération · {b.total - b.obtenues} couleur{b.total - b.obtenues > 1 ? "s" : ""} à obtenir
         </span>
         <span className="flex-1" />
-        <div className="flex rounded-lg border border-border-light p-0.5 text-sm">
-          {(
-            [
-              ["tous", "Tous"],
-              ["encours", "En cours"],
-              ["valides", "Validés"],
-            ] as const
-          ).map(([v, l]) => (
-            <button key={v} onClick={() => setFiltre(v)} className={`rounded-md px-3 py-1 ${filtre === v ? "bg-bg-hover text-text-primary" : "text-text-secondary"}`}>
-              {l}
-            </button>
-          ))}
-        </div>
+        <Segments
+          valeur={filtre}
+          onChange={setFiltre}
+          options={[
+            { valeur: "tous" as Filtre, libelle: "Tous" },
+            { valeur: "encours" as Filtre, libelle: "En cours" },
+            { valeur: "valides" as Filtre, libelle: "Validés" },
+          ]}
+        />
         <label className="flex items-center gap-2 text-sm text-text-secondary">
           <input type="checkbox" className="accent-accent" checked={manquantesSeules} onChange={(e) => setManquantesSeules(e.target.checked)} />
           Seulement les manquantes

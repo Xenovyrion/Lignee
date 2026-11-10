@@ -7,9 +7,17 @@
   --color-bg-card: rgb(22 27 36 / calc(0.55 + var(--voile, 0.7) * 0.45));
   --color-bg-hover: #1e2532;
 
+  /* Couleurs du thème (remplacées par le thème choisi, voir src/themes.ts). */
   --color-accent: #d4a017;
   --color-accent-hover: #b8890f;
-  --color-accent-dim: rgba(212, 160, 23, 0.12);
+  --color-accent-clair: #facc15;
+  --color-accent-fonce: #a16207;
+  --color-accent-texte: #1a1405;
+  --color-accent-2: #7c3aed;
+  --color-accent-dim: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  --color-lueur-1: rgba(70, 100, 170, 0.12);
+  --color-lueur-2: rgba(40, 120, 140, 0.1);
+  --color-luciole: #f1f5f9;
 
   --color-border: rgba(255, 255, 255, 0.07);
   --color-border-light: rgba(255, 255, 255, 0.14);
@@ -53,8 +61,8 @@ body {
   background-color: var(--color-bg-primary);
   /* Lueurs bleu nuit discrètes (l'image de fond choisie dans les Paramètres passe par-dessus). */
   background-image:
-    radial-gradient(1200px 700px at 0% 0%, rgba(70, 100, 170, 0.12), transparent 60%),
-    radial-gradient(1000px 700px at 100% 100%, rgba(40, 120, 140, 0.1), transparent 60%);
+    radial-gradient(1200px 700px at 0% 0%, var(--color-lueur-1), transparent 60%),
+    radial-gradient(1000px 700px at 100% 100%, var(--color-lueur-2), transparent 60%);
   background-attachment: fixed;
 }
 
@@ -118,7 +126,7 @@ body {
   padding-top: 0;
 }
 .arbre {
-  --branche: rgba(212, 160, 23, 0.45);
+  --branche: color-mix(in srgb, var(--color-accent) 45%, transparent);
 }
 
 /* Action pas encore faisable : fond hachuré. */
@@ -204,8 +212,8 @@ body {
 
 /* Ruban « Prochain objectif ». */
 .ruban {
-  background: linear-gradient(90deg, #a16207, #facc15 55%, #d4a017);
-  color: #1a1405;
+  background: linear-gradient(90deg, var(--color-accent-fonce), var(--color-accent-clair) 55%, var(--color-accent));
+  color: var(--color-accent-texte);
   clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 50%, 100% 100%, 0 100%);
   padding: 3px 18px 3px 10px;
   border-radius: 4px 0 0 4px;
@@ -241,8 +249,8 @@ body {
 .luciole {
   position: absolute;
   border-radius: 9999px;
-  background: #f1f5f9;
-  box-shadow: 0 0 10px 3px rgba(200, 220, 255, 0.5);
+  background: var(--color-luciole);
+  box-shadow: 0 0 10px 3px color-mix(in srgb, var(--color-luciole) 55%, transparent);
   opacity: 0.65;
   animation-name: flotter, scintiller;
   animation-timing-function: ease-in-out;
@@ -401,18 +409,41 @@ body {
 @keyframes bord-1 {
   0%,
   100% {
-    stop-color: #fde68a;
+    stop-color: var(--color-accent-clair);
   }
   50% {
-    stop-color: #f9a8d4;
+    stop-color: var(--color-accent-2);
   }
 }
 @keyframes bord-2 {
   0%,
   100% {
-    stop-color: #7c3aed;
+    stop-color: var(--color-accent-2);
   }
   50% {
-    stop-color: #f59e0b;
+    stop-color: var(--color-accent-clair);
+  }
+}
+/* Notifications discrètes. */
+.toast {
+  position: relative;
+  animation: toast-entree 0.35s cubic-bezier(0.2, 1.2, 0.4, 1) both;
+}
+@keyframes toast-entree {
+  from {
+    opacity: 0;
+    transform: translateX(30px) scale(0.96);
+  }
+}
+.toast-duree {
+  transform-origin: left;
+  animation-name: toast-duree;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+  opacity: 0.7;
+}
+@keyframes toast-duree {
+  to {
+    transform: scaleX(0);
   }
 }

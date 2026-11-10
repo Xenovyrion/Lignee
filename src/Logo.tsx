@@ -17,12 +17,12 @@ export const Logo = ({ taille = 48, anime = false }: { taille?: number; anime?: 
         <stop className="logo-teinte-3" offset="1" stopColor="#c2410c" />
       </linearGradient>
       <radialGradient id="logo-halo" cx="0.5" cy="0.55" r="0.5">
-        <stop offset="0" stopColor="#facc15" stopOpacity="0.45" />
-        <stop offset="1" stopColor="#facc15" stopOpacity="0" />
+        <stop offset="0" style={{ stopColor: "var(--color-accent-clair)" }} stopOpacity="0.45" />
+        <stop offset="1" style={{ stopColor: "var(--color-accent-clair)" }} stopOpacity="0" />
       </radialGradient>
       <linearGradient id="logo-bord" x1="0" y1="0" x2="1" y2="1">
-        <stop className="logo-bord-1" offset="0" stopColor="#fde68a" stopOpacity="0.7" />
-        <stop className="logo-bord-2" offset="1" stopColor="#7c3aed" stopOpacity="0.5" />
+        <stop className="logo-bord-1" offset="0" style={{ stopColor: "var(--color-accent-clair)" }} stopOpacity="0.7" />
+        <stop className="logo-bord-2" offset="1" style={{ stopColor: "var(--color-accent-2)" }} stopOpacity="0.5" />
       </linearGradient>
       <linearGradient id="logo-reflet" x1="0" y1="0" x2="1" y2="0">
         <stop offset="0" stopColor="#fff" stopOpacity="0" />

@@ -52,6 +52,41 @@ export const IconeBlocage = (p: P) => (
   </Icone>
 );
 
+/** Vue en grille (cartes). */
+export const IconeGrille = (p: P) => (
+  <Icone {...p}>
+    <rect x="3.5" y="3.5" width="7" height="7" rx="1.5" />
+    <rect x="13.5" y="3.5" width="7" height="7" rx="1.5" />
+    <rect x="3.5" y="13.5" width="7" height="7" rx="1.5" />
+    <rect x="13.5" y="13.5" width="7" height="7" rx="1.5" />
+  </Icone>
+);
+
+/** Vue en liste. */
+export const IconeListe = (p: P) => (
+  <Icone {...p}>
+    <path d="M9 6h11M9 12h11M9 18h11" />
+    <circle cx="4.5" cy="6" r="1" fill="currentColor" />
+    <circle cx="4.5" cy="12" r="1" fill="currentColor" />
+    <circle cx="4.5" cy="18" r="1" fill="currentColor" />
+  </Icone>
+);
+
+/** Enclos : barrière. */
+export const IconeEnclos = (p: P) => (
+  <Icone {...p}>
+    <path d="M5 5v15M12 5v15M19 5v15M3 9h18M3 15h18" />
+  </Icone>
+);
+
+/** Stérile : œuf barré. */
+export const IconeSterile = (p: P) => (
+  <Icone {...p}>
+    <path d="M12 3c3.6 0 6.5 5.2 6.5 9.6A6.5 6.5 0 0 1 12 19.5a6.5 6.5 0 0 1-6.5-6.9C5.5 8.2 8.4 3 12 3Z" />
+    <path d="m4 20 16-16" />
+  </Icone>
+);
+
 /** Tableau de bord : cible. */
 export const IconeActions = (p: P) => (
   <Icone {...p}>

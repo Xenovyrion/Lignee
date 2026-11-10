@@ -32,7 +32,7 @@ export function useCompteur(cible: number, duree = 700) {
 
 export const Nombre = ({ valeur }: { valeur: number }) => <>{Math.round(useCompteur(valeur))}</>;
 
-const TEINTES_CONFETTI = ["#facc15", "#d4a017", "#fde68a", "#4ade80", "#a78bfa", "#f472b6"];
+const TEINTES_CONFETTI = ["var(--color-accent-clair)", "var(--color-accent)", "var(--color-accent-2)", "#4ade80", "#f1f5f9", "#f472b6"];
 
 /** Pluie de confettis dorés, rejouée à chaque changement de `declencheur` (> 0). */
 export function Confettis({ declencheur }: { declencheur: number }) {
@@ -74,7 +74,7 @@ export function Bandeau({ message, fermer }: { message: string | null; fermer: (
   }, [message, fermer]);
   if (!message) return null;
   return (
-    <div className="bandeau fixed left-1/2 top-6 z-50 -translate-x-1/2 rounded-2xl border border-accent/60 bg-bg-card/95 px-6 py-3 text-center shadow-[0_10px_40px_rgba(212,160,23,0.35)] backdrop-blur" role="status">
+    <div className="bandeau fixed left-1/2 top-6 z-50 -translate-x-1/2 rounded-2xl border border-accent/60 bg-bg-card/95 px-6 py-3 text-center shadow-[0_10px_40px_color-mix(in_srgb,var(--color-accent)_35%,transparent)] backdrop-blur" role="status">
       <div className="text-lg font-bold text-accent">{message}</div>
     </div>
   );

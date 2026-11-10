@@ -80,4 +80,6 @@ export interface Options {
   fondFlou: number;
   /** Opacité des panneaux, en % (plus haut = plus opaque, plus lisible). */
   voile: number;
+  /** Thème (palette de couleurs), voir src/themes.ts. */
+  theme: string;
 }

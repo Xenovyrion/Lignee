@@ -1,10 +1,12 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { nouvelId } from "../../moteur/actions";
 import { couleur, FAMILLES, NOMS_FAMILLE } from "../../moteur/donnees";
 import { ajusterStock, besoinsParCouleur, compterStock, rendreFecondes } from "../../moteur/etable";
 import { planifier } from "../../moteur/planificateur";
 import type { Etat, Famille, Monture, Sauvegarde, Sexe } from "../../moteur/types";
-import { Bouton, champ, ETATS } from "../../ui";
+import { IconeEnclos, IconeGrille, IconeListe, IconeSterile } from "../../icones";
+import { useNotifier } from "../../notifications";
+import { Bouton, champ, ETATS, Segments } from "../../ui";
 import { filtrer, filtreVide, trier, type Filtre, type Tri } from "./filtres";
 import { ListeMontures } from "./ListeMontures";
 import { PanneauFiltres } from "./PanneauFiltres";
@@ -15,7 +17,7 @@ import { Steriles } from "./Steriles";
 import { VueCouleurs } from "./VueCouleurs";
 
 const CAPACITE_ETABLE = 500;
-const TEINTE_FAMILLE = { dragodinde: "#d4a017", muldo: "#14b8a6", volkorne: "#a78bfa" } as const;
+const TEINTE_FAMILLE = { dragodinde: "var(--color-accent)", muldo: "#14b8a6", volkorne: "#a78bfa" } as const;
 
 /** Filtres rapides en un clic. */
 const RACCOURCIS: { libelle: string; titre: string; filtre: Partial<Filtre> }[] = [
@@ -37,6 +39,7 @@ export function Etable({ famille, s, setS }: Props) {
   const [filtre, setFiltre] = useState<Filtre>(filtreVide);
   const [tri, setTri] = useState<Tri>({ cle: "generation", sens: 1 });
   const simple = s.options.modeSuivi === "simple";
+  const notifier = useNotifier();
   const [vueChoisie, setVue] = useState<"couleurs" | "liste" | "enclos" | "steriles">("couleurs");
   // En mode simple, pas de liste ni d'enclos : on revient à la vue par couleur.
   const vue = simple && (vueChoisie === "liste" || vueChoisie === "enclos") ? "couleurs" : vueChoisie;
@@ -96,34 +99,44 @@ export function Etable({ famille, s, setS }: Props) {
 
       <div className="flex min-w-0 flex-1 flex-col gap-3">
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex rounded-lg border border-border-light p-0.5 text-sm">
-            {(
+          <Segments
+            valeur={vue}
+            onChange={setVue}
+            options={(
               [
-                ["couleurs", "Par couleur"],
-                ["liste", "Liste"],
-                ["enclos", "Enclos"],
-                ["steriles", "Stériles"],
-              ] as const
-            )
-              .filter(([v]) => !simple || v === "couleurs" || v === "steriles")
-              .map(([v, l]) => (
-              <button key={v} onClick={() => setVue(v)} className={`rounded-md px-3 py-1 ${vue === v ? "bg-bg-hover text-text-primary" : "text-text-secondary"}`}>
-                {l}
-                {v === "enclos" && s.montures.some((m) => m.enclos) && <span className="ml-1 text-xs text-accent">{s.montures.filter((m) => m.enclos).length}</span>}
-                {v === "steriles" && deLaFamille.some((m) => m.etat === "sterile") && (
-                  <span className="ml-1 text-xs text-status-err">{deLaFamille.filter((m) => m.etat === "sterile").length}</span>
-                )}
-              </button>
-            ))}
-          </div>
+                { valeur: "couleurs", libelle: "Par couleur", icone: <IconeGrille taille={16} /> },
+                { valeur: "liste", libelle: "Liste", icone: <IconeListe taille={16} /> },
+                {
+                  valeur: "enclos",
+                  libelle: "Enclos",
+                  icone: <IconeEnclos taille={16} />,
+                  badge: s.montures.some((m) => m.enclos) ? <span className="text-xs opacity-80">{s.montures.filter((m) => m.enclos).length}</span> : undefined,
+                },
+                {
+                  valeur: "steriles",
+                  libelle: "Stériles",
+                  icone: <IconeSterile taille={16} />,
+                  badge: deLaFamille.some((m) => m.etat === "sterile") ? <span className="text-xs opacity-80">{deLaFamille.filter((m) => m.etat === "sterile").length}</span> : undefined,
+                },
+              ] as { valeur: typeof vue; libelle: string; icone: ReactNode; badge?: ReactNode }[]
+            ).filter((o) => !simple || o.valeur === "couleurs" || o.valeur === "steriles")}
+          />
           <span className="text-sm text-text-secondary">
             {affichees.length} / {deLaFamille.length} affichée(s)
           </span>
           {/* Remplissage de l'étable (500 places), par famille */}
           <div className="flex min-w-[220px] flex-col gap-1" title={FAMILLES.map((f) => `${NOMS_FAMILLE[f]}s : ${s.montures.filter((m) => m.famille === f).length}`).join(" · ")}>
-            <div className="flex h-2 overflow-hidden rounded-full bg-bg-hover">
+            <div className="flex h-2.5 overflow-hidden rounded-full bg-white/5 ring-1 ring-white/5">
               {FAMILLES.map((f) => (
-                <div key={f} style={{ width: `${(100 * s.montures.filter((m) => m.famille === f).length) / CAPACITE_ETABLE}%`, background: TEINTE_FAMILLE[f] }} />
+                <div
+                  key={f}
+                  className="croitre"
+                  style={{
+                    width: `${(100 * s.montures.filter((m) => m.famille === f).length) / CAPACITE_ETABLE}%`,
+                    background: TEINTE_FAMILLE[f],
+                    boxShadow: `0 0 10px color-mix(in srgb, ${TEINTE_FAMILLE[f]} 50%, transparent)`,
+                  }}
+                />
               ))}
             </div>
             <span className={`text-xs ${s.montures.length > CAPACITE_ETABLE * 0.9 ? "text-status-warn" : "text-text-muted"}`}>
@@ -200,7 +213,10 @@ export function Etable({ famille, s, setS }: Props) {
               montures={affichees}
               ajouter={ajouterUne}
               retirer={retirerUne}
-              simple={simple ? { stock: (c, sexe, etat) => compterStock(s.montures, famille, c, sexe, etat), ajuster: (c, sexe, etat, delta) => setS((s) => ajusterStock(s, famille, c, sexe, etat, delta, niveauDefaut)), rendrePrete: (c, sexe) => setS((s) => rendreFecondes(s, famille, c, sexe, 1)) } : undefined}
+              simple={simple ? { stock: (c, sexe, etat) => compterStock(s.montures, famille, c, sexe, etat), ajuster: (c, sexe, etat, delta) => setS((s) => ajusterStock(s, famille, c, sexe, etat, delta, niveauDefaut)), rendrePrete: (c, sexe) => {
+                      notifier(`${couleur(famille, c).nom} ${sexe === "M" ? "♂" : "♀"} passée en Féconde`, { annulable: true });
+                      setS((s) => rendreFecondes(s, famille, c, sexe, 1));
+                    } } : undefined}
               ouvrirCouleur={(c) => {
                 setFiltre({ ...filtre, couleurs: [c] });
                 setVue("liste");

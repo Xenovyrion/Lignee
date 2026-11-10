@@ -45,7 +45,7 @@ export function Steriles({ famille, s, setS, ouvrirFiche }: Props) {
         return (
           <section key={g} className="rounded-xl border border-border bg-bg-secondary p-3">
             <div className="mb-2 flex items-center justify-between">
-              <h3 className="font-semibold">Génération {g}</h3>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-accent">Génération {g}</h3>
               <span className="text-sm text-text-secondary">
                 {l.length} stérile{l.length > 1 ? "s" : ""}
               </span>
@@ -61,7 +61,7 @@ export function Steriles({ famille, s, setS, ouvrirFiche }: Props) {
               {l.map((m) => {
                 const n = ressourcesExtraction(m);
                 return (
-                  <div key={m.id} className="flex items-center gap-2 rounded-lg border border-border bg-bg-card px-2 py-1.5 text-sm">
+                  <div key={m.id} className="hachure flex items-center gap-2 rounded-lg border border-border px-2 py-1.5 text-sm transition hover:border-border-light">
                     <button className="flex min-w-0 flex-1 items-center gap-2 text-left hover:text-accent" onClick={() => ouvrirFiche(m.id)} title="Ouvrir la fiche">
                       <ImageMonture famille={famille} id={m.couleur} taille={30} />
                       <span className="min-w-0 flex-1 truncate">{nomCouleur(famille, m.couleur)}</span>

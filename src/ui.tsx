@@ -17,12 +17,58 @@ export const Carte = ({ titre, children, droite }: { titre?: ReactNode; children
 export const Bouton = ({ children, discret, ...p }: { discret?: boolean } & React.ButtonHTMLAttributes<HTMLButtonElement>) => (
   <button
     {...p}
-    className={`rounded-md px-3 py-1.5 text-sm font-medium transition disabled:opacity-40 ${
-      discret ? "border border-border-light text-text-secondary hover:bg-bg-hover" : "bg-accent text-black hover:bg-accent-hover"
+    className={`rounded-lg px-3 py-1.5 text-sm font-medium transition disabled:opacity-40 ${
+      discret
+        ? "border border-border-light text-text-secondary hover:bg-bg-hover hover:text-text-primary"
+        : "bg-linear-to-b from-accent-clair to-accent text-accent-texte shadow-[0_2px_10px_color-mix(in_srgb,var(--color-accent)_30%,transparent)] hover:brightness-110"
     } ${p.className ?? ""}`}
   >
     {children}
   </button>
+);
+
+/** Sélecteur à segments (même style que le menu principal). */
+export function Segments<T extends string | number>({
+  valeur,
+  options,
+  onChange,
+  petit,
+}: {
+  valeur: T;
+  options: { valeur: T; libelle: ReactNode; icone?: ReactNode; titre?: string; badge?: ReactNode }[];
+  onChange: (v: T) => void;
+  petit?: boolean;
+}) {
+  return (
+    <div className="flex rounded-xl border border-border bg-bg-secondary p-1">
+      {options.map((o) => {
+        const actif = o.valeur === valeur;
+        return (
+          <button
+            key={String(o.valeur)}
+            title={o.titre}
+            onClick={() => onChange(o.valeur)}
+            className={`flex items-center gap-1.5 rounded-lg font-medium transition ${petit ? "px-2.5 py-0.5 text-xs" : "px-3 py-1.5 text-sm"} ${
+              actif ? "bg-linear-to-b from-accent-clair to-accent text-accent-texte shadow-[0_2px_10px_color-mix(in_srgb,var(--color-accent)_30%,transparent)]" : "text-text-secondary hover:bg-bg-hover hover:text-text-primary"
+            }`}
+          >
+            {o.icone}
+            {o.libelle}
+            {o.badge}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Titre de section avec filet dégradé (« Génération 3 ———— »). */
+export const TitreSection = ({ children, droite }: { children: ReactNode; droite?: ReactNode }) => (
+  <div className="mb-2 flex items-center gap-3">
+    <span className="text-xs font-semibold uppercase tracking-wider text-accent">{children}</span>
+    <span className="h-px flex-1 bg-linear-to-r from-accent/40 to-transparent" />
+    {droite}
+  </div>
 );
 
 export const champ = "rounded-md border border-border-light bg-bg-secondary px-2 py-1.5 text-sm outline-hidden focus:border-accent";

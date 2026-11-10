@@ -8,6 +8,7 @@ import { ajusterStock, rendreFecondes } from "../../moteur/etable";
 import type { GroupeClonage } from "../../moteur/planificateur";
 import type { Famille, Makina, Monture, Sauvegarde, Sexe } from "../../moteur/types";
 import { Bouton, ChoixCouleur, champ, pourcent, sexeSymbole } from "../../ui";
+import { useNotifier } from "../../notifications";
 import { ImageMonture } from "../arbre/commun";
 
 type SetS = (f: (s: Sauvegarde) => Sauvegarde) => void;
@@ -17,7 +18,7 @@ export const NOM_MAKINA: Record<Makina, string> = { optimakina: "Optimakina", an
 export const TYPES = {
   naissance: { libelle: "Naissance", teinte: "#22c55e" },
   clonage: { libelle: "Clonage", teinte: "#a78bfa" },
-  preparer: { libelle: "Préparer", teinte: "#d4a017" },
+  preparer: { libelle: "Préparer", teinte: "var(--color-accent)" },
   capture: { libelle: "Capture", teinte: "#60a5fa" },
 } as const;
 
@@ -68,7 +69,7 @@ function CadreAction(p: {
         {p.children}
         {p.droite}
       </div>
-      {p.pied && <div className="mt-2 flex flex-wrap gap-x-4 pl-[8.5rem] text-xs text-text-muted">{p.pied}</div>}
+      {p.pied && <div className="mt-2 flex flex-wrap gap-x-4 sm:pl-[8.5rem] text-xs text-text-muted">{p.pied}</div>}
       {p.formulaire}
     </li>
   );
@@ -116,6 +117,11 @@ interface Ligne {
   F: number;
 }
 const total = (l: Ligne[]) => l.reduce((n, x) => n + x.M + x.F, 0);
+const resumer = (famille: Famille, l: Ligne[]) =>
+  l
+    .filter((x) => x.M + x.F > 0)
+    .map((x) => `${nomCouleur(famille, x.couleur)} ${[x.M && `${x.M} ♂`, x.F && `${x.F} ♀`].filter(Boolean).join(" ")}`)
+    .join(", ");
 const versListe = (l: Ligne[]) => l.flatMap((x) => [...Array(x.M).fill({ couleur: x.couleur, sexe: "M" }), ...Array(x.F).fill({ couleur: x.couleur, sexe: "F" })]) as { couleur: string; sexe: Sexe }[];
 
 function SaisieResultats({ famille, lignes, setLignes, couleursFixes }: { famille: Famille; lignes: Ligne[]; setLignes: (l: Ligne[]) => void; couleursFixes?: boolean }) {
@@ -257,7 +263,7 @@ export function CarteNaissance({
   );
 }
 
-function FormNaissances({ famille, a, setS, niveauBebes, fermer }: { famille: Famille; a: ActionAccouplement; setS: SetS; niveauBebes: number; fermer: () => void }) {
+export function FormNaissances({ famille, a, setS, niveauBebes, fermer }: { famille: Famille; a: ActionAccouplement; setS: SetS; niveauBebes: number; fermer: () => void }) {
   // Par défaut 1 bébé par accouplement ; avec Reproducteur, le nombre d'accouplements est saisi à part.
   const [reproducteur, setReproducteur] = useState(false);
   const [nSaisi, setN] = useState(a.nombre);
@@ -265,10 +271,12 @@ function FormNaissances({ famille, a, setS, niveauBebes, fermer }: { famille: Fa
   const [makina, setMakina] = useState<Makina | "">(a.makina.makina);
   const bebes = total(lignes);
   const n = reproducteur ? nSaisi : Math.min(bebes, a.nombre);
+  const notifier = useNotifier();
   const ok = n >= 1 && bebes >= n && bebes <= 2 * n;
   const valider = () => {
     try {
       const paires = a.paires.slice(0, n).map((p) => ({ pereId: p.pere.id, mereId: p.mere.id }));
+      notifier(`${n > 1 ? `${n} naissances enregistrées` : "Naissance enregistrée"} : ${resumer(famille, lignes)}`, { annulable: true });
       setS((s) => enregistrerNaissances(s, paires, versListe(lignes) as Bebe[], makina || undefined, niveauBebes));
       fermer();
     } catch (err) {
@@ -358,15 +366,17 @@ export function CarteClonage({ id, numero, famille, g, setS }: { id?: string; nu
   );
 }
 
-function FormClonages({ famille, g, setS, fermer }: { famille: Famille; g: GroupeClonage; setS: SetS; fermer: () => void }) {
+export function FormClonages({ famille, g, setS, fermer }: { famille: Famille; g: GroupeClonage; setS: SetS; fermer: () => void }) {
   const n0 = g.paires.length;
   const [lignes, setLignes] = useState<Ligne[]>(
     g.memeCouleur ? [{ couleur: g.couleurs[0], ...repartir(n0) }] : g.couleurs.map((c, i) => ({ couleur: c, ...repartir(i === 0 ? Math.ceil(n0 / 2) : Math.floor(n0 / 2)) })),
   );
   const n = total(lignes);
+  const notifier = useNotifier();
   const valider = () => {
     try {
       const paires = g.paires.slice(0, n).map((p) => ({ idA: p.a.id, idB: p.b.id }));
+      notifier(`${n > 1 ? `${n} clonages enregistrés` : "Clonage enregistré"} : ${resumer(famille, lignes)}`, { annulable: true });
       setS((s) => clonerPlusieurs(s, paires, versListe(lignes)));
       fermer();
     } catch (err) {
@@ -393,6 +403,7 @@ function FormClonages({ famille, g, setS, fermer }: { famille: Famille; g: Group
 
 export function CartePreparer({ id, numero, famille, groupes, setS }: { id?: string; numero: number; famille: Famille; groupes: { couleur: string; sexe: Sexe; montures: Monture[] }[]; setS: SetS }) {
   const nb = groupes.reduce((n, g) => n + g.montures.length, 0);
+  const notifier = useNotifier();
   return (
     <CadreAction id={id} numero={numero} type="preparer" nombre={nb} pied={<span>Remplis Endurance, Maturité et Amour en enclos (≈ {Math.ceil(nb / 10)} enclos de 10), puis clique « ✓ Prêtes ».</span>}>
       <ul className="flex flex-1 flex-wrap gap-2">
@@ -406,7 +417,10 @@ export function CartePreparer({ id, numero, famille, groupes, setS }: { id?: str
             <Bouton
               discret
               className="px-2! py-0.5!"
-              onClick={() => setS((s) => rendreFecondes(s, famille, g.couleur, g.sexe, g.montures.length, new Set(g.montures.map((m) => m.id))))}
+              onClick={() => {
+                notifier(`${nomCouleur(famille, g.couleur)} ${sexeSymbole(g.sexe)} ×${g.montures.length} passée${g.montures.length > 1 ? "s" : ""} en Féconde`, { annulable: true });
+                setS((s) => rendreFecondes(s, famille, g.couleur, g.sexe, g.montures.length, new Set(g.montures.map((m) => m.id))));
+              }}
               title="Jauges remplies en jeu : passer ces montures en « Féconde »"
             >
               ✓ Prêtes
@@ -423,7 +437,9 @@ export function CartePreparer({ id, numero, famille, groupes, setS }: { id?: str
 export function CarteCapture({ id, numero, famille, capture, setS, niveau }: { id?: string; numero: number; famille: Famille; capture: ActionCapture; setS: SetS; niveau: number }) {
   const [ouvert, setOuvert] = useState(false);
   const [lignes, setLignes] = useState<Ligne[]>([{ couleur: capture.couleur, ...repartir(capture.nombre, capture.sexe) }]);
+  const notifier = useNotifier();
   const valider = () => {
+    notifier(`${total(lignes)} ${nomCouleur(famille, capture.couleur)} ajoutée${total(lignes) > 1 ? "s" : ""} à l'étable`, { annulable: true });
     setS((s) => {
       let r = ajusterStock(s, famille, capture.couleur, "M", "fertile", lignes[0].M, niveau);
       r = ajusterStock(r, famille, capture.couleur, "F", "fertile", lignes[0].F, niveau);

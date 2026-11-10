@@ -4,6 +4,7 @@ import { actionsMaintenant, conseiller, type ActionAccouplement } from "../../mo
 import { enfantsDe, lignee } from "../../moteur/genealogie";
 import { planifier, regrouperClonages, suggererClonages } from "../../moteur/planificateur";
 import type { Famille, Sauvegarde } from "../../moteur/types";
+import { Segments, TitreSection } from "../../ui";
 import { ArbreCentre, type Sens } from "./ArbreCentre";
 import { Etoile, fabriquerStatut, ImageMonture, LegendeArbre, type RolePlan, type Statut } from "./commun";
 import { VueEnsemble } from "./VueEnsemble";
@@ -56,7 +57,7 @@ export function Arbre({ famille, s }: Props) {
   return (
     <div className="flex h-[calc(100vh-150px)] min-h-[560px] gap-4">
       <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-border bg-bg-card">
-        <div className="flex flex-wrap items-center gap-2 border-b border-border px-3 py-2 text-sm">
+        <div className="flex flex-wrap items-center gap-2 border-b border-border bg-bg-secondary px-3 py-2 text-sm">
           {racine ? (
             <>
               <button className="rounded-md px-2 py-1 text-text-secondary hover:bg-bg-hover" onClick={() => (setRacine(null), setHistorique([]))}>
@@ -70,17 +71,16 @@ export function Arbre({ famille, s }: Props) {
               <span className="font-semibold">
                 {nomCouleur(famille, racine)} <span className="text-text-muted">G{couleur(famille, racine).generation}</span>
               </span>
-              <div className="ml-2 flex rounded-lg border border-border-light p-0.5">
-                {(
-                  [
-                    ["ancetres", "▲ D'où elle vient"],
-                    ["descendants", "▼ Ce qu'elle débloque"],
-                  ] as const
-                ).map(([v, l]) => (
-                  <button key={v} onClick={() => setSens(v)} className={`rounded-md px-2.5 py-0.5 ${sens === v ? "bg-bg-hover text-text-primary" : "text-text-secondary"}`}>
-                    {l}
-                  </button>
-                ))}
+              <div className="ml-2">
+                <Segments
+                  petit
+                  valeur={sens}
+                  onChange={setSens}
+                  options={[
+                    { valeur: "ancetres", libelle: "▲ D'où elle vient" },
+                    { valeur: "descendants", libelle: "▼ Ce qu'elle débloque" },
+                  ]}
+                />
               </div>
               <span className="flex-1" />
               <button className="h-7 w-7 rounded-md border border-border-light hover:bg-bg-hover" onClick={() => setZoom((z) => Math.max(0.4, z - 0.15))}>
@@ -100,13 +100,7 @@ export function Arbre({ famille, s }: Props) {
           <span className="flex-1" />
           <div className="flex items-center gap-1 text-xs text-text-secondary" title="Nombre de générations de parenté affichées">
             Profondeur
-            <div className="flex rounded-lg border border-border-light p-0.5">
-              {[1, 2, 3, Infinity].map((p) => (
-                <button key={p} onClick={() => setProfondeur(p)} className={`min-w-8 rounded-md px-1.5 py-0.5 ${profondeur === p ? "bg-accent-dim text-accent" : "hover:bg-bg-hover"}`}>
-                  {p === Infinity ? "Tout" : p}
-                </button>
-              ))}
-            </div>
+            <Segments petit valeur={profondeur} onChange={setProfondeur} options={[1, 2, 3, Infinity].map((p) => ({ valeur: p, libelle: p === Infinity ? "Tout" : String(p) }))} />
           </div>
         </div>
         <div className="min-h-0 flex-1">
@@ -157,7 +151,9 @@ function Detail({ famille, id, statut, centrer }: { famille: Famille; id: string
   return (
     <div className="flex flex-col gap-3 text-sm">
       <div className="flex flex-col items-center text-center">
-        <ImageMonture famille={famille} id={id} taille={112} />
+        <div className="rounded-full p-2" style={{ background: "radial-gradient(circle, color-mix(in srgb, var(--color-accent) 28%, transparent), transparent 70%)" }}>
+          <ImageMonture famille={famille} id={id} taille={112} />
+        </div>
         <div className="text-lg font-semibold">{c.nom}</div>
         <div className="text-text-muted">Génération {c.generation}</div>
         <div className="mt-1">
@@ -176,7 +172,7 @@ function Detail({ famille, id, statut, centrer }: { famille: Famille; id: string
 
       {c.recettes.length > 0 && (
         <div>
-          <div className="mb-1 text-xs font-semibold uppercase text-text-muted">{c.recettes.length > 1 ? `${c.recettes.length} recettes` : "Recette"}</div>
+          <TitreSection>{c.recettes.length > 1 ? `${c.recettes.length} recettes` : "Recette"}</TitreSection>
           <div className="flex flex-col gap-1">
             {c.recettes.map(([a, b], i) => (
               <div key={i} className="flex flex-wrap items-center gap-1">
@@ -189,7 +185,7 @@ function Detail({ famille, id, statut, centrer }: { famille: Famille; id: string
 
       {enfants.length > 0 && (
         <div>
-          <div className="mb-1 text-xs font-semibold uppercase text-text-muted">Permet d'obtenir ({enfants.length})</div>
+          <TitreSection>Permet d'obtenir ({enfants.length})</TitreSection>
           <div className="flex flex-wrap gap-1">
             {enfants.map((x) => (
               <Puce key={x} x={x} />
@@ -208,17 +204,18 @@ function Detail({ famille, id, statut, centrer }: { famille: Famille; id: string
 function Prochaines({ famille, liste, centrer }: { famille: Famille; liste: ActionAccouplement[]; centrer: (id: string) => void }) {
   return (
     <div>
-      <div className="text-[11px] font-semibold uppercase text-text-muted">À faire maintenant ({liste.length})</div>
-      <p className="mb-2 text-[11px] text-text-muted">Naissances possibles avec ton étable, dans l'ordre conseillé.</p>
+      <TitreSection>Naissances à venir ({liste.length})</TitreSection>
+      <p className="mb-2 text-[11px] text-text-muted">Même numérotation que le tableau de bord ; hachurées : parents à préparer d'abord.</p>
       {liste.length === 0 ? (
         <p className="text-xs text-text-muted">Aucune pour l'instant : voir les captures dans le « Tableau de bord ».</p>
       ) : (
-        <div className="flex flex-col gap-1">
-          {liste.map((a) => (
+        <div className="flex flex-col gap-1.5">
+          {[...liste].sort((x, y) => x.rang - y.rang).map((a) => (
             <button
               key={a.etape}
               onClick={() => centrer(a.e.couleur)}
-              className="flex items-center gap-2 rounded-md px-1.5 py-1 text-left text-sm hover:bg-bg-hover"
+              className={`flex items-center gap-2 rounded-lg border px-2 py-1.5 text-left text-sm transition hover:-translate-y-0.5 hover:border-border-light ${a.aPreparer.length ? "hachure border-border" : "border-border-light bg-bg-secondary"}`}
+              style={{ borderLeft: `3px solid ${a.aPreparer.length ? "rgba(255,255,255,0.15)" : "#22c55e"}` }}
               title="Ouvrir son arbre"
             >
               <Etoile rang={a.rang} pret={!a.aPreparer.length} />
