@@ -4,23 +4,15 @@ import { useState, type ReactNode } from "react";
 import { clonerPlusieurs, enregistrerNaissances, type Bebe } from "../../moteur/actions";
 import type { ActionAccouplement, ActionCapture } from "../../moteur/conseils";
 import { couleur, nomCouleur } from "../../moteur/donnees";
-import { ajusterStock, rendreFecondes } from "../../moteur/etable";
+import { ajusterStock } from "../../moteur/etable";
 import type { GroupeClonage } from "../../moteur/planificateur";
 import type { Famille, Makina, Monture, Sauvegarde, Sexe } from "../../moteur/types";
 import { Bouton, ChoixCouleur, champ, pourcent, sexeSymbole } from "../../ui";
 import { useNotifier } from "../../notifications";
 import { ImageMonture } from "../arbre/commun";
+import { NOM_MAKINA, preparationParGeneration, TYPES, useRendrePretes } from "./typesActions";
 
 type SetS = (f: (s: Sauvegarde) => Sauvegarde) => void;
-
-export const NOM_MAKINA: Record<Makina, string> = { optimakina: "Optimakina", animakina: "Animakina", kromakina: "Kromakina" };
-
-export const TYPES = {
-  naissance: { libelle: "Naissance", teinte: "#22c55e" },
-  clonage: { libelle: "Clonage", teinte: "#a78bfa" },
-  preparer: { libelle: "Préparer", teinte: "var(--color-accent)" },
-  capture: { libelle: "Capture", teinte: "#60a5fa" },
-} as const;
 
 const couleurSexe = (s: Sexe) => (s === "M" ? "text-sky-400" : "text-pink-400");
 
@@ -403,31 +395,44 @@ export function FormClonages({ famille, g, setS, fermer }: { famille: Famille; g
 
 export function CartePreparer({ id, numero, famille, groupes, setS }: { id?: string; numero: number; famille: Famille; groupes: { couleur: string; sexe: Sexe; montures: Monture[] }[]; setS: SetS }) {
   const nb = groupes.reduce((n, g) => n + g.montures.length, 0);
-  const notifier = useNotifier();
+  const rendrePretes = useRendrePretes(famille, setS);
   return (
-    <CadreAction id={id} numero={numero} type="preparer" nombre={nb} pied={<span>Remplis Endurance, Maturité et Amour en enclos (≈ {Math.ceil(nb / 10)} enclos de 10), puis clique « ✓ Prêtes ».</span>}>
-      <ul className="flex flex-1 flex-wrap gap-2">
-        {groupes.map((g) => (
-          <li key={`${g.couleur}/${g.sexe}`} className="flex items-center gap-2 rounded-lg border border-border-light bg-bg-card py-1 pl-1 pr-1.5 text-sm">
-            <ImageMonture famille={famille} id={g.couleur} taille={32} />
-            <span>
-              {nomCouleur(famille, g.couleur)} <span className={couleurSexe(g.sexe)}>{sexeSymbole(g.sexe)}</span>
-              <b className="ml-1">×{g.montures.length}</b>
-            </span>
-            <Bouton
-              discret
-              className="px-2! py-0.5!"
-              onClick={() => {
-                notifier(`${nomCouleur(famille, g.couleur)} ${sexeSymbole(g.sexe)} ×${g.montures.length} passée${g.montures.length > 1 ? "s" : ""} en Féconde`, { annulable: true });
-                setS((s) => rendreFecondes(s, famille, g.couleur, g.sexe, g.montures.length, new Set(g.montures.map((m) => m.id))));
-              }}
-              title="Jauges remplies en jeu : passer ces montures en « Féconde »"
-            >
-              ✓ Prêtes
-            </Bouton>
-          </li>
+    <CadreAction id={id} numero={numero} type="preparer" nombre={nb} pied={<span>Remplis Endurance, Maturité et Amour en enclos (≈ {Math.ceil(nb / 10)} enclos de 10), puis clique « ✓ » quand elles sont prêtes.</span>}>
+      <div className="flex min-w-0 flex-1 flex-col gap-2">
+        {preparationParGeneration(famille, groupes).map(({ generation, couleurs }) => (
+          <div key={generation} className="flex flex-wrap items-center gap-2">
+            <span className="w-9 shrink-0 text-xs font-semibold text-accent">G{generation}</span>
+            {couleurs.map((c) => (
+              <div key={c.couleur} className="flex items-center gap-2 rounded-lg border border-border-light bg-bg-card py-1 pl-1 pr-1.5 text-sm">
+                <ImageMonture famille={famille} id={c.couleur} taille={32} />
+                <span className="font-medium">{nomCouleur(famille, c.couleur)}</span>
+                {(["M", "F"] as Sexe[])
+                  .filter((sexe) => c[sexe].length)
+                  .map((sexe) => (
+                    <button
+                      key={sexe}
+                      onClick={() => rendrePretes(c.couleur, c[sexe])}
+                      title={`Jauges remplies : passer ${c[sexe].length > 1 ? `ces ${c[sexe].length} ${sexe === "M" ? "mâles" : "femelles"}` : `ce${sexe === "M" ? " mâle" : "tte femelle"}`} en Féconde`}
+                      className={`flex items-center gap-1 rounded-md border border-border-light px-1.5 py-0.5 text-xs font-semibold transition hover:border-status-ok hover:bg-status-ok/15 ${couleurSexe(sexe)}`}
+                    >
+                      {sexeSymbole(sexe)} ×{c[sexe].length}
+                      <span className="text-status-ok">✓</span>
+                    </button>
+                  ))}
+                {c.M.length > 0 && c.F.length > 0 && (
+                  <button
+                    onClick={() => rendrePretes(c.couleur, [...c.M, ...c.F])}
+                    title="Toutes ces montures sont prêtes"
+                    className="rounded-md px-1.5 py-0.5 text-xs font-semibold text-status-ok hover:bg-status-ok/15"
+                  >
+                    ✓ Toutes
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
         ))}
-      </ul>
+      </div>
     </CadreAction>
   );
 }

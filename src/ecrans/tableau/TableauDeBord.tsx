@@ -7,7 +7,8 @@ import type { Famille, Sauvegarde } from "../../moteur/types";
 import { Etoile, ImageMonture } from "../arbre/commun";
 import { Bandeau, Confettis, Nombre, useCompteur } from "../../effets";
 import { IconeBlocage, IconeCapture, IconeClonage, IconeNaissance, IconePreparer } from "../../icones";
-import { CarteCapture, CarteClonage, CarteNaissance, CartePreparer, TYPES } from "./CartesActions";
+import { CarteCapture, CarteClonage, CarteNaissance, CartePreparer } from "./CartesActions";
+import { TYPES } from "./typesActions";
 
 const LIMITE_FRISE = 6;
 
