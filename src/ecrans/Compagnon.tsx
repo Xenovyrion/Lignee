@@ -1,17 +1,16 @@
 // Mode compagnon : vue compacte des prochaines étapes, pour une petite fenêtre gardée à côté du jeu.
 import { useMemo, useState, type ReactNode } from "react";
 import { actionsMaintenant, conseiller, seancesDesEtapes, type ActionAccouplement, type ActionCapture } from "../moteur/conseils";
-import { ajusterStock, rendreFecondes } from "../moteur/etable";
+import { ajusterStock } from "../moteur/etable";
 import { couleurs, FAMILLES, NOMS_FAMILLE, nomCouleur, objectifs } from "../moteur/donnees";
 import { planifier, regrouperClonages, suggererClonages, type GroupeClonage } from "../moteur/planificateur";
-import type { Famille, Monture, Sauvegarde, Sexe } from "../moteur/types";
+import type { Famille, Sauvegarde, Sexe } from "../moteur/types";
 import { useNotifier } from "../notifications";
 import { Logo } from "../Logo";
 import { pourcent, sexeSymbole } from "../ui";
 import { ImageMonture } from "./arbre/commun";
-import { FormClonages, FormNaissances, TYPES } from "./tableau/CartesActions";
-
-type GroupePreparer = { couleur: string; sexe: Sexe; montures: Monture[] };
+import { FormClonages, FormNaissances } from "./tableau/CartesActions";
+import { preparationParGeneration, TYPES, useRendrePretes, type GroupePreparer } from "./tableau/typesActions";
 
 type SetS = (f: (s: Sauvegarde) => Sauvegarde) => void;
 
@@ -171,26 +170,31 @@ function LigneNaissance({ numero, famille, a, setS, niveau }: { numero: number; 
 }
 
 function LignePreparer({ numero, famille, groupes, setS }: { numero: number; famille: Famille; groupes: GroupePreparer[]; setS: SetS }) {
-  const notifier = useNotifier();
+  const rendrePretes = useRendrePretes(famille, setS);
   return (
     <Ligne numero={numero} type="preparer" nombre={groupes.reduce((n, g) => n + g.montures.length, 0)}>
-      <div className="flex flex-col gap-1">
-        {groupes.map((g) => (
-          <div key={`${g.couleur}/${g.sexe}`} className="flex items-center gap-1.5 text-xs">
-            <ImageMonture famille={famille} id={g.couleur} taille={24} />
-            <span className="min-w-0 flex-1 truncate">
-              {nomCouleur(famille, g.couleur)} <span className={g.sexe === "M" ? "text-sky-400" : "text-pink-400"}>{sexeSymbole(g.sexe)}</span> <b>×{g.montures.length}</b>
-            </span>
-            <button
-              className="shrink-0 rounded-md border border-status-ok/50 px-1.5 py-0.5 text-[11px] font-semibold text-status-ok hover:bg-status-ok/15"
-              title="Jauges remplies en jeu : passer en Féconde"
-              onClick={() => {
-                notifier(`${nomCouleur(famille, g.couleur)} ${sexeSymbole(g.sexe)} ×${g.montures.length} en Féconde`, { annulable: true });
-                setS((s) => rendreFecondes(s, famille, g.couleur, g.sexe, g.montures.length, new Set(g.montures.map((m) => m.id))));
-              }}
-            >
-              ✓ Prêtes
-            </button>
+      <div className="flex flex-col gap-1.5">
+        {preparationParGeneration(famille, groupes).map(({ generation, couleurs }) => (
+          <div key={generation} className="flex flex-col gap-1">
+            <span className="text-[10px] font-semibold text-accent">G{generation}</span>
+            {couleurs.map((c) => (
+              <div key={c.couleur} className="flex items-center gap-1.5 text-xs">
+                <ImageMonture famille={famille} id={c.couleur} taille={24} />
+                <span className="min-w-0 flex-1 truncate">{nomCouleur(famille, c.couleur)}</span>
+                {(["M", "F"] as Sexe[])
+                  .filter((sexe) => c[sexe].length)
+                  .map((sexe) => (
+                    <button
+                      key={sexe}
+                      onClick={() => rendrePretes(c.couleur, c[sexe])}
+                      title="Jauges remplies : passer en Féconde"
+                      className={`shrink-0 rounded-md border border-border-light px-1.5 py-0.5 text-[11px] font-semibold hover:border-status-ok hover:bg-status-ok/15 ${sexe === "M" ? "text-sky-400" : "text-pink-400"}`}
+                    >
+                      {sexeSymbole(sexe)}×{c[sexe].length} <span className="text-status-ok">✓</span>
+                    </button>
+                  ))}
+              </div>
+            ))}
           </div>
         ))}
       </div>
