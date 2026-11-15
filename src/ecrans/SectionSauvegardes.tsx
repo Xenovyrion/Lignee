@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import type { Sauvegarde } from "../moteur/types";
+import { useNotifier } from "../notifications";
 import { exporter, importer, lireCopie, listerCopies, type CopieAuto } from "../sauvegardes";
 import { Bouton, Carte, champ } from "../ui";
 
@@ -40,12 +41,18 @@ export function SectionSauvegardes({ s, setS }: Props) {
       .catch(() => setCopies([]));
   }, []);
 
+  const notifier = useNotifier();
   const agir = async (f: () => Promise<string | null>) => {
     try {
       const texte = await f();
-      if (texte) setMessage({ ok: true, texte });
+      if (texte) {
+        setMessage({ ok: true, texte });
+        notifier(texte, { annulable: texte.startsWith("Données restaurées"), ton: texte.startsWith("Données restaurées") ? "succes" : "info" });
+      }
     } catch (e) {
-      setMessage({ ok: false, texte: e instanceof Error ? e.message : String(e) });
+      const texte = e instanceof Error ? e.message : String(e);
+      setMessage({ ok: false, texte });
+      notifier(texte, { ton: "erreur" });
     }
   };
 

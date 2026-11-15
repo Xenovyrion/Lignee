@@ -1,9 +1,9 @@
 import { useState } from "react";
 import type { MiseAJour } from "../miseAJour";
-import { Bouton } from "../ui";
+import { BarreChargement, Bouton } from "../ui";
 
 /** Bandeau affiché quand une nouvelle version est disponible : installer et redémarrer, ou plus tard. */
-export function BandeauMiseAJour({ maj, fermer }: { maj: MiseAJour; fermer: () => void }) {
+export function BandeauMiseAJour({ maj, fermer, voirNouveautes }: { maj: MiseAJour; fermer: () => void; voirNouveautes?: () => void }) {
   const [etat, setEtat] = useState<"attente" | "installation" | "erreur">("attente");
   const [pct, setPct] = useState<number | null>(null);
   const [erreur, setErreur] = useState("");
@@ -27,9 +27,8 @@ export function BandeauMiseAJour({ maj, fermer }: { maj: MiseAJour; fermer: () =
           <div className="text-xs text-status-err">Échec de la mise à jour : {erreur}</div>
         ) : etat === "installation" ? (
           <div className="mt-1 flex items-center gap-2 text-xs text-text-secondary">
-            <span className="h-1.5 w-48 overflow-hidden rounded-full bg-white/10">
-              <span className="block h-full rounded-full bg-linear-to-r from-accent-fonce to-accent-clair transition-[width]" style={{ width: `${pct ?? 30}%` }} />
-            </span>
+            <BarreChargement pct={pct} className="w-48" />
+
             {pct === null ? "Téléchargement…" : `${pct} %`} — l'application redémarrera toute seule
           </div>
         ) : (
@@ -38,6 +37,11 @@ export function BandeauMiseAJour({ maj, fermer }: { maj: MiseAJour; fermer: () =
       </div>
       {etat !== "installation" && (
         <>
+          {voirNouveautes && (
+            <button className="text-sm text-accent hover:underline" onClick={voirNouveautes}>
+              Voir les nouveautés
+            </button>
+          )}
           <Bouton onClick={installer}>Installer et redémarrer</Bouton>
           <Bouton discret onClick={fermer}>
             Plus tard

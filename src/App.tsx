@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { TableauDeBord } from "./ecrans/tableau/TableauDeBord";
 import { Arbre } from "./ecrans/arbre/Arbre";
 import { Etable } from "./ecrans/etable/Etable";
@@ -10,8 +10,10 @@ import { IconeActions, IconeArbre, IconeEtable, IconeParametres, IconeSucces } f
 import { Logo } from "./Logo";
 import { entrerCompagnon, epingler, quitterCompagnon } from "./compagnon";
 import { Compagnon } from "./ecrans/Compagnon";
-import { FournisseurNotifications } from "./notifications";
-import { chercherMiseAJour, type MiseAJour } from "./miseAJour";
+import { FournisseurNotifications, useAnnuler } from "./notifications";
+import { chercherMiseAJour, versionNouvellementInstallee, type MiseAJour } from "./miseAJour";
+import { NotesDeVersion } from "./ecrans/NotesDeVersion";
+import { BarreChargement } from "./ui";
 import { BandeauMiseAJour } from "./ecrans/BandeauMiseAJour";
 import { Lucioles } from "./effets";
 import { urlFond } from "./fond";
@@ -26,8 +28,10 @@ const ICONES_ONGLETS = { actions: IconeActions, etable: IconeEtable, arbre: Icon
 /** Image de fond choisie dans les Paramètres, assombrie pour garder le contenu lisible. */
 function FondEcran({ nom, visibilite, flou }: { nom: string; visibilite: number; flou: number }) {
   const [url, setUrl] = useState<string | null>(null);
+  const [charge, setCharge] = useState(false);
   useEffect(() => {
     let actuelle: string | null = null;
+    setCharge(false);
     urlFond(nom)
       .then((u) => setUrl((actuelle = u)))
       .catch(() => setUrl(null));
@@ -38,16 +42,35 @@ function FondEcran({ nom, visibilite, flou }: { nom: string; visibilite: number;
   if (!url) return null;
   return (
     <div className="pointer-events-none fixed inset-0 -z-20" aria-hidden>
+      {/* Fine barre de chargement en haut de l'écran le temps que l'image arrive. */}
+      {!charge && <BarreChargement className="fixed inset-x-0 top-0 z-50 h-0.5! rounded-none!" />}
       {/* Sans référent : les fonds d'Ankama ne s'affichent pas si la requête annonce un autre site. */}
       <img
         src={url}
         alt=""
         referrerPolicy="no-referrer"
-        className="absolute inset-0 h-full w-full scale-105 object-cover"
-        style={{ opacity: visibilite / 100, filter: flou ? `blur(${flou}px)` : undefined }}
+        onLoad={() => setCharge(true)}
+        onError={() => setCharge(true)}
+        className="absolute inset-0 h-full w-full scale-105 object-cover transition-opacity duration-700"
+        style={{ opacity: charge ? visibilite / 100 : 0, filter: flou ? `blur(${flou}px)` : undefined }}
       />
       <div className="absolute inset-0 bg-linear-to-b from-bg-primary/30 via-transparent to-bg-primary/70" />
     </div>
+  );
+}
+
+/** « ↶ Annuler » de l'en-tête (passe par les notifications pour signaler l'annulation). */
+function BoutonAnnuler({ possibles }: { possibles: number }) {
+  const annuler = useAnnuler();
+  return (
+    <button
+      onClick={annuler}
+      disabled={!possibles}
+      title={possibles ? `Annuler la dernière modification (${possibles} possible${possibles > 1 ? "s" : ""})` : "Rien à annuler"}
+      className="ml-1 rounded-xl px-3 py-2.5 text-sm text-text-secondary hover:bg-bg-hover disabled:opacity-30"
+    >
+      ↶ Annuler
+    </button>
   );
 }
 
@@ -68,7 +91,22 @@ export function App() {
       .then(setMaj)
       .catch((e) => console.warn("Vérification des mises à jour impossible", e));
   }, []);
-  if (!s) return <div className="p-6 text-text-muted">Chargement…</div>;
+  // Nouveautés : ouvertes automatiquement juste après une mise à jour, ou à la demande.
+  const [nouveautes, setNouveautes] = useState<{ ouvert: boolean; version?: string }>({ ouvert: false });
+  const fermerNouveautes = useCallback(() => setNouveautes({ ouvert: false }), []);
+  useEffect(() => {
+    versionNouvellementInstallee()
+      .then((v) => v && setNouveautes({ ouvert: true, version: v }))
+      .catch(() => {});
+  }, []);
+  if (!s)
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4">
+        <Logo taille={88} anime />
+        <div className="text-lg font-semibold">Chargement de ton élevage…</div>
+        <BarreChargement className="w-56" />
+      </div>
+    );
 
   const majS = (f: (x: Sauvegarde) => Sauvegarde) => {
     setHistorique((h) => [...h.slice(-29), s]);
@@ -119,7 +157,6 @@ export function App() {
               epingler(oui);
             }}
             agrandir={() => basculerCompagnon(false)}
-            annuler={annuler}
             peutAnnuler={historique.length > 0}
           />
         </div>
@@ -164,14 +201,8 @@ export function App() {
                 </button>
               );
             })}
-            <button
-              onClick={annuler}
-              disabled={!historique.length}
-              title={historique.length ? `Annuler la dernière modification (${historique.length} possible${historique.length > 1 ? "s" : ""})` : "Rien à annuler"}
-              className="ml-1 rounded-xl px-3 py-2.5 text-sm text-text-secondary hover:bg-bg-hover disabled:opacity-30"
-            >
-              ↶ Annuler
-            </button>
+            <BoutonAnnuler possibles={historique.length} />
+
             <button
               onClick={() => basculerCompagnon(true)}
               title="Fenêtre compacte gardée au premier plan, à côté du jeu"
@@ -181,7 +212,8 @@ export function App() {
             </button>
           </div>
         </header>
-        {maj && <BandeauMiseAJour maj={maj} fermer={() => setMaj(null)} />}
+        {maj && <BandeauMiseAJour maj={maj} fermer={() => setMaj(null)} voirNouveautes={() => setNouveautes({ ouvert: true })} />}
+      {nouveautes.ouvert && <NotesDeVersion miseEnAvant={nouveautes.version} fermer={fermerNouveautes} />}
         <nav className="surface flex flex-wrap gap-1.5 rounded-2xl border border-border p-1.5">
           {(Object.keys(ONGLETS) as Onglet[]).map((o) => {
             const Icone = ICONES_ONGLETS[o];

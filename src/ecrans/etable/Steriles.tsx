@@ -1,4 +1,5 @@
 import { couleur, nomCouleur } from "../../moteur/donnees";
+import { useNotifier } from "../../notifications";
 import { RESSOURCE_EXTRACTION, ressourcesExtraction } from "../../moteur/etable";
 import { suggererClonages } from "../../moteur/planificateur";
 import type { Famille, Monture, Sauvegarde } from "../../moteur/types";
@@ -18,9 +19,11 @@ export function Steriles({ famille, s, setS, ouvrirFiche }: Props) {
   const steriles = s.montures.filter((m) => m.famille === famille && m.etat === "sterile");
   const paires = suggererClonages(steriles);
   const gens = [...new Set(steriles.map((m) => couleur(famille, m.couleur).generation))].sort((a, b) => a - b);
+  const notifier = useNotifier();
   const extraire = (m: Monture) => {
     const n = ressourcesExtraction(m);
     if (!confirm(`Extraire ${nomCouleur(famille, m.couleur)} ${sexeSymbole(m.sexe)} ? Rend ${n} ${RESSOURCE_EXTRACTION[famille]}${n > 1 ? "s" : ""}.`)) return;
+    notifier(`${nomCouleur(famille, m.couleur)} ${sexeSymbole(m.sexe)} extraite (${n} ${RESSOURCE_EXTRACTION[famille]}${n > 1 ? "s" : ""})`, { annulable: true });
     setS((s) => ({ ...s, montures: s.montures.filter((x) => x.id !== m.id) }));
   };
 

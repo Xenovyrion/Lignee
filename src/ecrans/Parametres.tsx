@@ -32,14 +32,15 @@ const TuileFond = ({ titre, actif, onClick, children }: { titre: string; actif: 
 
 export function Parametres({ s, setS }: Props) {
   const o = s.options;
+  const notifier = useNotifier();
   const maj = (champs: Partial<Options>) => setS((s) => ({ ...s, options: { ...s.options, ...champs } }));
   /** Change l'image de fond ; une image perso remplacée est supprimée du dossier de Lignée. */
   const changerFond = (nom: string) => {
     if (o.fondEcran && o.fondEcran !== nom) supprimerFond(o.fondEcran);
+    notifier(nom ? "Image de fond changée" : "Image de fond retirée", { ton: "info", annulable: true });
     maj({ fondEcran: nom });
   };
   const themeActuel = themeParId(o.theme);
-  const notifier = useNotifier();
   /** Applique un thème : sa palette et son fond d'écran avec ses réglages. */
   const appliquerTheme = (t: Theme) => {
     if (o.fondEcran && o.fondEcran !== t.fond) supprimerFond(o.fondEcran);
@@ -189,7 +190,10 @@ export function Parametres({ s, setS }: Props) {
             ).map(([v, l]) => (
               <button
                 key={v}
-                onClick={() => setS((s) => ({ ...(v === "simple" ? appliquerNiveauUnique(s, s.options.niveauParDefaut) : s), options: { ...s.options, modeSuivi: v } }))}
+                onClick={() => {
+                  notifier(`Mode de suivi : ${v === "simple" ? "simple" : "détaillé"}`, { ton: "info", annulable: true });
+                  setS((s) => ({ ...(v === "simple" ? appliquerNiveauUnique(s, s.options.niveauParDefaut) : s), options: { ...s.options, modeSuivi: v } }));
+                }}
                 className={`rounded-md px-3 py-1 ${o.modeSuivi === v ? "bg-accent-dim text-accent" : "text-text-secondary"}`}
               >
                 {l}

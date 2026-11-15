@@ -55,3 +55,13 @@ export function useRendrePretes(famille: Famille, setS: (f: (s: Sauvegarde) => S
     });
   };
 }
+
+/** Passe en Féconde toutes les montures à préparer d'un coup (une seule modification, une notification). */
+export function useToutesPretes(famille: Famille, setS: (f: (s: Sauvegarde) => Sauvegarde) => void) {
+  const notifier = useNotifier();
+  return (groupes: GroupePreparer[]) => {
+    const n = groupes.reduce((k, g) => k + g.montures.length, 0);
+    notifier(`${n} monture${n > 1 ? "s" : ""} passée${n > 1 ? "s" : ""} en Féconde`, { annulable: true });
+    setS((s) => groupes.reduce((r, g) => rendreFecondes(r, famille, g.couleur, g.sexe, g.montures.length, new Set(g.montures.map((m) => m.id))), s));
+  };
+}

@@ -10,7 +10,7 @@ import type { Famille, Makina, Monture, Sauvegarde, Sexe } from "../../moteur/ty
 import { Bouton, ChoixCouleur, champ, pourcent, sexeSymbole } from "../../ui";
 import { useNotifier } from "../../notifications";
 import { ImageMonture } from "../arbre/commun";
-import { NOM_MAKINA, preparationParGeneration, TYPES, useRendrePretes } from "./typesActions";
+import { NOM_MAKINA, preparationParGeneration, TYPES, useRendrePretes, useToutesPretes } from "./typesActions";
 
 type SetS = (f: (s: Sauvegarde) => Sauvegarde) => void;
 
@@ -426,8 +426,18 @@ export function FormClonages({ famille, g, setS, fermer }: { famille: Famille; g
 export function CartePreparer({ id, numero, famille, groupes, setS }: { id?: string; numero: number; famille: Famille; groupes: { couleur: string; sexe: Sexe; montures: Monture[] }[]; setS: SetS }) {
   const nb = groupes.reduce((n, g) => n + g.montures.length, 0);
   const rendrePretes = useRendrePretes(famille, setS);
+  const toutesPretes = useToutesPretes(famille, setS);
   return (
-    <CadreAction id={id} numero={numero} type="preparer" nombre={nb} pied={<span>Remplis Endurance, Maturité et Amour en enclos (≈ {Math.ceil(nb / 10)} enclos de 10), puis clique « ✓ » quand elles sont prêtes.</span>}>
+    <CadreAction
+      id={id}
+      numero={numero}
+      type="preparer"
+      nombre={nb}
+      droite={
+        <Bouton onClick={() => toutesPretes(groupes)} title="Toutes les jauges sont remplies : tout passer en Féconde">
+          ✓ Toutes prêtes ({nb})
+        </Bouton>
+      } pied={<span>Remplis Endurance, Maturité et Amour en enclos (≈ {Math.ceil(nb / 10)} enclos de 10), puis clique « ✓ » quand elles sont prêtes.</span>}>
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         {preparationParGeneration(famille, groupes).map(({ generation, couleurs }) => (
           <div key={generation} className="flex flex-wrap items-center gap-2">
@@ -449,15 +459,6 @@ export function CartePreparer({ id, numero, famille, groupes, setS }: { id?: str
                       <span className="text-status-ok">✓</span>
                     </button>
                   ))}
-                {c.M.length > 0 && c.F.length > 0 && (
-                  <button
-                    onClick={() => rendrePretes(c.couleur, [...c.M, ...c.F])}
-                    title="Toutes ces montures sont prêtes"
-                    className="rounded-md px-1.5 py-0.5 text-xs font-semibold text-status-ok hover:bg-status-ok/15"
-                  >
-                    ✓ Toutes
-                  </button>
-                )}
               </div>
             ))}
           </div>

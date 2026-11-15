@@ -5,12 +5,12 @@ import { ajusterStock } from "../moteur/etable";
 import { couleurs, FAMILLES, NOMS_FAMILLE, nomCouleur, objectifs } from "../moteur/donnees";
 import { planifier, regrouperClonages, suggererClonages, type GroupeClonage } from "../moteur/planificateur";
 import type { Famille, Sauvegarde, Sexe } from "../moteur/types";
-import { useNotifier } from "../notifications";
+import { useAnnuler, useNotifier } from "../notifications";
 import { Logo } from "../Logo";
 import { pourcent, sexeSymbole } from "../ui";
 import { ImageMonture } from "./arbre/commun";
 import { FormClonages, FormNaissances } from "./tableau/CartesActions";
-import { preparationParGeneration, TYPES, useRendrePretes, type GroupePreparer } from "./tableau/typesActions";
+import { preparationParGeneration, TYPES, useRendrePretes, useToutesPretes, type GroupePreparer } from "./tableau/typesActions";
 
 type SetS = (f: (s: Sauvegarde) => Sauvegarde) => void;
 
@@ -22,11 +22,11 @@ interface Props {
   epingle: boolean;
   setEpingle: (oui: boolean) => void;
   agrandir: () => void;
-  annuler: () => void;
   peutAnnuler: boolean;
 }
 
-export function Compagnon({ famille, setFamille, s, setS, epingle, setEpingle, agrandir, annuler, peutAnnuler }: Props) {
+export function Compagnon({ famille, setFamille, s, setS, epingle, setEpingle, agrandir, peutAnnuler }: Props) {
+  const annuler = useAnnuler();
   const plan = useMemo(() => planifier(famille, s.montures, s.obtenues[famille]), [famille, s.montures, s.obtenues]);
   const c = useMemo(() => conseiller(plan, { takeza: s.options.takeza }), [plan, s.options.takeza]);
   const clonages = useMemo(() => regrouperClonages(suggererClonages(s.montures.filter((m) => m.famille === famille))), [famille, s.montures]);
@@ -171,8 +171,18 @@ function LigneNaissance({ numero, famille, a, setS, niveau }: { numero: number; 
 
 function LignePreparer({ numero, famille, groupes, setS }: { numero: number; famille: Famille; groupes: GroupePreparer[]; setS: SetS }) {
   const rendrePretes = useRendrePretes(famille, setS);
+  const toutesPretes = useToutesPretes(famille, setS);
   return (
-    <Ligne numero={numero} type="preparer" nombre={groupes.reduce((n, g) => n + g.montures.length, 0)}>
+    <Ligne
+      numero={numero}
+      type="preparer"
+      nombre={groupes.reduce((n, g) => n + g.montures.length, 0)}
+      bouton={
+        <PetitBouton ouvert={false} onClick={() => toutesPretes(groupes)}>
+          ✓ Toutes
+        </PetitBouton>
+      }
+    >
       <div className="flex flex-col gap-1.5">
         {preparationParGeneration(famille, groupes).map(({ generation, couleurs }) => (
           <div key={generation} className="flex flex-col gap-1">

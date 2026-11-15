@@ -59,9 +59,14 @@ export function Etable({ famille, s, setS }: Props) {
   const cibles = choisies.length ? choisies : affichees; // actions groupées : sélection, sinon tout l'affichage
   const niveauDefaut = s.options.niveauParDefaut;
 
-  const ajouterMontures = (nouvelles: Monture[]) => setS((s) => ({ ...s, montures: [...s.montures, ...nouvelles] }));
-  const ajouterUne = (c: string, sexe: Sexe) =>
-    ajouterMontures([
+  const ajouterMontures = (nouvelles: Monture[], silencieux = false) => {
+    if (!silencieux) notifier(`${nouvelles.length} monture${nouvelles.length > 1 ? "s" : ""} ajoutée${nouvelles.length > 1 ? "s" : ""} à l'étable`, { annulable: true });
+    setS((s) => ({ ...s, montures: [...s.montures, ...nouvelles] }));
+  };
+  const ajouterUne = (c: string, sexe: Sexe) => {
+    notifier(`${couleur(famille, c).nom} ${sexe === "M" ? "♂" : "♀"} ajoutée`, { annulable: true, cle: `ajout-${c}-${sexe}` });
+    ajouterMontures(
+      [
       {
         id: nouvelId(),
         famille,
@@ -72,23 +77,30 @@ export function Etable({ famille, s, setS }: Props) {
         origine: couleur(famille, c).generation === 1 ? "capture" : "saisie",
         creeLe: new Date().toISOString(),
       },
-    ]);
+      ],
+      true,
+    );
+  };
   /** Retire la monture disponible (non stérile) de cette couleur et de ce sexe la plus récemment ajoutée. */
-  const retirerUne = (c: string, sexe: Sexe) =>
+  const retirerUne = (c: string, sexe: Sexe) => {
+    notifier(`${couleur(famille, c).nom} ${sexe === "M" ? "♂" : "♀"} retirée`, { annulable: true, cle: `retrait-${c}-${sexe}` });
     setS((s) => {
       const candidates = s.montures.filter((m) => m.famille === famille && m.couleur === c && m.sexe === sexe && m.etat !== "sterile");
       if (!candidates.length) return s;
       const derniere = candidates.reduce((a, b) => (b.creeLe >= a.creeLe ? b : a));
       return { ...s, montures: s.montures.filter((m) => m.id !== derniere.id) };
     });
+  };
   const modifier = (id: string, champs: Partial<Monture>) => setS((s) => ({ ...s, montures: s.montures.map((m) => (m.id === id ? { ...m, ...champs } : m)) }));
   const modifierGroupe = (champs: Partial<Monture>) => {
     const ids = new Set(cibles.map((m) => m.id));
+    notifier(`${ids.size} monture${ids.size > 1 ? "s" : ""} modifiée${ids.size > 1 ? "s" : ""}`, { annulable: true });
     setS((s) => ({ ...s, montures: s.montures.map((m) => (ids.has(m.id) ? { ...m, ...champs } : m)) }));
   };
   const supprimerSelection = () => {
     if (!confirm(`Supprimer définitivement ${choisies.length} monture(s) de l'étable ?`)) return;
     const ids = new Set(choisies.map((m) => m.id));
+    notifier(`${ids.size} monture${ids.size > 1 ? "s" : ""} supprimée${ids.size > 1 ? "s" : ""}`, { annulable: true });
     setS((s) => ({ ...s, montures: s.montures.filter((m) => !ids.has(m.id)) }));
     setSelection(new Set());
   };
@@ -216,7 +228,10 @@ export function Etable({ famille, s, setS }: Props) {
               montures={affichees}
               ajouter={ajouterUne}
               retirer={retirerUne}
-              simple={simple ? { stock: (c, sexe, etat) => compterStock(s.montures, famille, c, sexe, etat), ajuster: (c, sexe, etat, delta) => setS((s) => ajusterStock(s, famille, c, sexe, etat, delta, niveauDefaut)), rendrePrete: (c, sexe) => {
+              simple={simple ? { stock: (c, sexe, etat) => compterStock(s.montures, famille, c, sexe, etat), ajuster: (c, sexe, etat, delta) => {
+                      notifier(`${couleur(famille, c).nom} ${sexe === "M" ? "♂" : "♀"} ${ETATS[etat].toLowerCase()} : ${compterStock(s.montures, famille, c, sexe, etat) + delta}`, { annulable: true, cle: `stock-${c}-${sexe}-${etat}` });
+                      setS((s) => ajusterStock(s, famille, c, sexe, etat, delta, niveauDefaut));
+                    }, rendrePrete: (c, sexe) => {
                       notifier(`${couleur(famille, c).nom} ${sexe === "M" ? "♂" : "♀"} passée en Féconde`, { annulable: true });
                       setS((s) => rendreFecondes(s, famille, c, sexe, 1));
                     } } : undefined}

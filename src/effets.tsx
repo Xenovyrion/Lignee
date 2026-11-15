@@ -2,6 +2,7 @@
 // Tous se coupent avec l'option « Animations » (classe .sans-animation sur la racine) ou le
 // réglage système « réduire les animations ».
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 const reduit = () => typeof window !== "undefined" && (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches || !!document.querySelector(".sans-animation"));
 
@@ -44,7 +45,8 @@ export function Confettis({ declencheur }: { declencheur: number }) {
     return () => window.clearTimeout(t);
   }, [declencheur]);
   if (!actif) return null;
-  return (
+  // Portail : hors du voile flouté (backdrop-filter), qui capturerait la position fixe.
+  return createPortal(
     <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden" aria-hidden>
       {Array.from({ length: 70 }, (_, i) => (
         <span
@@ -61,7 +63,8 @@ export function Confettis({ declencheur }: { declencheur: number }) {
           }}
         />
       ))}
-    </div>
+    </div>,
+    document.body,
   );
 }
 
@@ -73,10 +76,11 @@ export function Bandeau({ message, fermer }: { message: string | null; fermer: (
     return () => window.clearTimeout(t);
   }, [message, fermer]);
   if (!message) return null;
-  return (
+  return createPortal(
     <div className="bandeau fixed left-1/2 top-6 z-50 -translate-x-1/2 rounded-2xl border border-accent/60 bg-bg-card/95 px-6 py-3 text-center shadow-[0_10px_40px_color-mix(in_srgb,var(--color-accent)_35%,transparent)] backdrop-blur" role="status">
       <div className="text-lg font-bold text-accent">{message}</div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

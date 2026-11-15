@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNotifier } from "../../notifications";
 import { cloner } from "../../moteur/actions";
 import { nomCouleur } from "../../moteur/donnees";
 import type { PaireClonage } from "../../moteur/planificateur";
@@ -11,8 +12,10 @@ export function ClonagePropose({ paire, setS }: { paire: PaireClonage; setS: (f:
   const [resultat, setResultat] = useState(paire.a.couleur);
   const [sexe, setSexe] = useState<Sexe>(paire.a.sexe);
   const f = paire.a.famille;
+  const notifier = useNotifier();
   const valider = () => {
     try {
+      notifier(`Clonage enregistré : ${nomCouleur(f, resultat)} ${sexeSymbole(sexe)}`, { annulable: true });
       setS((s) => cloner(s, paire.a.id, paire.b.id, { couleur: resultat, sexe }));
     } catch (e) {
       alert((e as Error).message);

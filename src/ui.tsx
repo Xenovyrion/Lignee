@@ -62,6 +62,13 @@ export function Segments<T extends string | number>({
   );
 }
 
+/** Barre de progression : pourcentage connu, ou animation continue si `pct` est null. */
+export const BarreChargement = ({ pct = null, className = "" }: { pct?: number | null; className?: string }) => (
+  <span className={`block h-1.5 overflow-hidden rounded-full bg-white/10 ${pct === null ? "chargement" : ""} ${className}`}>
+    {pct !== null && <span className="block h-full rounded-full bg-linear-to-r from-accent-fonce to-accent-clair transition-[width] duration-300" style={{ width: `${pct}%` }} />}
+  </span>
+);
+
 /** Titre de section avec filet dégradé (« Génération 3 ———— »). */
 export const TitreSection = ({ children, droite }: { children: ReactNode; droite?: ReactNode }) => (
   <div className="mb-2 flex items-center gap-3">

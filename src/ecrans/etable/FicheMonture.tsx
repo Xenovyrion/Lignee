@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
+import { useNotifier } from "../../notifications";
 import { cloner } from "../../moteur/actions";
 import { conseiller } from "../../moteur/conseils";
 import { couleur, nomCouleur } from "../../moteur/donnees";
@@ -36,6 +38,7 @@ const Champ = ({ libelle, children }: { libelle: string; children: React.ReactNo
 export function FicheMonture({ monture: m, s, setS, plan, fermer }: Props) {
   const f = m.famille;
   const c = couleur(f, m.couleur);
+  const notifier = useNotifier();
   const modifier = (champs: Partial<Monture>) => setS((s) => ({ ...s, montures: s.montures.map((x) => (x.id === m.id ? { ...x, ...champs } : x)) }));
   const roles = roleDansLePlan(plan, m.id);
   const ordre = conseiller(plan, { takeza: s.options.takeza }).ordre;
@@ -51,6 +54,7 @@ export function FicheMonture({ monture: m, s, setS, plan, fermer }: Props) {
   const cloner2 = () => {
     if (!partenaire) return;
     try {
+      notifier(`Clonage enregistré : ${couleur(f, couleurClone).nom} ${sexeClone === "M" ? "♂" : "♀"}`, { annulable: true });
       setS((s) => cloner(s, m.id, partenaire.id, { couleur: couleurClone, sexe: sexeClone }));
       fermer();
     } catch (e) {
@@ -60,11 +64,12 @@ export function FicheMonture({ monture: m, s, setS, plan, fermer }: Props) {
   const retirer = () => {
     const quoi = ressources ? `Extraire cette monture (rend ${ressources} ${RESSOURCE_EXTRACTION[f]}${ressources > 1 ? "s" : ""}) ?` : "Retirer cette monture de l'étable ?";
     if (!confirm(quoi)) return;
+    notifier(`${c.nom} ${ressources ? "extraite" : "retirée de l'étable"}`, { annulable: true });
     setS((s) => ({ ...s, montures: s.montures.filter((x) => x.id !== m.id) }));
     fermer();
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-40 flex justify-end bg-black/40" onClick={fermer}>
       <aside className="flex h-full w-[400px] max-w-full flex-col gap-4 overflow-y-auto border-l border-border-light bg-bg-card p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-start justify-between">
@@ -222,6 +227,7 @@ export function FicheMonture({ monture: m, s, setS, plan, fermer }: Props) {
           </Bouton>
         </div>
       </aside>
-    </div>
+    </div>,
+    document.body,
   );
 }

@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useNotifier } from "../../notifications";
 import { conseiller } from "../../moteur/conseils";
 import { couleur, NOMS_FAMILLE, nomCouleur } from "../../moteur/donnees";
 import { CAPACITE_ENCLOS, nombreEnclos, prochainPalierEnclos } from "../../moteur/etable";
@@ -33,8 +34,10 @@ export function Enclos({ famille, s, setS, plan, ouvrirFiche }: Props) {
   }, [plan, s.options.takeza]);
   const enAttente = aPreparer.filter((m) => !s.montures.find((x) => x.id === m.id)?.enclos);
 
+  const notifier = useNotifier();
   const placer = (ids: string[], k: number | undefined) => {
     const set = new Set(ids);
+    notifier(k ? `${ids.length} monture${ids.length > 1 ? "s" : ""} placée${ids.length > 1 ? "s" : ""} dans l'enclos ${k}` : `${ids.length} monture${ids.length > 1 ? "s" : ""} sortie${ids.length > 1 ? "s" : ""} d'enclos`, { annulable: true });
     setS((s) => ({ ...s, montures: s.montures.map((m) => (set.has(m.id) ? { ...m, enclos: k } : m)) }));
   };
   const remplirAuto = () => {
@@ -45,10 +48,12 @@ export function Enclos({ famille, s, setS, plan, ouvrirFiche }: Props) {
       for (let j = 0; j < libres && i < enAttente.length; j++) places.push([enAttente[i++].id, k]);
     }
     const carte = new Map(places);
+    notifier(`${places.length} monture${places.length > 1 ? "s" : ""} réparties dans les enclos`, { annulable: true });
     setS((s) => ({ ...s, montures: s.montures.map((m) => (carte.has(m.id) ? { ...m, enclos: carte.get(m.id) } : m)) }));
   };
   const terminer = (k: number) => {
     if (!confirm(`Session terminée : passer les montures de l'enclos ${k} en « Féconde » et vider l'enclos ?`)) return;
+    notifier(`Enclos ${k} terminé : montures passées en Féconde`, { annulable: true });
     setS((s) => ({ ...s, montures: s.montures.map((m) => (m.enclos === k ? { ...m, enclos: undefined, etat: m.etat === "sterile" ? m.etat : "feconde" } : m)) }));
   };
 

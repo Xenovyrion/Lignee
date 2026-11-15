@@ -384,3 +384,26 @@ body {
     transform: scaleX(0);
   }
 }
+
+/* Barre de chargement indéterminée. */
+.chargement {
+  position: relative;
+  overflow: hidden;
+}
+.chargement::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, transparent, var(--color-accent-clair), transparent);
+  animation: chargement 1.2s ease-in-out infinite;
+}
+@keyframes chargement {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}

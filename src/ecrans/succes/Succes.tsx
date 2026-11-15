@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNotifier } from "../../notifications";
 import { conseiller } from "../../moteur/conseils";
 import { couleur, FAMILLES, NOMS_FAMILLE } from "../../moteur/donnees";
 import { planifier } from "../../moteur/planificateur";
@@ -67,11 +68,15 @@ export function Succes({ famille, setFamille, s, setS }: Props) {
   const b = bilans[famille];
   const total = naissances(s);
 
-  const basculer = (id: string) =>
+  const notifier = useNotifier();
+  const basculer = (id: string) => {
+    const deja = s.obtenues[famille].includes(id);
+    notifier(`${couleur(famille, id).nom} ${deja ? "décochée" : "cochée comme obtenue"}`, { annulable: true, ton: deja ? "info" : "succes" });
     setS((s) => {
       const l = s.obtenues[famille];
       return { ...s, obtenues: { ...s.obtenues, [famille]: l.includes(id) ? l.filter((x) => x !== id) : [...l, id] } };
     });
+  };
 
   const generations = b.generations.filter((g) => (filtre === "valides" ? g.valide : filtre === "encours" ? !g.valide : true));
 
