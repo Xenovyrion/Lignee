@@ -151,11 +151,18 @@ describe("planificateur", () => {
     const utilisees = new Set(p.etapes.flatMap((e) => e.parents.flatMap((s) => (s.type === "monture" ? [s.monture.id] : []))));
     expect([...p.reservees].sort()).toEqual([...utilisees].sort());
   });
-  it("signale deux parents existants du même sexe", () => {
+  it("n'accouple jamais deux montures du même sexe", () => {
     const obtenues = couleurs("dragodinde").filter((c) => c.generation <= 4).map((c) => c.id);
     const p = planifier("dragodinde", [m("dragodinde", "amande_rousse", "F"), m("dragodinde", "ebene_indigo", "F")], obtenues);
-    expect(p.etapes.find((e) => e.couleur === "pourpre")?.alerteSexe).toBe(true);
+    const pourpre = p.etapes.find((e) => e.couleur === "pourpre")!;
+    expect(pourpre.alerteSexe).toBe(false);
     expect(p.immediates.map((i) => p.etapes[i].couleur)).not.toContain("pourpre");
+    const plans = { dragodinde: planifier("dragodinde", [], []), muldo: planifier("muldo", [], []), volkorne: planifier("volkorne", [], []) };
+    for (const f of ["dragodinde", "muldo", "volkorne"] as const)
+      for (const e of plans[f].etapes) {
+        const sx = e.parents.map((s) => (s.type === "naissance" ? plans[f].etapes[s.etape].sexeVoulu : s.type === "capture" ? s.sexe : s.type === "monture" ? s.monture.sexe : undefined));
+        if (sx[0] && sx[1]) expect(sx[0]).not.toBe(sx[1]);
+      }
   });
 });
 

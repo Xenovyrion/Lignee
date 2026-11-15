@@ -17,7 +17,7 @@ export type Sterile = { monture: Monture } | { apresEtape: number };
 export type Source =
   | { type: "monture"; monture: Monture }
   | { type: "naissance"; etape: number }
-  | { type: "capture"; couleur: string }
+  | { type: "capture"; couleur: string; sexe?: Sexe }
   | { type: "clone"; couleur: string; steriles: [Sterile, Sterile] };
 
 export interface Etape {
@@ -91,24 +91,35 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
     return v;
   }
 
-  function prendre(c: string, sexe?: Sexe): Source {
+  /**
+   * Source d'une monture de couleur `c`. `sexe` : sexe souhaité ; avec `strict`, une monture
+   * existante ou un bébé déjà promis à l'autre sexe ne convient pas (on passe à la source suivante).
+   */
+  function prendre(c: string, sexe?: Sexe, strict = false): Source {
     const reelles = stock.get(c);
     if (reelles?.length) {
       // Sans sexe imposé, prendre dans le sexe le plus nombreux pour garder des couples possibles.
       const males = reelles.filter((m) => m.sexe === "M").length;
       const voulu = sexe ?? (males * 2 > reelles.length ? "M" : males * 2 < reelles.length ? "F" : undefined);
-      const i = voulu ? Math.max(0, reelles.findIndex((m) => m.sexe === voulu)) : 0;
-      const [m] = reelles.splice(i, 1);
-      reservees.add(m.id);
-      memo = new Map();
-      return { type: "monture", monture: m };
+      let i = voulu ? reelles.findIndex((m) => m.sexe === voulu) : 0;
+      if (i < 0 && !(strict && sexe)) i = 0;
+      if (i >= 0) {
+        const [m] = reelles.splice(i, 1);
+        reservees.add(m.id);
+        memo = new Map();
+        return { type: "monture", monture: m };
+      }
     }
     const v = virtuels.get(c);
     if (v?.length) {
-      const e = v.shift()!;
-      if (sexe && !etapes[e].sexeVoulu) etapes[e].sexeVoulu = sexe;
-      memo = new Map();
-      return { type: "naissance", etape: e };
+      let k = sexe ? v.findIndex((e) => !etapes[e].sexeVoulu || etapes[e].sexeVoulu === sexe) : 0;
+      if (k < 0 && !(strict && sexe)) k = 0;
+      if (k >= 0) {
+        const [e] = v.splice(k, 1);
+        if (sexe && !etapes[e].sexeVoulu) etapes[e].sexeVoulu = sexe;
+        memo = new Map();
+        return { type: "naissance", etape: e };
+      }
     }
     const st = steriles.get(c);
     if (st && st.length >= 2) {
@@ -120,12 +131,21 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
     }
     if (couleur(famille, c).generation === 1) {
       captures[c] = (captures[c] ?? 0) + 1;
-      return { type: "capture", couleur: c };
+      return { type: "capture", couleur: c, sexe };
     }
     const e = produire(c, "intermediaire");
     if (sexe) etapes[e].sexeVoulu = sexe;
     return { type: "naissance", etape: e };
   }
+
+  /** Sexe connu ou déjà décidé d'une source (un clone garde le sexe d'un de ses deux stériles). */
+  const sexeDe = (s: Source): Sexe | undefined =>
+    s.type === "monture" ? s.monture.sexe : s.type === "naissance" ? etapes[s.etape].sexeVoulu : s.type === "capture" ? s.sexe : undefined;
+  /** Décide le sexe d'une source encore libre (bébé à naître ou capture). */
+  const fixerSexe = (s: Source, sexe: Sexe) => {
+    if (s.type === "naissance" && !etapes[s.etape].sexeVoulu) etapes[s.etape].sexeVoulu = sexe;
+    if (s.type === "capture" && !s.sexe) s.sexe = sexe;
+  };
 
   function produire(c: string, pour: Etape["pour"]): number {
     const col = couleur(famille, c);
@@ -142,7 +162,13 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
     const sb = sexes(recette[1]);
     const sexeA: Sexe | undefined = sa.has("M") && sb.has("F") ? "M" : sa.has("F") && sb.has("M") ? "F" : undefined;
     const a = prendre(recette[0], sexeA);
-    const b = prendre(recette[1], a.type === "monture" ? autreSexe(a.monture.sexe) : undefined);
+    // Le second parent doit être de l'autre sexe : jamais deux mâles ou deux femelles.
+    if (!sexeDe(a) && a.type !== "clone") fixerSexe(a, sexeA ?? "M");
+    const sxA = sexeDe(a);
+    const b = prendre(recette[1], sxA ? autreSexe(sxA) : undefined, true);
+    const sxB = sexeDe(b);
+    if (!sxA && sxB) fixerSexe(a, autreSexe(sxB));
+    else if (sxA) fixerSexe(b, autreSexe(sxA));
     const alerteSexe = a.type === "monture" && b.type === "monture" && a.monture.sexe === b.monture.sexe;
     etapes.push({ couleur: c, generation: col.generation, recette, pour, parents: [a, b], alerteSexe });
     const i = etapes.length - 1;

@@ -472,7 +472,7 @@ export function CartePreparer({ id, numero, famille, groupes, setS }: { id?: str
 
 export function CarteCapture({ id, numero, famille, capture, setS, niveau }: { id?: string; numero: number; famille: Famille; capture: ActionCapture; setS: SetS; niveau: number }) {
   const [ouvert, setOuvert] = useState(false);
-  const [lignes, setLignes] = useState<Ligne[]>([{ couleur: capture.couleur, ...repartir(capture.nombre, capture.sexe) }]);
+  const [lignes, setLignes] = useState<Ligne[]>([{ couleur: capture.couleur, M: capture.M + Math.ceil(capture.libres / 2), F: capture.F + Math.floor(capture.libres / 2) }]);
   const notifier = useNotifier();
   const valider = () => {
     notifier(`${total(lignes)} ${nomCouleur(famille, capture.couleur)} ajoutée${total(lignes) > 1 ? "s" : ""} à l'étable`, { annulable: true });
@@ -511,7 +511,9 @@ export function CarteCapture({ id, numero, famille, capture, setS, niveau }: { i
         <ImageMonture famille={famille} id={capture.couleur} taille={52} />
         <div>
           <div className="font-semibold">
-            {nomCouleur(famille, capture.couleur)} {capture.sexe && <span className={couleurSexe(capture.sexe)}>{sexeSymbole(capture.sexe)}</span>}
+            {nomCouleur(famille, capture.couleur)}
+            {(["M", "F"] as Sexe[]).map((sx) => capture[sx] > 0 && <span key={sx} className={`ml-2 text-sm ${couleurSexe(sx)}`}>{sexeSymbole(sx)} ×{capture[sx]}</span>)}
+            {capture.libres > 0 && <span className="ml-2 text-sm text-text-muted">×{capture.libres} au choix</span>}
           </div>
           <div className="text-xs text-text-secondary">Génération 1 · à capturer au filet (métier Éleveur)</div>
         </div>

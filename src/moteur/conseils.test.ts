@@ -39,7 +39,7 @@ describe("conseils d'actions", () => {
   });
   it("captures avec le sexe nécessaire", () => {
     const c = conseiller(planifier("dragodinde", [m("amande", "F")], []), {});
-    expect(c.captures.some((x) => x.couleur === "doree" && x.sexe === "M")).toBe(true);
+    expect(c.captures.some((x) => x.couleur === "doree" && x.M > 0)).toBe(true);
   });
   it("priorité : terminer un succès de génération d'abord", () => {
     // Toutes les G2-G4 obtenues sauf Amande et Indigo ; Pourpre (G5) débloque bien plus d'étapes.
@@ -77,9 +77,15 @@ describe("conseils d'actions", () => {
     const cles = c.blocages.map((b) => b.e.couleur + b.message);
     expect(new Set(cles).size).toBe(cles.length);
   });
-  it("signale un blocage de sexe", () => {
+  it("deux femelles disponibles : pas de blocage, le mâle manquant est planifié", () => {
     const c = conseiller(planifier("dragodinde", [m("amande_rousse", "F"), m("ebene_indigo", "F")], jusquA(4)), {});
-    expect(c.blocages.some((b) => b.e.couleur === "pourpre")).toBe(true);
+    expect(c.blocages).toHaveLength(0);
+    expect(c.prets.some((a) => a.e.couleur === "pourpre")).toBe(false);
+  });
+  it("captures : chaque capture d'un couple a un sexe, opposé à celui de l'autre parent", () => {
+    const c = conseiller(planifier("muldo", [], []), {});
+    expect(c.captures.every((x) => x.libres === 0 && x.M + x.F === x.nombre)).toBe(true);
+    expect(new Set(c.captures.map((x) => x.couleur)).size).toBe(c.captures.length);
   });
 });
 

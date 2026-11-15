@@ -226,7 +226,7 @@ function LigneCapture({ numero, famille, capture, setS, niveau }: { numero: numb
       nombre={capture.nombre}
       bouton={
         <div className="flex shrink-0 gap-1">
-          {(capture.sexe ? [capture.sexe] : (["M", "F"] as Sexe[])).map((sexe) => (
+          {(["M", "F"] as Sexe[]).filter((sx) => capture[sx] > 0 || capture.libres > 0).map((sexe) => (
             <button
               key={sexe}
               onClick={() => ajouter(sexe)}
@@ -234,6 +234,7 @@ function LigneCapture({ numero, famille, capture, setS, niveau }: { numero: numb
               className={`rounded-lg border border-border-light px-2 py-1 text-xs font-semibold hover:bg-bg-hover ${sexe === "M" ? "text-sky-400" : "text-pink-400"}`}
             >
               +{sexeSymbole(sexe)}
+              {capture[sexe] > 0 && <span className="ml-0.5 font-normal opacity-70">({capture[sexe]})</span>}
             </button>
           ))}
         </div>
@@ -242,7 +243,8 @@ function LigneCapture({ numero, famille, capture, setS, niveau }: { numero: numb
       <div className="flex items-center gap-1.5">
         <ImageMonture famille={famille} id={capture.couleur} taille={28} />
         <span className="truncate text-xs">
-          <b>{nomCouleur(famille, capture.couleur)}</b> {capture.sexe && <span className={capture.sexe === "M" ? "text-sky-400" : "text-pink-400"}>{sexeSymbole(capture.sexe)}</span>}
+          <b>{nomCouleur(famille, capture.couleur)}</b>
+          {(["M", "F"] as Sexe[]).map((sx) => capture[sx] > 0 && <span key={sx} className={`ml-1 ${sx === "M" ? "text-sky-400" : "text-pink-400"}`}>{sexeSymbole(sx)}×{capture[sx]}</span>)}
           <span className="block text-text-muted">à capturer au filet</span>
         </span>
       </div>

@@ -34,10 +34,13 @@ export interface ActionAccouplement {
   niveauConseille: number | null;
 }
 
+/** Captures d'une couleur de génération 1, avec le sexe de chacune (opposé à celui de l'autre parent). */
 export interface ActionCapture {
   couleur: string;
-  /** Sexe nécessaire, quand l'autre parent existe déjà. */
-  sexe?: Sexe;
+  M: number;
+  F: number;
+  /** Captures dont le sexe n'importe pas encore. */
+  libres: number;
   nombre: number;
 }
 
@@ -222,11 +225,12 @@ export function conseiller(plan: Plan, options: Bonus & { takeza?: boolean }): C
       [b, a],
     ] as const) {
       if (p.type !== "capture") continue;
-      const sexe = autre.type === "monture" ? autreSexe(autre.monture.sexe) : undefined;
-      const cle = `${p.couleur}/${sexe ?? "?"}`;
-      const c = captures.get(cle) ?? { couleur: p.couleur, sexe, nombre: 0 };
+      const sexe = p.sexe ?? (autre.type === "monture" ? autreSexe(autre.monture.sexe) : undefined);
+      const c = captures.get(p.couleur) ?? { couleur: p.couleur, M: 0, F: 0, libres: 0, nombre: 0 };
+      if (sexe) c[sexe]++;
+      else c.libres++;
       c.nombre++;
-      captures.set(cle, c);
+      captures.set(p.couleur, c);
     }
   });
 
