@@ -11,6 +11,8 @@ import { Logo } from "./Logo";
 import { entrerCompagnon, epingler, quitterCompagnon } from "./compagnon";
 import { Compagnon } from "./ecrans/Compagnon";
 import { FournisseurNotifications } from "./notifications";
+import { chercherMiseAJour, type MiseAJour } from "./miseAJour";
+import { BandeauMiseAJour } from "./ecrans/BandeauMiseAJour";
 import { Lucioles } from "./effets";
 import { urlFond } from "./fond";
 import { appliquerPalette, themeParId } from "./themes";
@@ -59,6 +61,13 @@ export function App() {
   const [modifications, setModifications] = useState(0);
   const [compagnon, setCompagnon] = useState(false);
   const [epingle, setEpingle] = useState(true);
+  // Mise à jour disponible (vérifiée une fois au démarrage, silencieusement en cas d'erreur réseau).
+  const [maj, setMaj] = useState<MiseAJour | null>(null);
+  useEffect(() => {
+    chercherMiseAJour()
+      .then(setMaj)
+      .catch((e) => console.warn("Vérification des mises à jour impossible", e));
+  }, []);
   if (!s) return <div className="p-6 text-text-muted">Chargement…</div>;
 
   const majS = (f: (x: Sauvegarde) => Sauvegarde) => {
@@ -172,6 +181,7 @@ export function App() {
             </button>
           </div>
         </header>
+        {maj && <BandeauMiseAJour maj={maj} fermer={() => setMaj(null)} />}
         <nav className="surface flex flex-wrap gap-1.5 rounded-2xl border border-border p-1.5">
           {(Object.keys(ONGLETS) as Onglet[]).map((o) => {
             const Icone = ICONES_ONGLETS[o];

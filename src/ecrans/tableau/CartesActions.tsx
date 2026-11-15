@@ -116,7 +116,20 @@ const resumer = (famille: Famille, l: Ligne[]) =>
     .join(", ");
 const versListe = (l: Ligne[]) => l.flatMap((x) => [...Array(x.M).fill({ couleur: x.couleur, sexe: "M" }), ...Array(x.F).fill({ couleur: x.couleur, sexe: "F" })]) as { couleur: string; sexe: Sexe }[];
 
-function SaisieResultats({ famille, lignes, setLignes, couleursFixes }: { famille: Famille; lignes: Ligne[]; setLignes: (l: Ligne[]) => void; couleursFixes?: boolean }) {
+function SaisieResultats({
+  famille,
+  lignes,
+  setLignes,
+  couleursFixes,
+  ajouterAutre,
+}: {
+  famille: Famille;
+  lignes: Ligne[];
+  setLignes: (l: Ligne[]) => void;
+  couleursFixes?: boolean;
+  /** Ajout d'une couleur obtenue à la place de celle visée (croisement raté). */
+  ajouterAutre?: () => void;
+}) {
   const maj = (i: number, champs: Partial<Ligne>) => setLignes(lignes.map((x, j) => (j === i ? { ...x, ...champs } : x)));
   return (
     <div className="flex flex-col gap-1.5">
@@ -142,8 +155,8 @@ function SaisieResultats({ famille, lignes, setLignes, couleursFixes }: { famill
         </div>
       ))}
       {!couleursFixes && (
-        <button className="self-start text-xs text-accent hover:underline" onClick={() => setLignes([...lignes, { couleur: lignes[0].couleur, M: 0, F: 0 }])}>
-          + une autre couleur obtenue (croisement raté)
+        <button className="self-start text-xs text-accent hover:underline" onClick={ajouterAutre ?? (() => setLignes([...lignes, { couleur: lignes[0].couleur, M: 0, F: 0 }]))}>
+          + un croisement raté (autre couleur obtenue à la place)
         </button>
       )}
     </div>
@@ -256,15 +269,31 @@ export function CarteNaissance({
 }
 
 export function FormNaissances({ famille, a, setS, niveauBebes, fermer }: { famille: Famille; a: ActionAccouplement; setS: SetS; niveauBebes: number; fermer: () => void }) {
-  // Par défaut 1 bébé par accouplement ; avec Reproducteur, le nombre d'accouplements est saisi à part.
+  // Un bébé par accouplement fait : un croisement raté REMPLACE le bébé visé, il ne s'y ajoute pas.
+  // Seule la capacité Reproducteur permet 2 bébés pour un même accouplement.
   const [reproducteur, setReproducteur] = useState(false);
-  const [nSaisi, setN] = useState(a.nombre);
+  const [n, setNombre] = useState(a.nombre);
   const [lignes, setLignes] = useState<Ligne[]>([{ couleur: a.e.couleur, ...repartir(a.nombre, a.e.sexeVoulu) }]);
   const [makina, setMakina] = useState<Makina | "">(a.makina.makina);
   const bebes = total(lignes);
-  const n = reproducteur ? nSaisi : Math.min(bebes, a.nombre);
   const notifier = useNotifier();
-  const ok = n >= 1 && bebes >= n && bebes <= 2 * n;
+  const ok = n >= 1 && (reproducteur ? bebes >= n && bebes <= 2 * n : bebes === n);
+
+  /** Change le nombre d'accouplements faits : la ligne de la couleur visée suit. */
+  const changerNombre = (v: number) => {
+    const autres = total(lignes.slice(1));
+    const vise = Math.max(0, v - autres);
+    setNombre(v);
+    setLignes([{ ...lignes[0], ...repartir(vise, a.e.sexeVoulu) }, ...lignes.slice(1)]);
+  };
+  /** Croisement raté : un bébé passe de la couleur visée à une autre (à choisir), du même sexe. */
+  const ajouterEchec = () => {
+    const [vise, ...autres] = lignes;
+    const sexe: Sexe = vise.M >= vise.F ? "M" : "F";
+    const retire = vise[sexe] > 0 ? { ...vise, [sexe]: vise[sexe] - 1 } : vise;
+    const candidate = a.pere.couleur !== a.e.couleur ? a.pere.couleur : a.mere.couleur;
+    setLignes([retire, ...autres, { couleur: candidate, M: sexe === "M" ? 1 : 0, F: sexe === "F" ? 1 : 0 }]);
+  };
   const valider = () => {
     try {
       const paires = a.paires.slice(0, n).map((p) => ({ pereId: p.pere.id, mereId: p.mere.id }));
@@ -277,21 +306,20 @@ export function FormNaissances({ famille, a, setS, niveauBebes, fermer }: { fami
   };
   return (
     <Formulaire>
-      <div className="text-text-secondary">
-        Bébés obtenus <span className="text-xs text-text-muted">— un par accouplement fait (échec = la couleur réellement obtenue)</span>
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="text-text-secondary">Accouplements faits</span>
+        <Compteur valeur={n} setValeur={changerNombre} min={1} max={a.nombre} />
+        <span className="text-xs text-text-muted">sur {a.nombre} proposé{a.nombre > 1 ? "s" : ""}</span>
       </div>
-      <SaisieResultats famille={famille} lignes={lignes} setLignes={setLignes} />
+      <div className="text-text-secondary">
+        Bébés obtenus <span className="text-xs text-text-muted">— un par accouplement ; un croisement raté remplace le bébé visé</span>
+      </div>
+      <SaisieResultats famille={famille} lignes={lignes} setLignes={setLignes} ajouterAutre={ajouterEchec} />
       <div className="flex flex-wrap items-center gap-3">
         <label className="flex items-center gap-2 text-xs text-text-secondary">
           <input type="checkbox" checked={reproducteur} onChange={(e) => setReproducteur(e.target.checked)} />
-          Reproducteur (2 bébés pour un accouplement)
+          Reproducteur (un accouplement a donné 2 bébés)
         </label>
-        {reproducteur && (
-          <>
-            <span className="text-text-secondary">Accouplements faits</span>
-            <Compteur valeur={nSaisi} setValeur={setN} min={1} max={a.nombre} />
-          </>
-        )}
         <label className="ml-4 flex items-center gap-2 text-text-secondary">
           Makina
           <select className={champ} value={makina} onChange={(e) => setMakina(e.target.value as Makina | "")}>
@@ -312,9 +340,11 @@ export function FormNaissances({ famille, a, setS, niveauBebes, fermer }: { fami
           {bebes} bébé{bebes > 1 ? "s" : ""} pour {n} accouplement{n > 1 ? "s" : ""}
           {ok
             ? ` · ${2 * n} parents passent stériles, les nouvelles couleurs sont cochées.`
-            : bebes > a.nombre && !reproducteur
-              ? ` : ${a.nombre} accouplements au plus ici (coche Reproducteur si un accouplement a donné 2 bébés).`
-              : ` : il en faut entre ${n} et ${2 * n}.`}
+            : reproducteur
+              ? ` : il en faut entre ${n} et ${2 * n}.`
+              : bebes > n
+                ? ` : ${bebes - n} de trop. Un croisement raté remplace le bébé visé (retire-le de la première ligne), sauf Reproducteur.`
+                : ` : il manque ${n - bebes} bébé${n - bebes > 1 ? "s" : ""}.`}
         </span>
       </div>
     </Formulaire>

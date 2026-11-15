@@ -4,6 +4,7 @@ import type { Options, Sauvegarde } from "../moteur/types";
 import { choisirFond, FONDS_ANKAMA, idGalerie, SOURCE_FONDS, supprimerFond, valeurGalerie } from "../fond";
 import { Carte, champ } from "../ui";
 import { SectionSauvegardes } from "./SectionSauvegardes";
+import { SectionMiseAJour } from "./SectionMiseAJour";
 import { fondDuTheme, themeParId, THEMES, type Theme } from "../themes";
 import { useNotifier } from "../notifications";
 
@@ -223,6 +224,7 @@ export function Parametres({ s, setS }: Props) {
         )}
       </Carte>
       <SectionSauvegardes s={s} setS={setS} />
+      <SectionMiseAJour />
       <Carte titre="Accouplements">
         <Ligne titre="Bonus Almanax Takeza actif" aide="+20 % de chances d'obtenir la génération cible, les jours où l'Almanax le propose.">
           <input type="checkbox" className="h-4 w-4 accent-accent" checked={o.takeza} onChange={(e) => maj({ takeza: e.target.checked })} />

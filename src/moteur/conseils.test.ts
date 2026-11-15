@@ -133,3 +133,15 @@ describe("actions groupées", () => {
     expect((liste[1] as { a: { rang: number } }).a.rang).toBe(2);
   });
 });
+
+describe("croisement raté", () => {
+  it("un bébé d'une autre couleur remplace le bébé visé, sans bébé fantôme", () => {
+    let s = sauvegardeVide();
+    s = { ...s, montures: [m("ebene_indigo", "M"), m("amande_rousse", "F")] };
+    const [pere, mere] = s.montures.map((x) => x.id);
+    s = enregistrerNaissances(s, [{ pereId: pere, mereId: mere }], [{ couleur: "amande", sexe: "M" }]);
+    expect(s.montures.filter((x) => x.origine === "naissance").map((x) => x.couleur)).toEqual(["amande"]);
+    expect(s.montures.filter((x) => x.etat === "sterile")).toHaveLength(2);
+    expect(s.obtenues.dragodinde).not.toContain("pourpre");
+  });
+});

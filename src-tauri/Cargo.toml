@@ -1,6 +1,6 @@
 [package]
 name = "lignee"
-version = "1.0.0"
+version = "1.0.1"
 description = "Lignée - pilotage de l'élevage pour Dofus 3.7"
 authors = ["Xenovyrion"]
 edition = "2021"
@@ -16,6 +16,8 @@ tauri-plugin-fs = "2"
 serde           = { version = "1", features = ["derive"] }
 serde_json      = "1"
 tauri-plugin-dialog = "2"
+tauri-plugin-updater = "2"
+tauri-plugin-process = "2"
 
 [profile.release]
 panic         = "abort"
