@@ -206,6 +206,34 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
     places.forEach((_, k) => reservees.add(candidates[k].id));
   }
 
+  // Rééquilibrage des sexes : une étape dont les deux parents existants sont du même sexe échange
+  // l'un d'eux avec une monture de même couleur et de sexe opposé réservée par une autre étape, si
+  // l'autre parent de cette étape-là s'en accommode (monture de sexe opposé, clone, capture, ou
+  // bébé dont le sexe n'est pas encore imposé).
+  const accepte = (src: Source, sexe: Sexe) =>
+    src.type === "monture" ? src.monture.sexe !== sexe : src.type === "naissance" ? etapes[src.etape].sexeVoulu !== sexe : true;
+  etapes.forEach((e, i) => {
+    if (!e.alerteSexe) return;
+    const sexe = (e.parents[0] as { monture: Monture }).monture.sexe;
+    for (const cote of [0, 1] as const) {
+      const x = (e.parents[cote] as { monture: Monture }).monture;
+      for (let j = 0; j < etapes.length && e.alerteSexe; j++) {
+        if (j === i) continue;
+        for (const coteJ of [0, 1] as const) {
+          const y = etapes[j].parents[coteJ];
+          const autre = etapes[j].parents[1 - coteJ];
+          if (y.type !== "monture" || y.monture.couleur !== x.couleur || y.monture.sexe === sexe || !accepte(autre, sexe)) continue;
+          etapes[j].parents[coteJ] = { type: "monture", monture: x };
+          e.parents[cote] = y;
+          if (autre.type === "naissance") etapes[autre.etape].sexeVoulu = autreSexe(sexe);
+          e.alerteSexe = false;
+          break;
+        }
+      }
+      if (!e.alerteSexe) break;
+    }
+  });
+
   const immediates = etapes
     .map((e, i) => ({ e, i }))
     .filter(({ e }) => e.parents.every((p) => p.type === "monture") && !e.alerteSexe)
