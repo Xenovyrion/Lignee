@@ -22,5 +22,6 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: Lignée ${{ github.ref_name }}
-          releaseBody: Voir le CHANGELOG pour le détail.
-          releaseDraft: true
+          releaseBody: Installeur Windows ci-dessous (.exe ou .msi). Détail des nouveautés dans les notes de version.
+          releaseDraft: false
+          prerelease: false
