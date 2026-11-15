@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { couleur, couleurs, FAMILLES } from "./donnees";
-import { arbreAncetres, arbreDescendants, CASE, dispositionArbre, enfantsDe, lignee, parentsPrincipaux, type Noeud } from "./genealogie";
+import { arbreAncetres, arbreDescendants, CASE, dispositionArbre, dispositionCarte, enfantsDe, lignee, parentsPrincipaux, type Noeud } from "./genealogie";
 
 const tous = (n: Noeud): Noeud[] => [n, ...n.enfants.flatMap(tous)];
 
@@ -71,5 +71,17 @@ describe("généalogie", () => {
     const prune = positions.get("prune")!;
     for (const c of couleurs("dragodinde").filter((x) => x.generation === 10 && parentsPrincipaux("dragodinde", x.id).join() === "prune"))
       expect(Math.abs(positions.get(c.id)!.x - prune.x)).toBeLessThan(6 * CASE);
+  });
+});
+
+describe("carte des lignées", () => {
+  it("place chaque couleur une seule fois, une colonne par génération", () => {
+    for (const f of ["dragodinde", "muldo", "volkorne"] as const) {
+      const cols = dispositionCarte(f);
+      const ids = cols.flat();
+      expect(new Set(ids).size).toBe(ids.length);
+      expect(ids.length).toBe(couleurs(f).length);
+      cols.forEach((col) => expect(new Set(col.map((id) => couleur(f, id).generation)).size).toBe(1));
+    }
   });
 });

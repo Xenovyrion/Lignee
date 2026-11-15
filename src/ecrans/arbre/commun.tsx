@@ -56,9 +56,6 @@ export const teinte = (s: Statut) => (s.obtenue ? COULEURS.contour : COULEURS.ve
 /** Anneau orange pointillé : couleur à refaire plus tard pour servir de parent. */
 export const anneau = (s: Statut): string | null => (s.plan === "produire" ? COULEURS.produire : null);
 
-/** Une naissance à faire maintenant (étoile numérotée) ? */
-export const aFaireMaintenant = (s: Statut) => s.plan === "pret" || s.plan === "preparer";
-
 /** Étoile numérotée : pleine si les parents sont prêts, contour seul s'ils sont à préparer. */
 export const Etoile = ({ rang, pret, taille = 22 }: { rang: number; pret: boolean; taille?: number }) => (
   <span
@@ -85,36 +82,3 @@ export function ImageMonture({ famille, id, taille, className = "" }: { famille:
     <div style={{ width: taille, height: taille }} className={`rounded-full bg-bg-hover ${className}`} />
   );
 }
-
-const Rond = ({ bord, tirets, fond }: { bord: string; tirets?: boolean; fond?: string }) => (
-  <span className="inline-block h-3.5 w-3.5 shrink-0 rounded-full" style={{ border: `2px ${tirets ? "dashed" : "solid"} ${bord}`, background: fond ?? "transparent" }} />
-);
-
-const Pastille = ({ fond, n }: { fond: string; n: number }) => (
-  <span className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-full px-1 text-[11px] font-bold text-white" style={{ background: fond }}>
-    {n}
-  </span>
-);
-
-/** Légende affichée en barre sous l'arbre, toujours visible. */
-export const LegendeArbre = () => (
-  <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 border-t border-border bg-bg-secondary px-4 py-2 text-[13px] text-text-secondary">
-    <span className="flex items-center gap-1.5">
-      <PointObtenue /> Déjà obtenue (succès)
-    </span>
-    <span className="flex items-center gap-1.5">
-      <Rond bord={COULEURS.verrouillee} tirets /> Jamais obtenue
-    </span>
-    <span className="flex items-center gap-1.5">
-      <Etoile rang={1} pret taille={18} />
-      <Etoile rang={2} pret={false} taille={18} /> À faire maintenant, dans l'ordre (plein : parents prêts · vide : à préparer)
-    </span>
-    <span className="flex items-center gap-1.5">
-      <Rond bord={COULEURS.produire} tirets /> À refaire plus tard (servira de parent)
-    </span>
-    <span className="flex items-center gap-1.5">
-      <Pastille fond={COULEURS.males} n={2} />
-      <Pastille fond={COULEURS.femelles} n={3} /> En stock ♂ / ♀
-    </span>
-  </div>
-);

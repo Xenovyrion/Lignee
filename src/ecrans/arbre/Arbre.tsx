@@ -1,13 +1,12 @@
 import { useMemo, useState } from "react";
+import { actionsMaintenant, conseiller, seancesDesEtapes, type ActionAccouplement } from "../../moteur/conseils";
 import { couleur, nomCouleur } from "../../moteur/donnees";
-import { actionsMaintenant, conseiller, type ActionAccouplement } from "../../moteur/conseils";
 import { enfantsDe, lignee } from "../../moteur/genealogie";
-import { planifier, regrouperClonages, suggererClonages } from "../../moteur/planificateur";
+import { planifier, regrouperClonages, suggererClonages, type Plan } from "../../moteur/planificateur";
 import type { Famille, Sauvegarde } from "../../moteur/types";
 import { Segments, TitreSection } from "../../ui";
-import { ArbreCentre, type Sens } from "./ArbreCentre";
-import { Etoile, fabriquerStatut, ImageMonture, LegendeArbre, type RolePlan, type Statut } from "./commun";
-import { VueEnsemble } from "./VueEnsemble";
+import { CarteLignee, type FiltreCarte } from "./CarteLignee";
+import { COULEURS, Etoile, fabriquerStatut, ImageMonture, type RolePlan, type Statut } from "./commun";
 
 interface Props {
   famille: Famille;
@@ -15,22 +14,16 @@ interface Props {
 }
 
 export function Arbre({ famille, s }: Props) {
-  const [racine, setRacine] = useState<string | null>(null);
-  const [historique, setHistorique] = useState<string[]>([]);
-  const [sens, setSens] = useState<Sens>("ancetres");
-  const [zoom, setZoom] = useState(1);
-  const [choix, setChoix] = useState<Record<string, number>>({});
+  const [selection, setSelection] = useState<string | null>(null);
   const [survol, setSurvol] = useState<string | null>(null);
-  // Profondeur affichée : par défaut, liens directs dans le soleil, arbre complet quand il est centré.
-  const [profSoleil, setProfSoleil] = useState(1);
-  const [profArbre, setProfArbre] = useState<Record<Sens, number>>({ ancetres: Infinity, descendants: 1 });
-  const profondeur = racine ? profArbre[sens] : profSoleil;
-  const setProfondeur = (p: number) => (racine ? setProfArbre((x) => ({ ...x, [sens]: p })) : setProfSoleil(p));
-  // Le plan d'élevage colore l'arbre : prochaines naissances (★/☆) et couleurs à faire naître pour la suite.
-  const { statut, prochaines } = useMemo(() => {
+  const [filtre, setFiltre] = useState<FiltreCarte>("tout");
+  const [legende, setLegende] = useState(true);
+
+  // Le plan d'élevage colore la carte : prochaines naissances (★) et couleurs à faire naître pour la suite.
+  const { statut, prochaines, plan, dansPlan, seances } = useMemo(() => {
     const plan = planifier(famille, s.montures, s.obtenues[famille]);
     const c = conseiller(plan, { takeza: s.options.takeza });
-    // Même numérotation que « À faire maintenant » (clonages compris).
+    // Même numérotation que le tableau de bord (clonages compris).
     actionsMaintenant(c, regrouperClonages(suggererClonages(s.montures.filter((m) => m.famille === famille))));
     const roles = new Map<string, RolePlan>();
     for (const e of plan.etapes) if (e.pour === "intermediaire") roles.set(e.couleur, "produire");
@@ -40,97 +33,48 @@ export function Arbre({ famille, s }: Props) {
       roles.set(a.e.couleur, a.aPreparer.length ? "preparer" : "pret");
       rangs.set(a.e.couleur, a.rang);
     }
-    return { statut: fabriquerStatut(famille, s.montures, s.obtenues[famille], roles, rangs), prochaines: c.ordre };
+    // « Mon plan » : les couleurs à faire naître et celles qui leur servent de parents.
+    const dansPlan = new Set<string>();
+    for (const e of plan.etapes) {
+      dansPlan.add(e.couleur);
+      e.recette.forEach((x) => dansPlan.add(x));
+    }
+    return { statut: fabriquerStatut(famille, s.montures, s.obtenues[famille], roles, rangs), prochaines: c.ordre, plan, dansPlan, seances: seancesDesEtapes(plan) };
   }, [famille, s.montures, s.obtenues, s.options.takeza]);
 
-  const centrer = (id: string) => {
-    if (racine) setHistorique((h) => [...h, racine]);
-    setRacine(id);
-    setSurvol(null);
-  };
-  const retour = () => {
-    setRacine(historique[historique.length - 1] ?? null);
-    setHistorique((h) => h.slice(0, -1));
-  };
-  const detail = survol ?? racine;
+  const detail = selection ?? survol;
 
   return (
-    <div className="flex h-[calc(100vh-150px)] min-h-[560px] gap-4">
+    <div className="flex h-[calc(100vh-190px)] min-h-[560px] gap-4">
       <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-border bg-bg-card">
-        <div className="flex flex-wrap items-center gap-2 border-b border-border bg-bg-secondary px-3 py-2 text-sm">
-          {racine ? (
-            <>
-              <button className="rounded-md px-2 py-1 text-text-secondary hover:bg-bg-hover" onClick={() => (setRacine(null), setHistorique([]))}>
-                ☀ Vue d'ensemble
-              </button>
-              {historique.length > 0 && (
-                <button className="rounded-md px-2 py-1 text-text-secondary hover:bg-bg-hover" onClick={retour}>
-                  ← {nomCouleur(famille, historique[historique.length - 1])}
-                </button>
-              )}
-              <span className="font-semibold">
-                {nomCouleur(famille, racine)} <span className="text-text-muted">G{couleur(famille, racine).generation}</span>
-              </span>
-              <div className="ml-2">
-                <Segments
-                  petit
-                  valeur={sens}
-                  onChange={setSens}
-                  options={[
-                    { valeur: "ancetres", libelle: "▲ D'où elle vient" },
-                    { valeur: "descendants", libelle: "▼ Ce qu'elle débloque" },
-                  ]}
-                />
-              </div>
-              <span className="flex-1" />
-              <button className="h-7 w-7 rounded-md border border-border-light hover:bg-bg-hover" onClick={() => setZoom((z) => Math.max(0.4, z - 0.15))}>
-                −
-              </button>
-              <span className="w-10 text-center text-xs text-text-muted">{Math.round(zoom * 100)} %</span>
-              <button className="h-7 w-7 rounded-md border border-border-light hover:bg-bg-hover" onClick={() => setZoom((z) => Math.min(1.6, z + 0.15))}>
-                +
-              </button>
-            </>
-          ) : (
-            <>
-              <span className="font-semibold">Vue d'ensemble</span>
-              <span className="text-text-muted">— survole une couleur pour voir sa lignée, clique pour ouvrir son arbre</span>
-            </>
-          )}
+        <div className="flex flex-wrap items-center gap-3 border-b border-border bg-bg-secondary px-3 py-2 text-sm">
+          <span className="font-semibold">Carte des lignées</span>
+          <span className="text-xs text-text-muted">glisser pour déplacer · molette pour zoomer · survol : parents et enfants · clic : toute la lignée · Échap : désélectionner</span>
           <span className="flex-1" />
-          <div className="flex items-center gap-1 text-xs text-text-secondary" title="Nombre de générations de parenté affichées">
-            Profondeur
-            <Segments petit valeur={profondeur} onChange={setProfondeur} options={[1, 2, 3, Infinity].map((p) => ({ valeur: p, libelle: p === Infinity ? "Tout" : String(p) }))} />
-          </div>
+          <Segments
+            petit
+            valeur={filtre}
+            onChange={setFiltre}
+            options={[
+              { valeur: "tout", libelle: "Tout" },
+              { valeur: "plan", libelle: "Mon plan", titre: "Seulement les couleurs à faire naître et leurs parents" },
+              { valeur: "manquantes", libelle: "Manquantes", titre: "Seulement les couleurs jamais obtenues" },
+            ]}
+          />
         </div>
         <div className="min-h-0 flex-1">
-          {racine ? (
-            <ArbreCentre
-              famille={famille}
-              racine={racine}
-              sens={sens}
-              zoom={zoom}
-              profondeur={profondeur}
-              choix={choix}
-              setChoix={setChoix}
-              statut={statut}
-              setSurvol={setSurvol}
-              recentrer={centrer}
-            />
-          ) : (
-            <VueEnsemble famille={famille} statut={statut} profondeur={profondeur} survol={survol} setSurvol={setSurvol} choisir={centrer} />
-          )}
+          <CarteLignee famille={famille} statut={statut} selection={selection} setSelection={setSelection} survol={survol} setSurvol={setSurvol} filtre={filtre} dansPlan={dansPlan} />
         </div>
-        <LegendeArbre />
+        <Legende ouverte={legende} basculer={() => setLegende(!legende)} />
       </div>
 
-      <aside className="w-72 shrink-0 overflow-y-auto rounded-xl border border-border bg-bg-card p-4">
+      <aside className="w-80 shrink-0 overflow-y-auto rounded-xl border border-border bg-bg-card p-4">
         {detail ? (
-          <Detail famille={famille} id={detail} statut={statut(detail)} centrer={centrer} />
+          <Detail famille={famille} id={detail} statut={statut} plan={plan} seances={seances} choisir={setSelection} selectionnee={detail === selection} />
         ) : (
           <div className="flex flex-col gap-5">
-            <Prochaines famille={famille} liste={prochaines} centrer={centrer} />
-            <p className="text-xs text-text-muted">Survole une couleur pour voir ses recettes, ce qu'elle débloque et ton stock ; clique pour ouvrir son arbre.</p>
+            <Prochaines famille={famille} liste={prochaines} choisir={setSelection} />
+            <p className="text-xs text-text-muted">Clique une couleur sur la carte pour voir comment l'obtenir et ce qu'elle débloque.</p>
           </div>
         )}
       </aside>
@@ -138,37 +82,123 @@ export function Arbre({ famille, s }: Props) {
   );
 }
 
-function Detail({ famille, id, statut, centrer }: { famille: Famille; id: string; statut: Statut; centrer: (id: string) => void }) {
+const Rond = ({ bord, tirets }: { bord: string; tirets?: boolean }) => <span className="inline-block h-3.5 w-3.5 shrink-0 rounded-full" style={{ border: `2px ${tirets ? "dashed" : "solid"} ${bord}` }} />;
+
+/** Légende sur une ligne, repliable. */
+function Legende({ ouverte, basculer }: { ouverte: boolean; basculer: () => void }) {
+  return (
+    <div className="flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-border bg-bg-secondary px-3 py-1.5 text-xs text-text-secondary">
+      <button className="text-text-muted hover:text-text-primary" onClick={basculer}>
+        {ouverte ? "▾ Légende" : "▸ Légende"}
+      </button>
+      {ouverte && (
+        <>
+          <span className="flex items-center gap-1.5">
+            <span className="flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold text-black" style={{ background: COULEURS.obtenue }}>
+              ✓
+            </span>
+            Obtenue
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Etoile rang={1} pret taille={16} /> Prochaine étape (n° du tableau de bord)
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Rond bord={COULEURS.produire} tirets /> À produire pour la suite
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Rond bord={COULEURS.verrouillee} tirets /> Jamais obtenue
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-0.5 w-5 rounded" style={{ background: "var(--color-accent)" }} /> D'où elle vient
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-0.5 w-5 rounded bg-sky-400" /> Ce qu'elle débloque
+          </span>
+        </>
+      )}
+    </div>
+  );
+}
+
+const Puce = ({ famille, x, choisir }: { famille: Famille; x: string; choisir: (id: string) => void }) => (
+  <button onClick={() => choisir(x)} className="flex items-center gap-1 rounded-md border border-border-light px-1.5 py-0.5 text-xs hover:bg-bg-hover" title="Sélectionner sur la carte">
+    <ImageMonture famille={famille} id={x} taille={20} />
+    {nomCouleur(famille, x)}
+  </button>
+);
+
+/** Étapes du plan qui mènent à cette couleur (comme le chemin du tableau de bord). */
+function cheminVers(plan: Plan, id: string): number[] {
+  const indices = plan.etapes.map((e, i) => ({ e, i })).filter(({ e }) => e.couleur === id);
+  if (!indices.length) return [];
+  const depart = (indices.find(({ e }) => e.pour === "succes") ?? indices[0]).i;
+  const chemin = new Set<number>();
+  const remonter = (i: number) => {
+    if (chemin.has(i)) return;
+    chemin.add(i);
+    for (const p of plan.etapes[i].parents) if (p.type === "naissance") remonter(p.etape);
+  };
+  remonter(depart);
+  return [...chemin].sort((a, b) => a - b);
+}
+
+function Detail(p: { famille: Famille; id: string; statut: (id: string) => Statut; plan: Plan; seances: number[]; choisir: (id: string) => void; selectionnee: boolean }) {
+  const { famille, id } = p;
   const c = couleur(famille, id);
+  const st = p.statut(id);
   const enfants = enfantsDe(famille, id);
   const l = lignee(famille, id);
-  const Puce = ({ x }: { x: string }) => (
-    <button onClick={() => centrer(x)} className="flex items-center gap-1 rounded-md border border-border-light px-1.5 py-0.5 text-xs hover:bg-bg-hover" title="Centrer l'arbre">
-      <ImageMonture famille={famille} id={x} taille={20} />
-      {nomCouleur(famille, x)}
-    </button>
-  );
+  const chemin = cheminVers(p.plan, id);
   return (
-    <div className="flex flex-col gap-3 text-sm">
+    <div className="flex flex-col gap-4 text-sm">
       <div className="flex flex-col items-center text-center">
         <div className="rounded-full p-2" style={{ background: "radial-gradient(circle, color-mix(in srgb, var(--color-accent) 28%, transparent), transparent 70%)" }}>
-          <ImageMonture famille={famille} id={id} taille={112} />
+          <ImageMonture famille={famille} id={id} taille={104} />
         </div>
         <div className="text-lg font-semibold">{c.nom}</div>
         <div className="text-text-muted">Génération {c.generation}</div>
         <div className="mt-1">
           {c.generation === 1 ? (
             <span className="text-text-secondary">Capturable (sauvage)</span>
-          ) : statut.obtenue ? (
+          ) : st.obtenue ? (
             <span className="text-status-ok">✓ Naissance obtenue</span>
           ) : (
             <span className="text-status-warn">Naissance à obtenir</span>
           )}
         </div>
         <div className="mt-1">
-          En stock : <span className="text-sky-400">{statut.males} ♂</span> · <span className="text-pink-400">{statut.femelles} ♀</span>
+          En stock : <span className="text-sky-400">{st.males} ♂</span> · <span className="text-pink-400">{st.femelles} ♀</span>
         </div>
+        {!p.selectionnee && <div className="mt-1 text-[11px] text-text-muted">Clique pour la sélectionner et voir toute sa lignée.</div>}
       </div>
+
+      {chemin.length > 0 && (
+        <div>
+          <TitreSection>Comment l'obtenir</TitreSection>
+          <ol className="flex flex-col gap-1">
+            {chemin.map((i) => {
+              const e = p.plan.etapes[i];
+              const s = p.statut(e.couleur);
+              return (
+                <li key={i} className="flex items-center gap-2 rounded-lg border border-border-light bg-bg-secondary px-2 py-1">
+                  <ImageMonture famille={famille} id={e.recette[0]} taille={20} />
+                  <span className="text-text-muted">×</span>
+                  <ImageMonture famille={famille} id={e.recette[1]} taille={20} />
+                  <span className="text-accent">→</span>
+                  <button className="min-w-0 flex-1 truncate text-left text-xs hover:text-accent" onClick={() => p.choisir(e.couleur)}>
+                    {nomCouleur(famille, e.couleur)}
+                  </button>
+                  {s.rang && p.seances[i] === 1 ? (
+                    <Etoile rang={s.rang} pret={s.plan === "pret"} taille={18} />
+                  ) : (
+                    <span className="shrink-0 text-[10px] text-text-muted">{p.seances[i] === 1 ? "maintenant" : `séance ${p.seances[i]}`}</span>
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      )}
 
       {c.recettes.length > 0 && (
         <div>
@@ -176,7 +206,7 @@ function Detail({ famille, id, statut, centrer }: { famille: Famille; id: string
           <div className="flex flex-col gap-1">
             {c.recettes.map(([a, b], i) => (
               <div key={i} className="flex flex-wrap items-center gap-1">
-                <Puce x={a} /> <span className="text-text-muted">×</span> <Puce x={b} />
+                <Puce famille={famille} x={a} choisir={p.choisir} /> <span className="text-text-muted">×</span> <Puce famille={famille} x={b} choisir={p.choisir} />
               </div>
             ))}
           </div>
@@ -185,10 +215,10 @@ function Detail({ famille, id, statut, centrer }: { famille: Famille; id: string
 
       {enfants.length > 0 && (
         <div>
-          <TitreSection>Permet d'obtenir ({enfants.length})</TitreSection>
+          <TitreSection>Ce qu'elle débloque ({enfants.length})</TitreSection>
           <div className="flex flex-wrap gap-1">
             {enfants.map((x) => (
-              <Puce key={x} x={x} />
+              <Puce key={x} famille={famille} x={x} choisir={p.choisir} />
             ))}
           </div>
         </div>
@@ -201,7 +231,7 @@ function Detail({ famille, id, statut, centrer }: { famille: Famille; id: string
   );
 }
 
-function Prochaines({ famille, liste, centrer }: { famille: Famille; liste: ActionAccouplement[]; centrer: (id: string) => void }) {
+function Prochaines({ famille, liste, choisir }: { famille: Famille; liste: ActionAccouplement[]; choisir: (id: string) => void }) {
   return (
     <div>
       <TitreSection>Naissances à venir ({liste.length})</TitreSection>
@@ -210,27 +240,29 @@ function Prochaines({ famille, liste, centrer }: { famille: Famille; liste: Acti
         <p className="text-xs text-text-muted">Aucune pour l'instant : voir les captures dans le « Tableau de bord ».</p>
       ) : (
         <div className="flex flex-col gap-1.5">
-          {[...liste].sort((x, y) => x.rang - y.rang).map((a) => (
-            <button
-              key={a.etape}
-              onClick={() => centrer(a.e.couleur)}
-              className={`flex items-center gap-2 rounded-lg border px-2 py-1.5 text-left text-sm transition hover:-translate-y-0.5 hover:border-border-light ${a.aPreparer.length ? "hachure border-border" : "border-border-light bg-bg-secondary"}`}
-              style={{ borderLeft: `3px solid ${a.aPreparer.length ? "rgba(255,255,255,0.15)" : "#22c55e"}` }}
-              title="Ouvrir son arbre"
-            >
-              <Etoile rang={a.rang} pret={!a.aPreparer.length} />
-              <ImageMonture famille={famille} id={a.e.couleur} taille={28} />
-              <span className="min-w-0 flex-1">
-                <span className="block truncate">
-                  {nomCouleur(famille, a.e.couleur)} <span className="text-[11px] text-text-muted">G{a.e.generation}</span>
+          {[...liste]
+            .sort((x, y) => x.rang - y.rang)
+            .map((a) => (
+              <button
+                key={a.etape}
+                onClick={() => choisir(a.e.couleur)}
+                className={`flex items-center gap-2 rounded-lg border px-2 py-1.5 text-left text-sm transition hover:-translate-y-0.5 hover:border-border-light ${a.aPreparer.length ? "hachure border-border" : "border-border-light bg-bg-secondary"}`}
+                style={{ borderLeft: `3px solid ${a.aPreparer.length ? "rgba(255,255,255,0.15)" : "#22c55e"}` }}
+                title="Voir sur la carte"
+              >
+                <Etoile rang={a.rang} pret={!a.aPreparer.length} />
+                <ImageMonture famille={famille} id={a.e.couleur} taille={28} />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate">
+                    {nomCouleur(famille, a.e.couleur)} <span className="text-[11px] text-text-muted">G{a.e.generation}</span>
+                  </span>
+                  <span className={`block text-[11px] ${a.termineSucces ? "text-status-ok" : a.e.pour === "succes" ? "text-accent" : "text-text-muted"}`}>
+                    {a.termineSucces ? `termine le succès G${a.e.generation}` : a.e.pour === "succes" ? "nouvelle couleur" : "pour la suite"}
+                    {a.aPreparer.length ? " · parents à préparer" : ""}
+                  </span>
                 </span>
-                <span className={`block text-[11px] ${a.termineSucces ? "text-status-ok" : a.e.pour === "succes" ? "text-accent" : "text-text-muted"}`}>
-                  {a.termineSucces ? `termine le succès G${a.e.generation}` : a.e.pour === "succes" ? "nouvelle couleur" : "pour la suite"}
-                  {a.aPreparer.length ? " · parents à préparer" : ""}
-                </span>
-              </span>
-            </button>
-          ))}
+              </button>
+            ))}
         </div>
       )}
     </div>

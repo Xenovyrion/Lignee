@@ -259,3 +259,34 @@ export function dispositionArbre(f: Famille, colonnesBouquet = 3): Disposition {
   for (const p of positions.values()) p.x -= gauche;
   return { positions, principal, niveaux: [...base].map(([generation, yy]) => ({ generation, y: yy })), largeur: droite - gauche, hauteur };
 }
+
+/**
+ * Carte des lignées : une colonne par génération. Dans chaque colonne, l'ordre vertical rapproche
+ * chaque couleur de ses parents et de ses enfants (méthode des barycentres, quelques passes),
+ * ce qui limite les croisements quand les liens sont affichés.
+ */
+export function dispositionCarte(f: Famille, passes = 6): string[][] {
+  const liste = couleurs(f);
+  const gens = [...new Set(liste.map((c) => c.generation))].sort((a, b) => a - b);
+  const colonnes = gens.map((g) => liste.filter((c) => c.generation === g).sort((a, b) => a.nom.localeCompare(b.nom)).map((c) => c.id));
+  const parents = (id: string) => [...new Set(couleur(f, id).recettes.flat())];
+  const place = () => {
+    const p = new Map<string, number>();
+    for (const col of colonnes) col.forEach((id, i) => p.set(id, (i + 0.5) / col.length));
+    return p;
+  };
+  const trier = (col: string[], voisins: (id: string) => string[]) => {
+    const p = place();
+    const cle = new Map(col.map((id, i) => [id, i / col.length] as const));
+    for (const id of col) {
+      const v = voisins(id).filter((x) => p.has(x));
+      if (v.length) cle.set(id, v.reduce((s, x) => s + p.get(x)!, 0) / v.length);
+    }
+    col.sort((a, b) => cle.get(a)! - cle.get(b)!);
+  };
+  for (let k = 0; k < passes; k++) {
+    for (let i = 1; i < colonnes.length; i++) trier(colonnes[i], parents);
+    for (let i = colonnes.length - 2; i >= 0; i--) trier(colonnes[i], (id) => enfantsDe(f, id));
+  }
+  return colonnes;
+}
