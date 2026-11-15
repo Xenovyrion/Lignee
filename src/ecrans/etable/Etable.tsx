@@ -26,6 +26,7 @@ const RACCOURCIS: { libelle: string; titre: string; filtre: Partial<Filtre> }[] 
   { libelle: "À préparer", titre: "Utiles au plan mais pas encore fécondes : à mettre en enclos", filtre: { plan: "reservees", etats: ["fertile"] } },
   { libelle: "Fécondes", titre: "Prêtes à s'accoupler", filtre: { etats: ["feconde"] } },
   { libelle: "Libres", titre: "Non stériles et non utilisées par le plan : réserve, vente ou recyclage", filtre: { plan: "libres", etats: ["fertile", "feconde"] } },
+  { libelle: "À vendre", titre: "Couleurs déjà obtenues qui ne servent plus à aucun croisement, et dont le plan n'a pas besoin", filtre: { plan: "vendables" } },
   { libelle: "Stériles", titre: "À cloner ou à extraire", filtre: { etats: ["sterile"] } },
 ];
 
@@ -52,7 +53,8 @@ export function Etable({ famille, s, setS }: Props) {
   const reservees = plan.reservees;
   const besoins = useMemo(() => besoinsParCouleur(famille, s.montures, plan), [famille, s.montures, plan]);
   const deLaFamille = useMemo(() => s.montures.filter((m) => m.famille === famille), [s.montures, famille]);
-  const affichees = useMemo(() => trier(filtrer(deLaFamille, famille, filtre, reservees), famille, tri), [deLaFamille, famille, filtre, reservees, tri]);
+  const obtenues = useMemo(() => new Set(s.obtenues[famille]), [s.obtenues, famille]);
+  const affichees = useMemo(() => trier(filtrer(deLaFamille, famille, filtre, reservees, obtenues), famille, tri), [deLaFamille, famille, filtre, reservees, obtenues, tri]);
   const choisies = affichees.filter((m) => selection.has(m.id));
   const cibles = choisies.length ? choisies : affichees; // actions groupées : sélection, sinon tout l'affichage
   const niveauDefaut = s.options.niveauParDefaut;
@@ -165,7 +167,7 @@ export function Etable({ famille, s, setS }: Props) {
                   className={`rounded-full border px-3 py-1 text-sm transition ${actif ? "border-accent bg-accent-dim text-accent" : "border-border-light text-text-secondary hover:bg-bg-hover"}`}
                 >
                   {r.libelle}
-                  <span className="ml-1.5 text-xs text-text-muted">{filtrer(deLaFamille, famille, f, reservees).length}</span>
+                  <span className="ml-1.5 text-xs text-text-muted">{filtrer(deLaFamille, famille, f, reservees, obtenues).length}</span>
                 </button>
               );
             })}
@@ -209,6 +211,7 @@ export function Etable({ famille, s, setS }: Props) {
           ) : vue === "couleurs" ? (
             <VueCouleurs
               besoins={besoins}
+              obtenues={obtenues}
               famille={famille}
               montures={affichees}
               ajouter={ajouterUne}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Monture } from "../../moteur/types";
-import { filtreVide, filtrer, trier, trouverCouleur } from "./filtres";
+import { estVendable, filtreVide, filtrer, trier, trouverCouleur } from "./filtres";
 
 const m = (id: string, couleur: string, extra: Partial<Monture> = {}): Monture => ({
   id, famille: "dragodinde", couleur, sexe: "F", niveau: 100, etat: "fertile", origine: "saisie", creeLe: "", ...extra,
@@ -29,5 +29,19 @@ describe("filtres de l'étable", () => {
     expect(trouverCouleur("dragodinde", "amande")).toBe("amande");
     expect(trouverCouleur("dragodinde", "pourp")).toBeNull(); // ambigu : Pourpre et ses bicolores
     expect(trouverCouleur("dragodinde", "xyz")).toBeNull();
+  });
+});
+
+describe("montures à vendre", () => {
+  const mo = (id: string, couleur: string, etat: Monture["etat"] = "fertile"): Monture => ({ id, famille: "dragodinde", couleur, sexe: "M", niveau: 100, etat, origine: "saisie", creeLe: "" });
+  const obtenues = new Set(["doree_pourpre", "indigo_pourpre"]);
+  it("cul-de-sac obtenu et inutile au plan : vendable", () => {
+    expect(estVendable("dragodinde", mo("a", "doree_pourpre"), new Set(), obtenues)).toBe(true);
+  });
+  it("sert encore de parent, réservée, stérile ou pas encore obtenue : à garder", () => {
+    expect(estVendable("dragodinde", mo("b", "indigo_pourpre"), new Set(), obtenues)).toBe(false); // parent d'Ivoire
+    expect(estVendable("dragodinde", mo("c", "doree_pourpre"), new Set(["c"]), obtenues)).toBe(false);
+    expect(estVendable("dragodinde", mo("d", "doree_pourpre", "sterile"), new Set(), obtenues)).toBe(false);
+    expect(estVendable("dragodinde", mo("e", "dorée_orchidee"), new Set(), obtenues)).toBe(false);
   });
 });

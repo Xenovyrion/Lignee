@@ -1,5 +1,6 @@
 // Filtres et tri de l'étable (logique pure, testée).
 import { couleur, couleurs } from "../../moteur/donnees";
+import { enfantsDe } from "../../moteur/genealogie";
 import type { Etat, Famille, Monture, Sexe } from "../../moteur/types";
 
 export interface Filtre {
@@ -10,7 +11,7 @@ export interface Filtre {
   couleurs: string[];
   niveauMin: number;
   niveauMax: number;
-  plan: "toutes" | "reservees" | "libres";
+  plan: "toutes" | "reservees" | "libres" | "vendables";
 }
 
 export const filtreVide = (): Filtre => ({ texte: "", generations: [], sexes: [], etats: [], couleurs: [], niveauMin: 1, niveauMax: 200, plan: "toutes" });
@@ -43,7 +44,14 @@ export function trouverCouleur(famille: Famille, saisie: string): string | null 
   return partielles.length === 1 ? partielles[0].id : null;
 }
 
-export function filtrer(montures: Monture[], famille: Famille, f: Filtre, reservees: Set<string>): Monture[] {
+/**
+ * Monture vendable : non stérile, inutile au plan, d'une couleur déjà obtenue qui ne sert de parent à
+ * aucun croisement (cul-de-sac). Les stériles restent utiles (clonage, extraction).
+ */
+export const estVendable = (famille: Famille, m: Monture, reservees: Set<string>, obtenues: Set<string>) =>
+  m.etat !== "sterile" && !reservees.has(m.id) && obtenues.has(m.couleur) && enfantsDe(famille, m.couleur).length === 0;
+
+export function filtrer(montures: Monture[], famille: Famille, f: Filtre, reservees: Set<string>, obtenues: Set<string> = new Set()): Monture[] {
   return montures.filter((m) => {
     if (m.famille !== famille) return false;
     const c = couleur(famille, m.couleur);
@@ -55,6 +63,7 @@ export function filtrer(montures: Monture[], famille: Famille, f: Filtre, reserv
     if (m.niveau < f.niveauMin || m.niveau > f.niveauMax) return false;
     if (f.plan === "reservees" && !reservees.has(m.id)) return false;
     if (f.plan === "libres" && reservees.has(m.id)) return false;
+    if (f.plan === "vendables" && !estVendable(famille, m, reservees, obtenues)) return false;
     return true;
   });
 }

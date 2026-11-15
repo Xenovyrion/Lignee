@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import { couleurs } from "../../moteur/donnees";
+import { enfantsDe } from "../../moteur/genealogie";
 import type { BesoinCouleur } from "../../moteur/etable";
 import type { Etat, Famille, Monture, Sexe } from "../../moteur/types";
 import { TitreSection } from "../../ui";
@@ -12,6 +13,8 @@ interface Props {
   ajouter: (couleur: string, sexe: Sexe) => void;
   retirer: (couleur: string, sexe: Sexe) => void;
   ouvrirCouleur: (couleur: string) => void;
+  /** Couleurs déjà obtenues (succès) : pour repérer les montures vendables. */
+  obtenues: Set<string>;
   /** Mode simple : stock saisi par sexe et état. */
   simple?: {
     stock: (c: string, sexe: Sexe, etat: Etat) => number;
@@ -103,7 +106,7 @@ const Pastille = ({ n, fond }: { n: number; fond: string }) => (
 );
 
 /** Une carte par couleur, regroupées par génération : stock comparé aux besoins du plan, ajout et retrait en un clic. */
-export function VueCouleurs({ famille, montures, besoins, ajouter, retirer, ouvrirCouleur, simple }: Props) {
+export function VueCouleurs({ famille, montures, besoins, ajouter, retirer, ouvrirCouleur, simple, obtenues }: Props) {
   const presentes = new Set(montures.map((m) => m.couleur));
   const liste = couleurs(famille).filter((c) => presentes.has(c.id));
   if (liste.length === 0) return <p className="p-4 text-sm text-text-muted">Aucune monture ne correspond aux filtres.</p>;
@@ -184,11 +187,26 @@ export function VueCouleurs({ famille, montures, besoins, ajouter, retirer, ouvr
                         </span>
                       )}
                       {b && b.utilisees > 0 && <span className="rounded-sm bg-accent-dim px-1.5 text-accent">{b.utilisees} pour le plan</span>}
-                      {b && b.libres > 0 && (
-                        <span className="rounded-sm bg-bg-hover px-1.5 text-text-secondary" title="Montures que le plan n'utilise pas : à garder en réserve, vendre ou recycler">
-                          {b.libres} libre{b.libres > 1 ? "s" : ""}
-                        </span>
-                      )}
+                      {b && b.libres > 0 &&
+                        (obtenues.has(c.id) && enfantsDe(famille, c.id).length === 0 ? (
+                          <span
+                            className="rounded-sm bg-status-ok/15 px-1.5 font-semibold text-status-ok"
+                            title="Couleur déjà obtenue qui ne sert plus à aucun croisement, et dont le plan n'a pas besoin : tu peux la vendre."
+                          >
+                            💰 {b.libres} à vendre
+                          </span>
+                        ) : obtenues.has(c.id) ? (
+                          <span
+                            className="rounded-sm bg-bg-hover px-1.5 text-text-secondary"
+                            title="Le plan n'en a pas besoin, mais cette couleur sert encore de parent : tu peux en vendre, en gardant une ou deux en réserve en cas d'échec."
+                          >
+                            {b.libres} en surplus
+                          </span>
+                        ) : (
+                          <span className="rounded-sm bg-bg-hover px-1.5 text-text-secondary" title="Montures que le plan n'utilise pas (couleur pas encore obtenue : à garder)">
+                            {b.libres} libre{b.libres > 1 ? "s" : ""}
+                          </span>
+                        ))}
                       {manque > 0 && (
                         <span
                           className="rounded-sm px-1.5"
