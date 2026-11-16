@@ -1,6 +1,6 @@
 // Mode compagnon : vue compacte des prochaines étapes, pour une petite fenêtre gardée à côté du jeu.
 import { useMemo, useState, type ReactNode } from "react";
-import { actionsMaintenant, conseiller, seancesDesEtapes, type ActionAccouplement, type ActionCapture } from "../moteur/conseils";
+import { actionsMaintenant, cleAction, conseiller, seancesDesEtapes, type ActionAccouplement, type ActionCapture } from "../moteur/conseils";
 import { ajusterStock } from "../moteur/etable";
 import { couleurs, FAMILLES, NOMS_FAMILLE, nomCouleur, objectifs } from "../moteur/donnees";
 import { planifier, regrouperClonages, suggererClonages, type GroupeClonage } from "../moteur/planificateur";
@@ -81,7 +81,7 @@ export function Compagnon({ famille, setFamille, s, setS, epingle, setEpingle, a
       <div className="flex flex-col gap-1.5">
         {actions.length === 0 && <p className="surface rounded-xl p-3 text-sm text-text-muted">Rien à faire pour l'instant.</p>}
         {actions.map((x) => {
-          const k = `c-${x.numero}`;
+          const k = cleAction(x);
           if (x.type === "naissance") return <LigneNaissance key={k} numero={x.numero} famille={famille} a={x.a} setS={setS} niveau={niveau} />;
           if (x.type === "clonage") return <LigneClonage key={k} numero={x.numero} famille={famille} g={x.g} setS={setS} />;
           if (x.type === "preparer") return <LignePreparer key={k} numero={x.numero} famille={famille} groupes={x.groupes} setS={setS} />;

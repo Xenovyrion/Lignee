@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { actionsMaintenant, conseiller, prochainObjectif, seancesDesEtapes, seancesSuivantes } from "../../moteur/conseils";
+import { actionsMaintenant, cleAction, conseiller, prochainObjectif, seancesDesEtapes, seancesSuivantes } from "../../moteur/conseils";
 import { couleur, NOMS_FAMILLE, nomCouleur, objectifs } from "../../moteur/donnees";
 import { planifier, regrouperClonages, suggererClonages } from "../../moteur/planificateur";
 import { nomSuccesGeneration } from "../../moteur/succes";
@@ -301,11 +301,12 @@ export function TableauDeBord({ famille, s, setS }: Props) {
           <ul className="flex flex-col gap-2">
             {actions.map((x) => {
               const id = `action-${x.numero}`;
+              const k = cleAction(x);
               if (x.type === "naissance")
-                return <CarteNaissance key={id} id={id} numero={x.numero} famille={famille} a={x.a} prevues={prevues(x.a.e.couleur)} setS={setS} niveauBebes={niveauNouvelles} etapePreparer={premier("preparer")} />;
-              if (x.type === "clonage") return <CarteClonage key={id} id={id} numero={x.numero} famille={famille} g={x.g} setS={setS} />;
-              if (x.type === "preparer") return <CartePreparer key={id} id={id} numero={x.numero} famille={famille} groupes={x.groupes} setS={setS} />;
-              return <CarteCapture key={id} id={id} numero={x.numero} famille={famille} capture={x.capture} setS={setS} niveau={niveauNouvelles} />;
+                return <CarteNaissance key={k} id={id} numero={x.numero} famille={famille} a={x.a} prevues={prevues(x.a.e.couleur)} setS={setS} niveauBebes={niveauNouvelles} etapePreparer={premier("preparer")} />;
+              if (x.type === "clonage") return <CarteClonage key={k} id={id} numero={x.numero} famille={famille} g={x.g} setS={setS} />;
+              if (x.type === "preparer") return <CartePreparer key={k} id={id} numero={x.numero} famille={famille} groupes={x.groupes} setS={setS} />;
+              return <CarteCapture key={k} id={id} numero={x.numero} famille={famille} capture={x.capture} setS={setS} niveau={niveauNouvelles} />;
             })}
           </ul>
         ) : (

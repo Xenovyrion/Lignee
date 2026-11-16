@@ -485,7 +485,8 @@ export function CartePreparer({ id, numero, famille, groupes, setS }: { id?: str
 
 export function CarteCapture({ id, numero, famille, capture, setS, niveau }: { id?: string; numero: number; famille: Famille; capture: ActionCapture; setS: SetS; niveau: number }) {
   const [ouvert, setOuvert] = useState(false);
-  const [lignes, setLignes] = useState<Ligne[]>([{ couleur: capture.couleur, M: capture.M + Math.ceil(capture.libres / 2), F: capture.F + Math.floor(capture.libres / 2) }]);
+  const prevues = (): Ligne[] => [{ couleur: capture.couleur, M: capture.M + Math.ceil(capture.libres / 2), F: capture.F + Math.floor(capture.libres / 2) }];
+  const [lignes, setLignes] = useState<Ligne[]>(prevues);
   const notifier = useNotifier();
   const valider = () => {
     notifier(`${total(lignes)} ${nomCouleur(famille, capture.couleur)} ajoutée${total(lignes) > 1 ? "s" : ""} à l'étable`, { annulable: true });
@@ -503,7 +504,14 @@ export function CarteCapture({ id, numero, famille, capture, setS, niveau }: { i
       type="capture"
       nombre={capture.nombre}
       droite={
-        <Bouton discret={ouvert} onClick={() => setOuvert(!ouvert)}>
+        <Bouton
+          discret={ouvert}
+          onClick={() => {
+            // À l'ouverture, repartir des nombres actuels du plan (ils changent après chaque saisie).
+            if (!ouvert) setLignes(prevues());
+            setOuvert(!ouvert);
+          }}
+        >
           {ouvert ? "Annuler" : "Capturé"}
         </Bouton>
       }

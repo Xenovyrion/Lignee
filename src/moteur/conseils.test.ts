@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { clonerPlusieurs, enregistrerNaissances, sauvegardeVide } from "./actions";
-import { actionsMaintenant, conseiller, conseillerMakina, prochainObjectif, seancesDesEtapes, seancesSuivantes } from "./conseils";
+import { actionsMaintenant, cleAction, conseiller, conseillerMakina, prochainObjectif, seancesDesEtapes, seancesSuivantes } from "./conseils";
 import { couleurs } from "./donnees";
 import { planifier, regrouperClonages, suggererClonages } from "./planificateur";
 import type { Monture, Sexe } from "./types";
@@ -149,5 +149,15 @@ describe("croisement raté", () => {
     expect(s.montures.filter((x) => x.origine === "naissance").map((x) => x.couleur)).toEqual(["amande"]);
     expect(s.montures.filter((x) => x.etat === "sterile")).toHaveLength(2);
     expect(s.obtenues.dragodinde).not.toContain("pourpre");
+  });
+});
+
+describe("clés des actions", () => {
+  it("chaque action a une clé unique, indépendante de sa position", () => {
+    for (const f of ["dragodinde", "muldo", "volkorne"] as const) {
+      const c = conseiller(planifier(f, [], []), {});
+      const cles = actionsMaintenant(c, []).map(cleAction);
+      expect(new Set(cles).size).toBe(cles.length);
+    }
   });
 });

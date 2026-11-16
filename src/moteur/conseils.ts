@@ -304,3 +304,13 @@ export function actionsMaintenant(c: Conseils, clonages: GroupeClonage[]): Actio
   for (const x of liste) if (x.type === "naissance") x.a.rang = x.numero;
   return liste;
 }
+
+/** Clé stable d'une action (son contenu, pas sa position) : un formulaire ouvert reste sur la bonne carte quand la liste se réordonne. */
+export const cleAction = (x: ActionMaintenant) =>
+  x.type === "naissance"
+    ? `n-${x.a.e.couleur}-${x.a.pere.couleur}>${x.a.mere.couleur}-${x.a.aPreparer.length ? "a" : "p"}`
+    : x.type === "clonage"
+      ? `c-${x.g.couleurs.join("+")}`
+      : x.type === "preparer"
+        ? "preparer"
+        : `k-${x.capture.couleur}`;
