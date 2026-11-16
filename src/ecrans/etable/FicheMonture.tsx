@@ -8,7 +8,8 @@ import { nombreEnclos, RESSOURCE_EXTRACTION, ressourcesExtraction, roleDansLePla
 import type { Plan } from "../../moteur/planificateur";
 import { clonables } from "../../moteur/regles";
 import type { Capacite, Etat, Monture, Sauvegarde, Sexe } from "../../moteur/types";
-import { Bouton, ChoixCouleur, champ, ETATS, sexeSymbole } from "../../ui";
+import { Bouton, champ, ETATS, sexeSymbole } from "../../ui";
+import { ChoixCouleur } from "../ChoixCouleur";
 import { Etoile, ImageMonture } from "../arbre/commun";
 
 const CAPACITES: Record<Capacite, string> = {
@@ -119,7 +120,7 @@ export function FicheMonture({ monture: m, s, setS, plan, fermer }: Props) {
         {/* Caractéristiques */}
         <div className="flex flex-col gap-2">
           <Champ libelle="Couleur">
-            <ChoixCouleur famille={f} value={m.couleur} onChange={(e) => modifier({ couleur: e.target.value })} className="w-48" />
+            <ChoixCouleur famille={f} valeur={m.couleur} onChange={(v) => modifier({ couleur: v })} className="w-48" />
           </Champ>
           <Champ libelle="Sexe">
             <select className={champ} value={m.sexe} onChange={(e) => modifier({ sexe: e.target.value as Sexe })}>
@@ -170,14 +171,14 @@ export function FicheMonture({ monture: m, s, setS, plan, fermer }: Props) {
             <input className={`${champ} w-48`} value={m.nom ?? ""} placeholder="—" onChange={(e) => modifier({ nom: e.target.value || undefined })} />
           </Champ>
           <Champ libelle="Père">
-            <ChoixCouleur famille={f} vide="inconnu" value={m.parents?.[0] ?? ""} onChange={(e) => modifier({ parents: e.target.value ? [e.target.value, m.parents?.[1] ?? e.target.value] : undefined })} className="w-48" />
+            <ChoixCouleur famille={f} vide="inconnu" valeur={m.parents?.[0] ?? ""} onChange={(v) => modifier({ parents: v ? [v, m.parents?.[1] ?? v] : undefined })} className="w-48" />
           </Champ>
           <Champ libelle="Mère">
             <ChoixCouleur
               famille={f}
               vide="inconnue"
-              value={m.parents?.[1] ?? ""}
-              onChange={(e) => modifier({ parents: e.target.value ? [m.parents?.[0] ?? e.target.value, e.target.value] : undefined })}
+              valeur={m.parents?.[1] ?? ""}
+              onChange={(v) => modifier({ parents: v ? [m.parents?.[0] ?? v, v] : undefined })}
               className="w-48"
             />
           </Champ>

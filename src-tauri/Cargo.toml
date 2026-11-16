@@ -1,6 +1,6 @@
 [package]
 name = "lignee"
-version = "1.0.5"
+version = "1.0.6"
 description = "Lignée - pilotage de l'élevage pour Dofus 3.7"
 authors = ["Xenovyrion"]
 edition = "2021"

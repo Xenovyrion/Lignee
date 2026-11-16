@@ -13,6 +13,7 @@ import { Compagnon } from "./ecrans/Compagnon";
 import { FournisseurNotifications, useAnnuler } from "./notifications";
 import { chercherMiseAJour, versionNouvellementInstallee, type MiseAJour } from "./miseAJour";
 import { NotesDeVersion } from "./ecrans/NotesDeVersion";
+import { Didacticiel, ProposerDidacticiel } from "./ecrans/Didacticiel";
 import { BarreChargement } from "./ui";
 import { BandeauMiseAJour } from "./ecrans/BandeauMiseAJour";
 import { Lucioles } from "./effets";
@@ -94,6 +95,15 @@ export function App() {
   // Nouveautés : ouvertes automatiquement juste après une mise à jour, ou à la demande.
   const [nouveautes, setNouveautes] = useState<{ ouvert: boolean; version?: string }>({ ouvert: false });
   const fermerNouveautes = useCallback(() => setNouveautes({ ouvert: false }), []);
+  // Visite guidée : proposée à l'ouverture tant qu'elle n'a été ni faite ni refusée.
+  const [tuto, setTuto] = useState(false);
+  const [tutoReporte, setTutoReporte] = useState(false);
+  const allerA = useCallback((o: Onglet) => setOnglet(o), []);
+  const fixerTuto = useCallback((v: "vu" | "refuse") => setS((x) => (x ? { ...x, options: { ...x.options, didacticiel: v } } : x)), [setS]);
+  const fermerTuto = useCallback(() => {
+    setTuto(false);
+    fixerTuto("vu");
+  }, [fixerTuto]);
   useEffect(() => {
     versionNouvellementInstallee()
       .then((v) => v && setNouveautes({ ouvert: true, version: v }))
@@ -176,6 +186,7 @@ export function App() {
             </h1>
           </div>
           <div className="surface flex flex-wrap items-center gap-1.5 rounded-2xl border border-border p-1.5">
+            <div data-tuto="familles" className="flex flex-wrap gap-1.5">
             {FAMILLES.map((f) => {
               const n = s.obtenues[f].length;
               const total = objectifs(f).length;
@@ -201,9 +212,13 @@ export function App() {
                 </button>
               );
             })}
-            <BoutonAnnuler possibles={historique.length} />
+            </div>
+            <span data-tuto="annuler">
+              <BoutonAnnuler possibles={historique.length} />
+            </span>
 
             <button
+              data-tuto="compagnon"
               onClick={() => basculerCompagnon(true)}
               title="Fenêtre compacte gardée au premier plan, à côté du jeu"
               className="rounded-xl px-3 py-2.5 text-sm text-text-secondary hover:bg-bg-hover hover:text-text-primary"
@@ -214,6 +229,10 @@ export function App() {
         </header>
         {maj && <BandeauMiseAJour maj={maj} fermer={() => setMaj(null)} voirNouveautes={() => setNouveautes({ ouvert: true })} />}
       {nouveautes.ouvert && <NotesDeVersion miseEnAvant={nouveautes.version} fermer={fermerNouveautes} />}
+        {!s.options.didacticiel && !tutoReporte && !tuto && !nouveautes.ouvert && (
+          <ProposerDidacticiel commencer={() => setTuto(true)} plusTard={() => setTutoReporte(true)} refuser={() => fixerTuto("refuse")} />
+        )}
+        {tuto && <Didacticiel allerA={allerA} fermer={fermerTuto} />}
         <nav className="surface flex flex-wrap gap-1.5 rounded-2xl border border-border p-1.5">
           {(Object.keys(ONGLETS) as Onglet[]).map((o) => {
             const Icone = ICONES_ONGLETS[o];
@@ -236,12 +255,12 @@ export function App() {
         </nav>
         {erreur && <div className="rounded-md bg-status-err/15 p-2 text-sm text-status-err">Sauvegarde impossible : {erreur}</div>}
         {/* Voile commun derrière chaque écran : lisibilité uniforme quelle que soit l'image de fond. */}
-        <main className="surface rounded-2xl border border-border p-4">
+        <main data-tuto="ecran" className="surface rounded-2xl border border-border p-4">
           {onglet === "actions" && <TableauDeBord {...props} />}
           {onglet === "etable" && <Etable key={famille} {...props} />}
           {onglet === "arbre" && <Arbre key={famille} famille={famille} s={s} />}
           {onglet === "succes" && <Succes {...props} setFamille={setFamille} />}
-          {onglet === "parametres" && <Parametres s={s} setS={majS} />}
+          {onglet === "parametres" && <Parametres s={s} setS={majS} lancerDidacticiel={() => setTuto(true)} />}
         </main>
       </div>
     </FournisseurNotifications>

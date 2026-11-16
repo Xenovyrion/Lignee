@@ -7,7 +7,8 @@ import { couleur, nomCouleur } from "../../moteur/donnees";
 import { ajusterStock } from "../../moteur/etable";
 import type { GroupeClonage } from "../../moteur/planificateur";
 import type { Famille, Makina, Monture, Sauvegarde, Sexe } from "../../moteur/types";
-import { Bouton, ChoixCouleur, champ, pourcent, sexeSymbole } from "../../ui";
+import { Bouton, champ, pourcent, sexeSymbole } from "../../ui";
+import { ChoixCouleur } from "../ChoixCouleur";
 import { useNotifier } from "../../notifications";
 import { ImageMonture } from "../arbre/commun";
 import { NOM_MAKINA, preparationParGeneration, TYPES, useRendrePretes, useToutesPretes } from "./typesActions";
@@ -122,6 +123,7 @@ function SaisieResultats({
   setLignes,
   couleursFixes,
   ajouterAutre,
+  probables,
 }: {
   famille: Famille;
   lignes: Ligne[];
@@ -129,19 +131,24 @@ function SaisieResultats({
   couleursFixes?: boolean;
   /** Ajout d'une couleur obtenue à la place de celle visée (croisement raté). */
   ajouterAutre?: () => void;
+  /** Couleurs les plus probables en cas de croisement raté (arbre des parents), en tête de liste. */
+  probables?: string[];
 }) {
   const maj = (i: number, champs: Partial<Ligne>) => setLignes(lignes.map((x, j) => (j === i ? { ...x, ...champs } : x)));
   return (
     <div className="flex flex-col gap-1.5">
       {lignes.map((l, i) => (
         <div key={i} className="flex flex-wrap items-center gap-2">
+          {!couleursFixes && lignes.length > 1 && (
+            <span className={`w-14 text-[11px] font-semibold uppercase tracking-wide ${i === 0 ? "text-status-ok" : "text-orange-400"}`}>{i === 0 ? "visé" : "raté →"}</span>
+          )}
           {couleursFixes ? (
             <span className="flex w-52 items-center gap-1.5">
               <ImageMonture famille={famille} id={l.couleur} taille={24} />
               {nomCouleur(famille, l.couleur)}
             </span>
           ) : (
-            <ChoixCouleur famille={famille} value={l.couleur} onChange={(e) => maj(i, { couleur: e.target.value })} className="w-52" />
+            <ChoixCouleur famille={famille} valeur={l.couleur} onChange={(v) => maj(i, { couleur: v })} suggestions={i > 0 ? probables : undefined} className="w-56" />
           )}
           <span className="text-sky-400">♂</span>
           <Compteur valeur={l.M} setValeur={(M) => maj(i, { M })} teinte="text-sky-400" />
@@ -155,8 +162,12 @@ function SaisieResultats({
         </div>
       ))}
       {!couleursFixes && (
-        <button className="self-start text-xs text-accent hover:underline" onClick={ajouterAutre ?? (() => setLignes([...lignes, { couleur: lignes[0].couleur, M: 0, F: 0 }]))}>
-          + un croisement raté (autre couleur obtenue à la place)
+        <button
+          className="mt-1 flex items-center gap-2 self-start rounded-lg border border-orange-400/50 bg-orange-400/10 px-3 py-1.5 text-sm font-medium text-orange-300 transition hover:bg-orange-400/20"
+          onClick={ajouterAutre ?? (() => setLignes([...lignes, { couleur: lignes[0].couleur, M: 0, F: 0 }]))}
+        >
+          <span className="text-base leading-none">✗</span>
+          Croisement raté ? Indiquer la couleur obtenue à la place
         </button>
       )}
     </div>
@@ -287,6 +298,8 @@ export function FormNaissances({ famille, a, setS, niveauBebes, fermer }: { fami
     setLignes([{ ...lignes[0], ...repartir(vise, a.e.sexeVoulu) }, ...lignes.slice(1)]);
   };
   /** Croisement raté : un bébé passe de la couleur visée à une autre (à choisir), du même sexe. */
+  // En cas d'échec, le bébé prend surtout une couleur de l'arbre : les parents, puis leurs propres parents.
+  const probables = [a.pere.couleur, a.mere.couleur, ...(a.pere.parents ?? []), ...(a.mere.parents ?? [])].filter((c) => c !== a.e.couleur);
   const ajouterEchec = () => {
     const [vise, ...autres] = lignes;
     const sexe: Sexe = vise.M >= vise.F ? "M" : "F";
@@ -314,7 +327,7 @@ export function FormNaissances({ famille, a, setS, niveauBebes, fermer }: { fami
       <div className="text-text-secondary">
         Bébés obtenus <span className="text-xs text-text-muted">— un par accouplement ; un croisement raté remplace le bébé visé</span>
       </div>
-      <SaisieResultats famille={famille} lignes={lignes} setLignes={setLignes} ajouterAutre={ajouterEchec} />
+      <SaisieResultats famille={famille} lignes={lignes} setLignes={setLignes} ajouterAutre={ajouterEchec} probables={probables} />
       <div className="flex flex-wrap items-center gap-3">
         <label className="flex items-center gap-2 text-xs text-text-secondary">
           <input type="checkbox" checked={reproducteur} onChange={(e) => setReproducteur(e.target.checked)} />

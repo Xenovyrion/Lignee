@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { appliquerNiveauUnique, nombreEnclos, prochainPalierEnclos } from "../moteur/etable";
 import type { Options, Sauvegarde } from "../moteur/types";
 import { choisirFond, FONDS_ANKAMA, idGalerie, SOURCE_FONDS, supprimerFond, valeurGalerie } from "../fond";
-import { Carte, champ } from "../ui";
+import { Bouton, Carte, champ } from "../ui";
 import { SectionSauvegardes } from "./SectionSauvegardes";
 import { SectionMiseAJour } from "./SectionMiseAJour";
 import { fondDuTheme, themeParId, THEMES, type Theme } from "../themes";
@@ -11,6 +11,7 @@ import { useNotifier } from "../notifications";
 interface Props {
   s: Sauvegarde;
   setS: (f: (s: Sauvegarde) => Sauvegarde) => void;
+  lancerDidacticiel?: () => void;
 }
 
 const Ligne = ({ titre, aide, children }: { titre: string; aide: string; children: ReactNode }) => (
@@ -30,7 +31,7 @@ const TuileFond = ({ titre, actif, onClick, children }: { titre: string; actif: 
   </button>
 );
 
-export function Parametres({ s, setS }: Props) {
+export function Parametres({ s, setS, lancerDidacticiel }: Props) {
   const o = s.options;
   const notifier = useNotifier();
   const maj = (champs: Partial<Options>) => setS((s) => ({ ...s, options: { ...s.options, ...champs } }));
@@ -227,6 +228,16 @@ export function Parametres({ s, setS }: Props) {
           </Ligne>
         )}
       </Carte>
+      {lancerDidacticiel && (
+        <Carte titre="Visite guidée">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="text-sm text-text-secondary">Revoir la présentation de l'outil, écran par écran.</div>
+            <Bouton discret onClick={lancerDidacticiel}>
+              Lancer la visite guidée
+            </Bouton>
+          </div>
+        </Carte>
+      )}
       <SectionSauvegardes s={s} setS={setS} />
       <SectionMiseAJour />
       <Carte titre="Accouplements">

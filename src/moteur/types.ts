@@ -82,4 +82,6 @@ export interface Options {
   voile: number;
   /** Thème (palette de couleurs), voir src/themes.ts. */
   theme: string;
+  /** Visite guidée : « vu » (faite ou passée), « refuse » ; absent = à proposer à l'ouverture. */
+  didacticiel?: "vu" | "refuse";
 }

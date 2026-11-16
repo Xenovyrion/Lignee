@@ -257,7 +257,7 @@ export function TableauDeBord({ famille, s, setS }: Props) {
       )}
 
       {/* Tuiles : raccourcis vers la première action de chaque type */}
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+      <div data-tuto="tuiles" className="grid grid-cols-2 gap-3 md:grid-cols-5">
         <Tuile valeur={nbPrets} icone={<IconeNaissance taille={24} />} libelle="accouplements prêts" teinte={TYPES.naissance.teinte} cible={`action-${premier("naissance")}`} />
         <Tuile valeur={clonages.reduce((n, g) => n + g.paires.length, 0)} icone={<IconeClonage taille={24} />} libelle="clonages possibles" teinte={TYPES.clonage.teinte} cible={`action-${premier("clonage")}`} />
         <Tuile valeur={nbAPreparer} icone={<IconePreparer taille={24} />} libelle="montures à préparer" teinte={TYPES.preparer.teinte} cible={`action-${premier("preparer")}`} />

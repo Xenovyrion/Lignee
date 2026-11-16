@@ -1,6 +1,6 @@
-import type { ReactNode, SelectHTMLAttributes } from "react";
-import { couleurs, nomCouleur } from "./moteur/donnees";
-import type { Famille, Monture } from "./moteur/types";
+import type { ReactNode } from "react";
+import { nomCouleur } from "./moteur/donnees";
+import type { Monture } from "./moteur/types";
 
 export const Carte = ({ titre, children, droite }: { titre?: ReactNode; children: ReactNode; droite?: ReactNode }) => (
   <section className="rounded-xl border border-border bg-bg-card p-4">
@@ -81,26 +81,6 @@ export const TitreSection = ({ children, droite }: { children: ReactNode; droite
 export const champ = "rounded-md border border-border-light bg-bg-secondary px-2 py-1.5 text-sm outline-hidden focus:border-accent";
 
 /** Liste déroulante des couleurs d'une famille, groupées par génération. */
-export function ChoixCouleur({ famille, vide, ...p }: { famille: Famille; vide?: string } & SelectHTMLAttributes<HTMLSelectElement>) {
-  const gens = [...new Set(couleurs(famille).map((c) => c.generation))];
-  return (
-    <select {...p} className={`${champ} ${p.className ?? ""}`}>
-      {vide !== undefined && <option value="">{vide}</option>}
-      {gens.map((g) => (
-        <optgroup key={g} label={`Génération ${g}`}>
-          {couleurs(famille)
-            .filter((c) => c.generation === g)
-            .map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.nom}
-              </option>
-            ))}
-        </optgroup>
-      ))}
-    </select>
-  );
-}
-
 export const sexeSymbole = (s: "M" | "F") => (s === "M" ? "♂" : "♀");
 
 export function libelleMonture(m: Monture) {
