@@ -137,8 +137,19 @@ export interface Conseils {
 const autreSexe = (s: Sexe): Sexe => (s === "M" ? "F" : "M");
 
 /** Meilleure makina pour une étape : l'Animakina garantit le sexe, l'Optimakina la génération. */
-export function conseillerMakina(niveauA: number, niveauB: number, sexeVoulu: Sexe | undefined, takeza: boolean): ConseilMakina {
+export function conseillerMakina(
+  niveauA: number,
+  niveauB: number,
+  sexeVoulu: Sexe | undefined,
+  takeza: boolean,
+  prefere: "auto" | "optimakina" | "animakina" = "auto",
+): ConseilMakina {
   const avecOpti = probaCible(niveauA, niveauB, { optimakina: true, takeza });
+  const nomSexe = sexeVoulu === "M" ? "mâle" : "femelle";
+  if (prefere === "animakina")
+    return { makina: "animakina", chance: probaCible(niveauA, niveauB, { takeza }), raison: sexeVoulu ? `sexe garanti (${nomSexe})` : "choix du sexe (makina par défaut)" };
+  if (prefere === "optimakina")
+    return { makina: "optimakina", chance: avecOpti, raison: sexeVoulu ? `chance de génération cible ; sexe au hasard (${nomSexe} voulu)` : "maximise la chance de génération cible" };
   if (!sexeVoulu) return { makina: "optimakina", chance: avecOpti, raison: "maximise la chance de génération cible" };
   const opti = avecOpti * 0.5; // sexe aléatoire
   const ani = probaCible(niveauA, niveauB, { takeza }); // sexe garanti, pas de bonus de génération
@@ -147,7 +158,7 @@ export function conseillerMakina(niveauA: number, niveauB: number, sexeVoulu: Se
     : { makina: "optimakina", chance: opti, raison: "meilleure chance globale malgré le sexe au hasard" };
 }
 
-export function conseiller(plan: Plan, options: Bonus & { takeza?: boolean }): Conseils {
+export function conseiller(plan: Plan, options: Bonus & { takeza?: boolean; makina?: "auto" | "optimakina" | "animakina" }): Conseils {
   const takeza = !!options.takeza;
   // Dépendances : combien d'étapes suivantes reposent (directement ou non) sur chaque bébé.
   const enfants = plan.etapes.map(() => [] as number[]);
@@ -208,7 +219,7 @@ export function conseiller(plan: Plan, options: Bonus & { takeza?: boolean }): C
         rang: 0,
         nombre: 1,
         paires: [{ pere, mere }],
-        makina: conseillerMakina(pere.niveau, mere.niveau, e.sexeVoulu, takeza),
+        makina: conseillerMakina(pere.niveau, mere.niveau, e.sexeVoulu, takeza, options.makina),
         aPreparer: [pere, mere].filter((m) => m.etat !== "feconde"),
         niveauConseille: seuil !== null && pere.niveau + mere.niveau < seuil ? seuil : null,
       };

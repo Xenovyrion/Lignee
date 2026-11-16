@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { journaliser, resumerDifference } from "./diagnostic";
 import { TableauDeBord } from "./ecrans/tableau/TableauDeBord";
 import { Arbre } from "./ecrans/arbre/Arbre";
 import { Etable } from "./ecrans/etable/Etable";
@@ -11,7 +12,7 @@ import { Logo } from "./Logo";
 import { entrerCompagnon, epingler, quitterCompagnon } from "./compagnon";
 import { Compagnon } from "./ecrans/Compagnon";
 import { FournisseurNotifications, useAnnuler } from "./notifications";
-import { chercherMiseAJour, versionNouvellementInstallee, type MiseAJour } from "./miseAJour";
+import { chercherMiseAJour, versionActuelle, versionNouvellementInstallee, type MiseAJour } from "./miseAJour";
 import { NotesDeVersion } from "./ecrans/NotesDeVersion";
 import { Didacticiel, ProposerDidacticiel } from "./ecrans/Didacticiel";
 import { BarreChargement } from "./ui";
@@ -95,6 +96,23 @@ export function App() {
   // Nouveautés : ouvertes automatiquement juste après une mise à jour, ou à la demande.
   const [nouveautes, setNouveautes] = useState<{ ouvert: boolean; version?: string }>({ ouvert: false });
   const fermerNouveautes = useCallback(() => setNouveautes({ ouvert: false }), []);
+  // Journal de diagnostic : démarrage, puis chaque changement de la sauvegarde (quelle qu'en soit l'origine).
+  const precedent = useRef<Sauvegarde | null>(null);
+  useEffect(() => {
+    if (!s) return;
+    if (!precedent.current) {
+      versionActuelle().then((v) =>
+        journaliser(
+          "info",
+          `Démarrage de Lignée ${v ?? "(navigateur)"} · ${s.montures.length} montures · succès DD ${s.obtenues.dragodinde.length}, Muldo ${s.obtenues.muldo.length}, Volkorne ${s.obtenues.volkorne.length}`,
+        ),
+      );
+    } else if (precedent.current !== s) {
+      const d = resumerDifference(precedent.current, s);
+      if (d) journaliser("etat", d);
+    }
+    precedent.current = s;
+  }, [s]);
   // Visite guidée : proposée à l'ouverture tant qu'elle n'a été ni faite ni refusée.
   const [tuto, setTuto] = useState(false);
   const [tutoReporte, setTutoReporte] = useState(false);

@@ -2,6 +2,10 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { App } from "./App";
 import "./index.css";
+import { chargerJournal, installerCaptureErreurs } from "./diagnostic";
+
+installerCaptureErreurs();
+chargerJournal();
 
 // Pas de menu du clic droit (Recharger, Inspecter…) dans l'application installée, sauf dans les
 // champs de saisie pour garder copier / coller. Laissé actif en développement pour l'inspecteur.

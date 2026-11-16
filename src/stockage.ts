@@ -1,5 +1,6 @@
 // Sauvegarde locale : fichier JSON dans le dossier AppData de l'application (Tauri),
 // ou localStorage quand l'interface tourne dans un navigateur (développement, version web).
+import { journaliser } from "./diagnostic";
 import { useEffect, useRef, useState } from "react";
 import { sauvegardeVide } from "./moteur/actions";
 import type { Sauvegarde } from "./moteur/types";
@@ -51,7 +52,13 @@ export function useSauvegarde() {
     if (!s) return;
     window.clearTimeout(minuteur.current);
     minuteur.current = window.setTimeout(() => {
-      ecrire(s).then(() => setErreur(null), (e) => setErreur(String(e)));
+      ecrire(s).then(
+        () => setErreur(null),
+        (e) => {
+          setErreur(String(e));
+          journaliser("erreur", `Écriture de la sauvegarde impossible : ${String(e)}`);
+        },
+      );
     }, 400);
   }, [s]);
 

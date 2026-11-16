@@ -84,4 +84,6 @@ export interface Options {
   theme: string;
   /** Visite guidée : « vu » (faite ou passée), « refuse » ; absent = à proposer à l'ouverture. */
   didacticiel?: "vu" | "refuse";
+  /** Makina conseillée : « auto » (meilleure chance globale), ou toujours la même (modifiable à chaque saisie). */
+  makina?: "auto" | "optimakina" | "animakina";
 }

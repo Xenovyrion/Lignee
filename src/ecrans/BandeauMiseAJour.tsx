@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { journaliser } from "../diagnostic";
 import type { MiseAJour } from "../miseAJour";
 import { BarreChargement, Bouton } from "../ui";
 
@@ -9,10 +10,12 @@ export function BandeauMiseAJour({ maj, fermer, voirNouveautes }: { maj: MiseAJo
   const [erreur, setErreur] = useState("");
   const installer = async () => {
     setEtat("installation");
+    journaliser("info", `Installation de la mise à jour ${maj.version}`);
     try {
       await maj.installer(setPct);
     } catch (e) {
       setErreur(e instanceof Error ? e.message : String(e));
+      journaliser("erreur", `Échec de la mise à jour ${maj.version} : ${e instanceof Error ? e.message : String(e)}`);
       setEtat("erreur");
     }
   };

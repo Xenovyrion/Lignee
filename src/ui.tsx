@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { nomCouleur } from "./moteur/donnees";
 import type { Monture } from "./moteur/types";
 
@@ -104,3 +104,41 @@ export const BadgeEtat = ({ etat }: { etat: import("./moteur/types").Etat }) => 
     {ETATS[etat]}
   </span>
 );
+
+/** Nombre saisissable au clavier (entre les boutons − et +) : validé avec Entrée ou en quittant le champ, Échap annule. */
+export function ChampNombre({ valeur, setValeur, min = 0, max = 999, className = "" }: { valeur: number; setValeur: (n: number) => void; min?: number; max?: number; className?: string }) {
+  const [texte, setTexte] = useState<string | null>(null);
+  const annule = useRef(false);
+  const valider = () => {
+    const t = texte;
+    setTexte(null);
+    if (annule.current || t === null || t === "") {
+      annule.current = false;
+      return;
+    }
+    const v = Math.min(max, Math.max(min, parseInt(t, 10)));
+    if (!Number.isNaN(v) && v !== valeur) setValeur(v);
+  };
+  return (
+    <input
+      inputMode="numeric"
+      aria-label="Nombre"
+      value={texte ?? String(valeur)}
+      onClick={(e) => e.stopPropagation()}
+      onFocus={(e) => {
+        setTexte(String(valeur));
+        e.target.select();
+      }}
+      onChange={(e) => setTexte(e.target.value.replace(/\D/g, "").slice(0, 4))}
+      onBlur={valider}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") e.currentTarget.blur();
+        if (e.key === "Escape") {
+          annule.current = true;
+          e.currentTarget.blur();
+        }
+      }}
+      className={`w-8 rounded-sm bg-transparent text-center font-bold outline-hidden focus:bg-accent-dim focus:ring-1 focus:ring-accent ${className}`}
+    />
+  );
+}

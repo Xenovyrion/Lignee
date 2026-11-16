@@ -7,7 +7,7 @@ import { couleur, nomCouleur } from "../../moteur/donnees";
 import { ajusterStock } from "../../moteur/etable";
 import type { GroupeClonage } from "../../moteur/planificateur";
 import type { Famille, Makina, Monture, Sauvegarde, Sexe } from "../../moteur/types";
-import { Bouton, champ, pourcent, sexeSymbole } from "../../ui";
+import { Bouton, ChampNombre, champ, pourcent, sexeSymbole } from "../../ui";
 import { ChoixCouleur } from "../ChoixCouleur";
 import { useNotifier } from "../../notifications";
 import { ImageMonture } from "../arbre/commun";
@@ -95,7 +95,7 @@ function Compteur({ valeur, setValeur, min = 0, max = 99, teinte }: { valeur: nu
       <button type="button" disabled={valeur <= min} onClick={() => setValeur(valeur - 1)} className="px-2 py-1 text-text-muted hover:text-text-primary disabled:opacity-25">
         −
       </button>
-      <span className={`w-6 text-center font-bold ${teinte ?? ""}`}>{valeur}</span>
+      <ChampNombre valeur={valeur} setValeur={setValeur} min={min} max={max} className={teinte} />
       <button type="button" disabled={valeur >= max} onClick={() => setValeur(valeur + 1)} className="px-2 py-1 text-text-muted hover:text-text-primary disabled:opacity-25">
         +
       </button>
@@ -228,7 +228,13 @@ export function CarteNaissance({
       }
       droite={
         <>
-          <div className="flex items-center gap-2">
+          <div
+            className="flex cursor-help items-center gap-2"
+            title={`${NOM_MAKINA[a.makina.makina]} : ${a.makina.raison}.${
+              a.niveauConseille ? `
+Pour 100 % avec Optimakina : niveaux cumulés ${a.niveauConseille} (actuellement ${a.pere.niveau + a.mere.niveau}).` : ""
+            }`}
+          >
             <JaugeChance p={a.makina.chance} />
             <div className="text-xs text-text-secondary">
               de réussite
@@ -239,16 +245,6 @@ export function CarteNaissance({
           <Bouton discret={!pret || ouvert} onClick={() => setOuvert(!ouvert)}>
             {ouvert ? "Annuler" : "Enregistrer"}
           </Bouton>
-        </>
-      }
-      pied={
-        <>
-          {a.makina.makina === "animakina" && <span>Animakina : {a.makina.raison}</span>}
-          {a.niveauConseille && (
-            <span>
-              Pour 100 % avec Optimakina : niveaux cumulés {a.niveauConseille} (actuellement {a.pere.niveau + a.mere.niveau})
-            </span>
-          )}
         </>
       }
       formulaire={ouvert && <FormNaissances famille={famille} a={a} setS={setS} niveauBebes={niveauBebes} fermer={() => setOuvert(false)} />}
@@ -302,6 +298,12 @@ export function FormNaissances({ famille, a, setS, niveauBebes, fermer }: { fami
   const probables = [a.pere.couleur, a.mere.couleur, ...(a.pere.parents ?? []), ...(a.mere.parents ?? [])].filter((c) => c !== a.e.couleur);
   const ajouterEchec = () => {
     const [vise, ...autres] = lignes;
+    // Avec Reproducteur, le bébé raté peut venir en plus du bébé réussi (jumeaux) : rien n'est retiré.
+    if (reproducteur && total(lignes) < 2 * n) {
+      const candidate = a.pere.couleur !== a.e.couleur ? a.pere.couleur : a.mere.couleur;
+      setLignes([...lignes, { couleur: candidate, M: 0, F: 1 }]);
+      return;
+    }
     const sexe: Sexe = vise.M >= vise.F ? "M" : "F";
     const retire = vise[sexe] > 0 ? { ...vise, [sexe]: vise[sexe] - 1 } : vise;
     const candidate = a.pere.couleur !== a.e.couleur ? a.pere.couleur : a.mere.couleur;
@@ -325,7 +327,12 @@ export function FormNaissances({ famille, a, setS, niveauBebes, fermer }: { fami
         <span className="text-xs text-text-muted">sur {a.nombre} proposé{a.nombre > 1 ? "s" : ""}</span>
       </div>
       <div className="text-text-secondary">
-        Bébés obtenus <span className="text-xs text-text-muted">— un par accouplement ; un croisement raté remplace le bébé visé</span>
+        Bébés obtenus{" "}
+        <span className="text-xs text-text-muted">
+          {reproducteur
+            ? "— jusqu'à 2 par accouplement avec Reproducteur ; chaque bébé est réussi ou raté indépendamment"
+            : "— un par accouplement ; un croisement raté remplace le bébé visé"}
+        </span>
       </div>
       <SaisieResultats famille={famille} lignes={lignes} setLignes={setLignes} ajouterAutre={ajouterEchec} probables={probables} />
       <div className="flex flex-wrap items-center gap-3">

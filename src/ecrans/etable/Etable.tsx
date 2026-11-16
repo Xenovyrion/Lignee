@@ -2,6 +2,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import { nouvelId } from "../../moteur/actions";
 import { couleur, FAMILLES, NOMS_FAMILLE } from "../../moteur/donnees";
 import { ajusterStock, besoinsParCouleur, compterStock, rendreFecondes } from "../../moteur/etable";
+import { conseiller } from "../../moteur/conseils";
 import { planifier } from "../../moteur/planificateur";
 import type { Etat, Famille, Monture, Sauvegarde, Sexe } from "../../moteur/types";
 import { IconeEnclos, IconeGrille, IconeListe, IconeSterile } from "../../icones";
@@ -51,7 +52,10 @@ export function Etable({ famille, s, setS }: Props) {
 
   const plan = useMemo(() => planifier(famille, s.montures, s.obtenues[famille]), [famille, s.montures, s.obtenues]);
   const reservees = plan.reservees;
-  const besoins = useMemo(() => besoinsParCouleur(famille, s.montures, plan), [famille, s.montures, plan]);
+  const besoins = useMemo(
+    () => besoinsParCouleur(famille, s.montures, plan, conseiller(plan, { takeza: s.options.takeza, makina: s.options.makina }).captures),
+    [famille, s.montures, plan, s.options.takeza, s.options.makina],
+  );
   const deLaFamille = useMemo(() => s.montures.filter((m) => m.famille === famille), [s.montures, famille]);
   const obtenues = useMemo(() => new Set(s.obtenues[famille]), [s.obtenues, famille]);
   const affichees = useMemo(() => trier(filtrer(deLaFamille, famille, filtre, reservees, obtenues), famille, tri), [deLaFamille, famille, filtre, reservees, obtenues, tri]);

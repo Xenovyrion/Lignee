@@ -1,5 +1,6 @@
 // Notifications discrètes en bas à droite (« Naissance enregistrée · Annuler »).
 // Le bouton Annuler n'est proposé que sur la dernière modification (sinon il annulerait autre chose).
+import { journaliser } from "./diagnostic";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 export type TonNotification = "succes" | "info" | "erreur";
@@ -47,6 +48,7 @@ export function FournisseurNotifications({ children, historique, annuler }: { ch
 
   const retirer = useCallback((id: number) => setListe((l) => l.filter((n) => n.id !== id)), []);
   const notifier = useCallback<Contexte["notifier"]>((texte, o = {}) => {
+    journaliser(o.ton === "erreur" ? "erreur" : "action", texte);
     const etape = o.annulable ? historiqueRef.current + 1 : undefined;
     setListe((l) => {
       const meme = o.cle ? l.find((n) => n.cle === o.cle) : undefined;

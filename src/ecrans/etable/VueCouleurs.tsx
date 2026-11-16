@@ -3,7 +3,7 @@ import { couleurs } from "../../moteur/donnees";
 import { enfantsDe } from "../../moteur/genealogie";
 import type { BesoinCouleur } from "../../moteur/etable";
 import type { Etat, Famille, Monture, Sexe } from "../../moteur/types";
-import { TitreSection } from "../../ui";
+import { TitreSection, ChampNombre } from "../../ui";
 import { COULEURS, ImageMonture } from "../arbre/commun";
 
 interface Props {
@@ -65,7 +65,7 @@ function GrilleStock({ c, simple }: { c: string; simple: NonNullable<Props["simp
                       >
                         −
                       </button>
-                      <span className={`font-bold ${n ? "text-text-primary" : "text-text-muted"}`}>{n}</span>
+                      <ChampNombre valeur={n} setValeur={(v) => simple.ajuster(c, sexe, etat, v - n)} className={n ? "text-text-primary" : "text-text-muted"} />
                       <button onClick={() => simple.ajuster(c, sexe, etat, 1)} className="px-1.5 py-0.5 text-text-muted hover:text-text-primary" title="Ajouter une monture">
                         +
                       </button>
@@ -214,9 +214,21 @@ export function VueCouleurs({ famille, montures, besoins, ajouter, retirer, ouvr
                             background: "rgba(249,115,22,0.15)",
                             color: COULEURS.produire,
                           }}
-                          title="Prévu par le plan sur l'ensemble de l'élevage"
+                          title={
+                            c.generation === 1
+                              ? `Le plan prévoit ${manque} capture${manque > 1 ? "s" : ""} sur tout l'élevage (jusqu'à la génération 10). ${
+                                  b!.aCapturerMaintenant
+                                    ? `${b!.aCapturerMaintenant > 1 ? `${b!.aCapturerMaintenant} sont à faire` : "Une est à faire"} maintenant (tableau de bord)${b!.aCapturerMaintenant < manque ? ", les autres plus tard" : ""}.`
+                                    : "Aucune n'est à faire maintenant : le tableau de bord les demandera le moment venu."
+                                }`
+                              : "Prévu par le plan sur l'ensemble de l'élevage"
+                          }
                         >
-                          {c.generation === 1 ? `${manque} à capturer` : `${manque} à faire naître`}
+                          {c.generation === 1
+                            ? b!.aCapturerMaintenant
+                              ? `${b!.aCapturerMaintenant} à capturer maintenant · ${manque} au total`
+                              : `${manque} à capturer plus tard`
+                            : `${manque} à faire naître`}
                         </span>
                       )}
                     </div>

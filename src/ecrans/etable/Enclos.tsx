@@ -27,11 +27,11 @@ export function Enclos({ famille, s, setS, plan, ouvrirFiche }: Props) {
 
   // Montures à préparer pour le plan (non fécondes), dans l'ordre des priorités, pas encore en enclos.
   const aPreparer = useMemo(() => {
-    const c = conseiller(plan, { takeza: s.options.takeza });
+    const c = conseiller(plan, { takeza: s.options.takeza, makina: s.options.makina });
     const l: Monture[] = [];
     for (const a of c.ordre) for (const m of a.aPreparer) if (!l.some((x) => x.id === m.id)) l.push(m);
     return l;
-  }, [plan, s.options.takeza]);
+  }, [plan, s.options.takeza, s.options.makina]);
   const enAttente = aPreparer.filter((m) => !s.montures.find((x) => x.id === m.id)?.enclos);
 
   const notifier = useNotifier();

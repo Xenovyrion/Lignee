@@ -5,6 +5,7 @@ import { choisirFond, FONDS_ANKAMA, idGalerie, SOURCE_FONDS, supprimerFond, vale
 import { Bouton, Carte, champ } from "../ui";
 import { SectionSauvegardes } from "./SectionSauvegardes";
 import { SectionMiseAJour } from "./SectionMiseAJour";
+import { SectionDiagnostic } from "./SectionDiagnostic";
 import { fondDuTheme, themeParId, THEMES, type Theme } from "../themes";
 import { useNotifier } from "../notifications";
 
@@ -240,7 +241,25 @@ export function Parametres({ s, setS, lancerDidacticiel }: Props) {
       )}
       <SectionSauvegardes s={s} setS={setS} />
       <SectionMiseAJour />
+      <SectionDiagnostic s={s} />
       <Carte titre="Accouplements">
+        <Ligne
+          titre="Makina conseillée"
+          aide="Optimakina : +20 % de chance d'atteindre la génération cible, sexe au hasard. Animakina : sexe choisi, sans bonus. Automatique : la meilleure chance globale selon que le sexe compte ou non. Reste modifiable à chaque saisie."
+        >
+          <select
+            className={champ}
+            value={o.makina ?? "auto"}
+            onChange={(e) => {
+              maj({ makina: e.target.value as Options["makina"] });
+              notifier("Makina conseillée modifiée", { ton: "info", annulable: true });
+            }}
+          >
+            <option value="auto">Automatique</option>
+            <option value="optimakina">Toujours Optimakina</option>
+            <option value="animakina">Toujours Animakina</option>
+          </select>
+        </Ligne>
         <Ligne titre="Bonus Almanax Takeza actif" aide="+20 % de chances d'obtenir la génération cible, les jours où l'Almanax le propose.">
           <input type="checkbox" className="h-4 w-4 accent-accent" checked={o.takeza} onChange={(e) => maj({ takeza: e.target.checked })} />
         </Ligne>

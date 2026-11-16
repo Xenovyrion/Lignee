@@ -19,6 +19,11 @@ describe("conseil de makina", () => {
     // Animakina : 90 % garanti du bon sexe ; Optimakina : 100 % × 50 % = 50 %
     expect(conseillerMakina(200, 200, "F", false)).toMatchObject({ makina: "animakina", chance: 0.9 });
   });
+  it("makina choisie dans les paramètres : toujours celle-là", () => {
+    expect(conseillerMakina(100, 100, "F", false, "optimakina")).toMatchObject({ makina: "optimakina", chance: 0.8 });
+    expect(conseillerMakina(100, 100, undefined, false, "animakina")).toMatchObject({ makina: "animakina", chance: 0.6 });
+    expect(conseillerMakina(100, 100, "F", false, "auto").makina).toBe("animakina");
+  });
 });
 
 describe("conseils d'actions", () => {

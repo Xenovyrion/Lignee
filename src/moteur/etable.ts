@@ -15,14 +15,21 @@ export interface BesoinCouleur {
   libres: number;
   /** Naissances de cette couleur que le plan prévoit (pour un succès ou comme parent). */
   aProduire: number;
-  /** Captures de cette couleur que le plan prévoit (générations 1). */
+  /** Captures de cette couleur que le plan prévoit sur tout l'élevage (générations 1). */
   aCapturer: number;
+  /** Dont celles à faire dès maintenant (séance en cours, comme au tableau de bord). */
+  aCapturerMaintenant: number;
 }
 
-export function besoinsParCouleur(famille: Famille, montures: Monture[], plan: Plan): Map<string, BesoinCouleur> {
+export function besoinsParCouleur(
+  famille: Famille,
+  montures: Monture[],
+  plan: Plan,
+  capturesMaintenant: { couleur: string; nombre: number }[] = [],
+): Map<string, BesoinCouleur> {
   const r = new Map<string, BesoinCouleur>();
   const de = (c: string) => {
-    if (!r.has(c)) r.set(c, { males: 0, femelles: 0, fecondes: 0, steriles: 0, niveauMax: 0, utilisees: 0, libres: 0, aProduire: 0, aCapturer: 0 });
+    if (!r.has(c)) r.set(c, { males: 0, femelles: 0, fecondes: 0, steriles: 0, niveauMax: 0, utilisees: 0, libres: 0, aProduire: 0, aCapturer: 0, aCapturerMaintenant: 0 });
     return r.get(c)!;
   };
   for (const m of montures) {
@@ -41,6 +48,7 @@ export function besoinsParCouleur(famille: Famille, montures: Monture[], plan: P
   }
   for (const e of plan.etapes) de(e.couleur).aProduire++;
   for (const [c, n] of Object.entries(plan.captures)) de(c).aCapturer += n;
+  for (const k of capturesMaintenant) de(k.couleur).aCapturerMaintenant += k.nombre;
   return r;
 }
 
