@@ -7,7 +7,8 @@ import { Parametres } from "./ecrans/Parametres";
 import { Succes } from "./ecrans/succes/Succes";
 import { ImageMonture } from "./ecrans/arbre/commun";
 import { couleurs, FAMILLES, NOMS_FAMILLE, objectifs } from "./moteur/donnees";
-import { IconeActions, IconeArbre, IconeEtable, IconeParametres, IconeSucces } from "./icones";
+import { IconeActions, IconeArbre, IconeEtable, IconeGuide, IconeParametres, IconeSucces } from "./icones";
+import { Guide } from "./ecrans/guide/Guide";
 import { Logo } from "./Logo";
 import { entrerCompagnon, epingler, quitterCompagnon } from "./compagnon";
 import { Compagnon } from "./ecrans/Compagnon";
@@ -23,9 +24,9 @@ import { appliquerPalette, themeParId } from "./themes";
 import type { Famille, Sauvegarde } from "./moteur/types";
 import { useSauvegarde } from "./stockage";
 
-const ONGLETS = { actions: "Tableau de bord", etable: "Étable", arbre: "Arbre", succes: "Succès", parametres: "Paramètres" } as const;
+const ONGLETS = { actions: "Tableau de bord", etable: "Étable", arbre: "Arbre", succes: "Succès", guide: "Guide", parametres: "Paramètres" } as const;
 type Onglet = keyof typeof ONGLETS;
-const ICONES_ONGLETS = { actions: IconeActions, etable: IconeEtable, arbre: IconeArbre, succes: IconeSucces, parametres: IconeParametres };
+const ICONES_ONGLETS = { actions: IconeActions, etable: IconeEtable, arbre: IconeArbre, succes: IconeSucces, guide: IconeGuide, parametres: IconeParametres };
 
 /** Image de fond choisie dans les Paramètres, assombrie pour garder le contenu lisible. */
 function FondEcran({ nom, visibilite, flou }: { nom: string; visibilite: number; flou: number }) {
@@ -278,6 +279,7 @@ export function App() {
           {onglet === "etable" && <Etable key={famille} {...props} />}
           {onglet === "arbre" && <Arbre key={famille} famille={famille} s={s} />}
           {onglet === "succes" && <Succes {...props} setFamille={setFamille} />}
+          {onglet === "guide" && <Guide allerA={allerA} lancerVisite={() => setTuto(true)} />}
           {onglet === "parametres" && <Parametres s={s} setS={majS} lancerDidacticiel={() => setTuto(true)} />}
         </main>
       </div>

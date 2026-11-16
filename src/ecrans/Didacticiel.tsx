@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { Logo } from "../Logo";
 import { Bouton } from "../ui";
 
-export type OngletTuto = "actions" | "etable" | "arbre" | "succes" | "parametres";
+export type OngletTuto = "actions" | "etable" | "arbre" | "succes" | "guide" | "parametres";
 
 interface EtapeTuto {
   titre: string;
@@ -68,6 +68,13 @@ const ETAPES: EtapeTuto[] = [
     texte: "Toutes les couleurs par génération, avec leurs parents. Clique sur une couleur pour voir comment l'obtenir depuis ton étable.",
     cible: '[data-tuto="ecran"]',
     onglet: "arbre",
+  },
+  {
+    titre: "Le guide de l'éleveur",
+    texte:
+      "Nouveau dans l'élevage ? Le Guide explique les bases du jeu (capture, enclos, sérénité, génération cible, clonage, niveaux) et donne les conseils pour finir les succès.",
+    cible: '[data-tuto="ecran"]',
+    onglet: "guide",
   },
   {
     titre: "Paramètres",

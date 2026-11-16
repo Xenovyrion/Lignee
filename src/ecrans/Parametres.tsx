@@ -260,7 +260,7 @@ export function Parametres({ s, setS, lancerDidacticiel }: Props) {
             <option value="animakina">Toujours Animakina</option>
           </select>
         </Ligne>
-        <Ligne titre="Bonus Almanax Takeza actif" aide="+20 % de chances d'obtenir la génération cible, les jours où l'Almanax le propose.">
+        <Ligne titre="Bonus Almanax actif (Takeza, Otoul)" aide="+20 % de chances d'obtenir la génération cible : le 10 novembre (Otoul) et le jour de Takeza (date variable). Coche-le ces jours-là.">
           <input type="checkbox" className="h-4 w-4 accent-accent" checked={o.takeza} onChange={(e) => maj({ takeza: e.target.checked })} />
         </Ligne>
       </Carte>

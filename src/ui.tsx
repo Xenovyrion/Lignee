@@ -87,7 +87,7 @@ export function libelleMonture(m: Monture) {
   return `${nomCouleur(m.famille, m.couleur)} ${sexeSymbole(m.sexe)} niv. ${m.niveau}${m.nom ? ` « ${m.nom} »` : ""}`;
 }
 
-export const pourcent = (p: number) => `${Math.round(p * 1000) / 10} %`;
+export const pourcent = (p: number) => `${(Math.round(p * 1000) / 10).toLocaleString("fr-FR")} %`;
 
 export const ETATS: Record<import("./moteur/types").Etat, string> = { fertile: "Fertile", feconde: "Féconde", sterile: "Stérile" };
 

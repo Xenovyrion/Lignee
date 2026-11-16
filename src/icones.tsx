@@ -130,3 +130,11 @@ export const IconeParametres = (p: P) => (
     <circle cx="12" cy="12" r="6.5" />
   </Icone>
 );
+
+/** Guide : livre ouvert. */
+export const IconeGuide = (p: P) => (
+  <Icone {...p}>
+    <path d="M12 6.5C10 5 7.5 4.5 4 4.8v13.4c3.5-.3 6 .2 8 1.7 2-1.5 4.5-2 8-1.7V4.8c-3.5-.3-6 .2-8 1.7Z" />
+    <path d="M12 6.5v13.4" />
+  </Icone>
+);

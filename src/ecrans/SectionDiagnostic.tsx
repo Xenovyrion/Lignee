@@ -11,11 +11,10 @@ const LIBELLE: Record<Niveau, string> = { info: "info", action: "action", etat: 
 /** Journal de diagnostic : dernières entrées, export du fichier à transmettre en cas de problème. */
 export function SectionDiagnostic({ s }: { s: Sauvegarde }) {
   const [journal, setJournal] = useState(lireJournal);
-  const [tout, setTout] = useState(false);
   const notifier = useNotifier();
   useEffect(() => abonnerJournal(() => setJournal(lireJournal())), []);
   const erreurs = journal.filter((e) => e.n === "erreur").length;
-  const affichees = journal.slice(-(tout ? 300 : 12)).reverse();
+  const affichees = journal.slice(-300).reverse();
 
   const exporter = async () => {
     try {
@@ -51,22 +50,17 @@ export function SectionDiagnostic({ s }: { s: Sauvegarde }) {
             </Bouton>
           </div>
         </div>
-        {affichees.length > 0 && (
-          <div className={`flex flex-col gap-0.5 overflow-y-auto rounded-lg border border-border bg-bg-secondary p-2 font-mono text-[11px] ${tout ? "max-h-96" : ""}`}>
-            {affichees.map((e, i) => (
-              <div key={`${e.t}-${i}`} className="flex gap-2">
-                <span className="shrink-0 text-text-muted">{new Date(e.t).toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit" })}</span>
-                <span className={`w-12 shrink-0 ${TEINTE[e.n]}`}>{LIBELLE[e.n]}</span>
-                <span className="min-w-0 whitespace-pre-wrap break-words text-text-secondary">{e.m}</span>
-              </div>
-            ))}
-          </div>
-        )}
-        {journal.length > 12 && (
-          <button className="self-start text-xs text-accent hover:underline" onClick={() => setTout(!tout)}>
-            {tout ? "Afficher moins" : "Afficher plus d'entrées"}
-          </button>
-        )}
+        {/* Hauteur fixe : le journal défile sans changer la taille de la page. */}
+        <div className="flex h-48 flex-col gap-0.5 overflow-y-auto rounded-lg border border-border bg-bg-secondary p-2 font-mono text-[11px]">
+          {affichees.length === 0 && <div className="m-auto text-text-muted">Journal vide</div>}
+          {affichees.map((e, i) => (
+            <div key={`${e.t}-${i}`} className="flex gap-2">
+              <span className="shrink-0 text-text-muted">{new Date(e.t).toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit" })}</span>
+              <span className={`w-12 shrink-0 ${TEINTE[e.n]}`}>{LIBELLE[e.n]}</span>
+              <span className="min-w-0 whitespace-pre-wrap break-words text-text-secondary">{e.m}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </Carte>
   );
