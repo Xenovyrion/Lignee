@@ -60,13 +60,13 @@ function GrilleStock({ c, simple }: { c: string; simple: NonNullable<Props["simp
                       <button
                         disabled={!n}
                         onClick={() => simple.ajuster(c, sexe, etat, -1)}
-                        className="px-1.5 py-0.5 text-text-muted hover:text-text-primary disabled:opacity-25"
+                        className="px-1 py-0.5 text-text-muted hover:text-text-primary disabled:opacity-25"
                         title="Retirer une monture"
                       >
                         −
                       </button>
                       <ChampNombre valeur={n} setValeur={(v) => simple.ajuster(c, sexe, etat, v - n)} className={n ? "text-text-primary" : "text-text-muted"} />
-                      <button onClick={() => simple.ajuster(c, sexe, etat, 1)} className="px-1.5 py-0.5 text-text-muted hover:text-text-primary" title="Ajouter une monture">
+                      <button onClick={() => simple.ajuster(c, sexe, etat, 1)} className="px-1 py-0.5 text-text-muted hover:text-text-primary" title="Ajouter une monture">
                         +
                       </button>
                     </div>

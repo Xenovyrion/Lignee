@@ -138,7 +138,7 @@ export function ChampNombre({ valeur, setValeur, min = 0, max = 999, className =
           e.currentTarget.blur();
         }
       }}
-      className={`w-8 rounded-sm bg-transparent text-center font-bold outline-hidden focus:bg-accent-dim focus:ring-1 focus:ring-accent ${className}`}
+      className={`w-[3.2ch] min-w-0 rounded-sm bg-transparent text-center font-bold outline-hidden focus:bg-accent-dim focus:ring-1 focus:ring-accent ${className}`}
     />
   );
 }
