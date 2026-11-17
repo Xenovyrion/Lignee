@@ -2,7 +2,7 @@
 import { describe, expect, it } from "vitest";
 import { CRANS, simuler, xpNiveau, type JaugeEnclos } from "./enclos";
 
-const sim = (jauges: JaugeEnclos[], niveauDepart = 1, niveauCible = 1) => simuler({ jauges, niveauDepart, niveauCible });
+const sim = (jauges: JaugeEnclos[], niveauDepart = 1, niveauCible = 1, sereniteDepart?: number) => simuler({ jauges, niveauDepart, niveauCible, sereniteDepart });
 
 describe("minuteurs d'enclos", () => {
   it("Maturité seule : 20 000 points à 10 par tic au T1, à 40 au T4", () => {
@@ -35,8 +35,18 @@ describe("minuteurs d'enclos", () => {
     expect(r.evenements[r.evenements.length - 1].type).toBe("arret");
   });
 
-  it("Endurance sans Baffeur : rien ne progresse, conseil immédiat", () => {
-    const r = sim([{ type: "endurance", charge: 200_000 }]);
+  it("sérénité de départ déduite : Amour seul progresse (montures supposées en zone positive)", () => {
+    expect(sim([{ type: "amour", charge: 80_000 }]).fin).toBe(20_000);
+    expect(sim([{ type: "endurance", charge: 80_000 }]).fin).toBe(20_000);
+  });
+
+  it("Caresseur + Maturité depuis +1 500 : sort de la zone après 500 points", () => {
+    const r = sim([{ type: "caresseur", charge: 80_000 }, { type: "maturite", charge: 80_000 }], 1, 1, 1500);
+    expect(r.evenements.find((e) => e.type === "zone")?.t).toBe(510);
+  });
+
+  it("Endurance sans Baffeur depuis une sérénité neutre : rien ne progresse, conseil immédiat", () => {
+    const r = sim([{ type: "endurance", charge: 200_000 }], 1, 1, 0);
     expect(r.evenements).toHaveLength(1);
     expect(r.evenements[0]).toMatchObject({ type: "arret", t: 10 });
     expect(r.evenements[0].texte).toContain("Baffeur");

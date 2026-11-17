@@ -1,6 +1,7 @@
 // Minuteurs d'enclos : simulation des jauges tic par tic (toutes les 10 s) pour prévoir quand les montures
-// sont prêtes. Simplification voulue : les montures partent de 0 (sérénité, endurance, maturité, amour),
-// seul le niveau de départ compte pour l'XP. Règles : docs/REFERENCE_ELEVAGE_3.7.md, section 6.
+// sont prêtes. Simplification voulue : les caractéristiques (endurance, maturité, amour) partent de 0 ;
+// la sérénité de départ est choisie (ou déduite des jauges : on suppose les montures dans la bonne zone),
+// et seul le niveau de départ compte pour l'XP. Règles : docs/REFERENCE_ELEVAGE_3.7.md, section 6.
 import XP from "../donnees/xp_monture.json";
 
 export type TypeJauge = "baffeur" | "caresseur" | "endurance" | "maturite" | "amour" | "mangeoire";
@@ -23,6 +24,8 @@ export interface MinuteurEnclos {
   /** Mangeoire : niveau des montures au lancement et niveau visé. */
   niveauDepart: number;
   niveauCible: number;
+  /** Sérénité des montures au lancement (−5 000 à +5 000). Absente : déduite des jauges (sereniteParDefaut). */
+  sereniteDepart?: number;
   /** Clés des évènements déjà signalés (pour ne pas notifier deux fois). */
   signales: string[];
 }
@@ -83,6 +86,21 @@ export const xpNiveau = (n: number) => (XP as number[])[Math.min(200, Math.max(1
 
 /** Zone de sérénité où chaque caractéristique progresse. */
 const ZONES: Partial<Record<TypeJauge, [number, number]>> = { endurance: [-SERENITE_MAX, -1], maturite: [-2000, 2000], amour: [1, SERENITE_MAX] };
+/** Sérénité de départ approximative (mode simple) : milieu de la zone négative, neutre ou positive. */
+export const SERENITES = [
+  { nom: "Négative", valeur: -2500 },
+  { nom: "Neutre", valeur: 0 },
+  { nom: "Positive", valeur: 2500 },
+] as const;
+/** On suppose que les montures ont été mises dans la zone de la caractéristique travaillée. */
+export function sereniteParDefaut(types: TypeJauge[]) {
+  if (types.includes("amour")) return 2500;
+  if (types.includes("endurance")) return -2500;
+  return 0;
+}
+/** La sérénité de départ change-t-elle le résultat ? (une jauge de sérénité active : estimation) */
+export const dependDeLaSerenite = (types: TypeJauge[]) => types.includes("baffeur") || types.includes("caresseur");
+
 const dansZone = (t: TypeJauge, ser: number) => {
   const z = ZONES[t];
   return !z || (ser >= z[0] && ser <= z[1]);
@@ -106,13 +124,13 @@ export interface Simulation {
   caracs: Partial<Record<TypeJauge, number>>;
 }
 
-type Simulable = Pick<MinuteurEnclos, "jauges" | "niveauDepart" | "niveauCible">;
+type Simulable = Pick<MinuteurEnclos, "jauges" | "niveauDepart" | "niveauCible" | "sereniteDepart">;
 
 export function simuler(m: Simulable): Simulation {
   const jauges = m.jauges.slice(0, 2).map((j) => ({ ...j, charge: Math.max(0, Math.min(CHARGE_MAX, j.charge)) }));
   const evenements: Evenement[] = [];
   const caracs: Partial<Record<TypeJauge, number>> = {};
-  let ser = 0;
+  let ser = Math.max(-SERENITE_MAX, Math.min(SERENITE_MAX, Math.round(m.sereniteDepart ?? sereniteParDefaut(jauges.map((j) => j.type)))));
   const xpCible = xpNiveau(Math.max(m.niveauCible, m.niveauDepart));
   // Objectifs : 20 000 dans chaque caractéristique, le niveau visé pour la Mangeoire.
   // Sans objectif (sérénité seule), la jauge de sérénité tourne jusqu'à la borne.
