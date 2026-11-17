@@ -60,7 +60,7 @@ export function Parametres({ s, setS, lancerDidacticiel }: Props) {
           </select>
         </Ligne>
       </Carte>
-      <Carte titre="Apparence">
+      <Carte tuto="apparence" titre="Apparence">
         <div className="pb-3">
           <div className="flex items-baseline gap-2">
             <span className="text-sm font-medium">Thème</span>
@@ -161,7 +161,7 @@ export function Parametres({ s, setS, lancerDidacticiel }: Props) {
           <input type="checkbox" className="h-4 w-4 accent-accent" disabled={!o.animations} checked={o.particules && o.animations} onChange={(e) => maj({ particules: e.target.checked })} />
         </Ligne>
       </Carte>
-      <Carte titre="Métier">
+      <Carte tuto="metier" titre="Métier">
         <Ligne
           titre="Niveau du métier Éleveur"
           aide={`Détermine le nombre d'enclos : ${nombreEnclos(o.niveauEleveur)} actuellement${prochainPalierEnclos(o.niveauEleveur) ? `, un de plus au niveau ${prochainPalierEnclos(o.niveauEleveur)}` : " (maximum)"}.`}
@@ -176,7 +176,7 @@ export function Parametres({ s, setS, lancerDidacticiel }: Props) {
           />
         </Ligne>
       </Carte>
-      <Carte titre="Étable">
+      <Carte tuto="reglages-etable" titre="Étable">
         <Ligne
           titre="Mode de suivi"
           aide={
@@ -236,7 +236,7 @@ export function Parametres({ s, setS, lancerDidacticiel }: Props) {
         <Carte titre="Visite guidée">
           <div className="flex flex-col gap-3">
             <div className="text-sm text-text-secondary">
-              Quatre chapitres courts, à suivre dans l'ordre ou séparément. Les chapitres sur l'Étable et le tableau de bord utilisent une étable d'exemple : ta vraie
+              Cinq chapitres courts, à suivre dans l'ordre ou séparément. Les chapitres sur l'Étable et le tableau de bord utilisent une étable d'exemple : ta vraie
               étable n'est pas touchée.
             </div>
             <ChoixChapitres lancer={lancerDidacticiel} />

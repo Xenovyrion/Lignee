@@ -8,7 +8,7 @@ import type { Sauvegarde } from "../moteur/types";
 import { Bouton } from "../ui";
 
 export type OngletTuto = "actions" | "etable" | "enclos" | "arbre" | "succes" | "guide" | "parametres";
-export type Chapitre = "decouverte" | "etable" | "tableau" | "quotidien";
+export type Chapitre = "decouverte" | "etable" | "tableau" | "enclos" | "quotidien";
 
 interface EtapeTuto {
   titre: string;
@@ -56,7 +56,7 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
       {
         titre: "Les écrans",
         texte:
-          "Tableau de bord : ce qu'il faut faire maintenant. Étable : tes montures. Arbre : toutes les couleurs et leurs parents. Succès : les couleurs obtenues. Guide : les règles du jeu. Paramètres : réglages et sauvegardes.",
+          "Tableau de bord : ce qu'il faut faire maintenant. Étable : tes montures. Enclos : les minuteurs de tes enclos. Arbre : toutes les couleurs et leurs parents. Succès : les couleurs obtenues. Guide : les règles du jeu. Paramètres : réglages et sauvegardes.",
         cible: '[data-tuto="onglets"]',
       },
       {
@@ -83,7 +83,7 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
       {
         titre: "Les enclos",
         texte:
-          "Pour chaque enclos, active les deux jauges que tu as mises en jeu et règle leur remplissage : Lignée calcule l'heure où tes montures sont prêtes et te prévient (Windows, et Discord si tu l'as configuré dans les Paramètres).",
+          "Pour chaque enclos, active les jauges que tu as mises en jeu et règle leur remplissage : Lignée calcule l'heure où tes montures sont prêtes et te prévient (Windows, et Discord si tu l'as configuré). Le chapitre « Enclos et notifications » le détaille.",
         cible: '[data-tuto="ecran"]',
         onglet: "enclos",
       },
@@ -295,10 +295,75 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
     ],
   },
 
+  enclos: {
+    titre: "Enclos et notifications",
+    resume: "Régler les jauges d'un enclos, lire l'heure de fin, être prévenu sur Windows ou Discord.",
+    duree: "2 min",
+    demo: false,
+    etapes: [
+      {
+        titre: "Un minuteur par enclos",
+        texte:
+          "Ici, tu reproduis ce que tu as mis dans chaque enclos en jeu, et Lignée te dit quand les montures sont prêtes. Le nombre d'enclos suit ton niveau d'Éleveur (Paramètres). Les caractéristiques des montures sont supposées partir de 0, et leur nombre ne change pas la durée.",
+        cible: '[data-tuto="ecran"]',
+        onglet: "enclos",
+      },
+      {
+        titre: "Les jauges, comme en jeu",
+        texte:
+          "Dans l'ordre du jeu : Baffeur (sérénité −) et Caresseur (sérénité +), puis Endurance, Maturité, Amour, et la Mangeoire (XP). Deux jauges actives au plus, et Baffeur et Caresseur ne vont pas ensemble. Une jauge inactive est grisée et marquée « off ».",
+        cible: '[data-tuto="enclos-jauges"]',
+        onglet: "enclos",
+      },
+      {
+        titre: "Active une jauge",
+        texte: "Un clic sur la barre l'active et la remplit jusqu'au cran visé. Le rond sous la barre l'active ou la désactive.",
+        cible: '[data-tuto="enclos-jauges"]',
+        onglet: "enclos",
+        action: { consigne: "Clique la barre de l'Amour (rouge) du premier enclos.", fait: existe('[data-tuto="enclos-resultat"]') },
+      },
+      {
+        titre: "Régler le remplissage",
+        texte:
+          "Mode simple : la barre a 8 crans (T1 ½, T1 plein… T4 plein). Clique un cran pour remplir jusque-là, reclique le cran du haut pour descendre d'un cran, ou utilise la molette. Mode avancé : glisse la barre ou tape la valeur exacte lue en jeu.",
+        cible: '[data-tuto="enclos-jauges"]',
+        onglet: "enclos",
+      },
+      {
+        titre: "Réglages et sérénité de départ",
+        texte:
+          "À droite, le récapitulatif : remplissage de chaque jauge, montures, niveau visé pour la Mangeoire. La sérénité de départ se règle toute seule d'après les jauges (Amour : positive, Endurance : négative, Maturité : neutre) ; change-la si tes montures sont ailleurs.",
+        cible: '[data-tuto="enclos-reglages"]',
+        onglet: "enclos",
+      },
+      {
+        titre: "L'heure de fin et les alertes",
+        texte:
+          "L'heure où l'enclos sera prêt, puis les alertes prévues : jauge vide avant la fin, sérénité qui sort de la zone, caractéristique qui ne progresse pas, chacune avec quoi faire. Avec une jauge de sérénité active, l'heure est une estimation.",
+        cible: '[data-tuto="enclos-resultat"]',
+        onglet: "enclos",
+      },
+      {
+        titre: "Lancer le minuteur",
+        texte:
+          "Lance le minuteur au moment où tu remplis l'enclos en jeu : les barres se vident en direct. « Relancer » repart de maintenant avec de nouveaux réglages, « Arrêter » annule. Les alertes arrivent même si tu rouvres Lignée plus tard.",
+        cible: '[data-tuto="enclos-actions"]',
+        onglet: "enclos",
+      },
+      {
+        titre: "Être prévenu",
+        texte:
+          "Dans les Paramètres : saisie simple ou avancée, notifications Windows (Lignée ouverte), et Discord via le relais de ta guilde, même Lignée fermée, avec une mention pour toi seul. Pas encore de relais ? « Copier ma demande » prépare le message à envoyer à celui qui le gère.",
+        cible: '[data-tuto="minuteurs"]',
+        onglet: "parametres",
+      },
+    ],
+  },
+
   quotidien: {
     titre: "Au quotidien",
-    resume: "Mode compagnon, annulation, Almanax, sauvegardes et diagnostic.",
-    duree: "1 min",
+    resume: "Mode compagnon, annulation, réglages utiles, sauvegardes et diagnostic.",
+    duree: "2 min",
     demo: false,
     etapes: [
       {
@@ -319,6 +384,31 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
         onglet: "parametres",
       },
       {
+        titre: "Ton métier d'Éleveur",
+        texte: "Indique ton niveau d'Éleveur : il donne le nombre d'enclos affichés dans l'onglet Enclos (un de plus aux paliers du jeu).",
+        cible: '[data-tuto="metier"]',
+        onglet: "parametres",
+      },
+      {
+        titre: "Suivi simple ou détaillé",
+        texte:
+          "Simple : tu comptes tes montures par couleur, toutes au niveau par défaut. Détaillé : chaque monture a sa fiche et son niveau, ce qui affine les chances. Tu peux changer quand tu veux.",
+        cible: '[data-tuto="reglages-etable"]',
+        onglet: "parametres",
+      },
+      {
+        titre: "À ton goût",
+        texte: "Thèmes (Doré, Iop, Sadida…), fond d'écran (galerie officielle ou ta propre image), transparence, animations : tout se règle ici.",
+        cible: '[data-tuto="apparence"]',
+        onglet: "parametres",
+      },
+      {
+        titre: "Mises à jour",
+        texte: "Lignée vérifie au démarrage si une nouvelle version existe et propose de l'installer. Les nouveautés de chaque version sont consultables ici.",
+        cible: '[data-tuto="mises-a-jour"]',
+        onglet: "parametres",
+      },
+      {
         titre: "Sauvegardes",
         texte: "Lignée enregistre tout seul, et garde des copies automatiques. Tu peux aussi exporter ton élevage dans un fichier, et l'importer sur un autre ordinateur.",
         cible: '[data-tuto="sauvegardes"]',
@@ -334,10 +424,11 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
   },
 };
 
-const ORDRE: Chapitre[] = ["decouverte", "etable", "tableau", "quotidien"];
+const ORDRE: Chapitre[] = ["decouverte", "etable", "tableau", "enclos", "quotidien"];
 
 /** Chapitre qui correspond à l'écran affiché (bouton « ? Aide »). */
-export const chapitreDeLOnglet = (o: OngletTuto): Chapitre => (o === "etable" ? "etable" : o === "actions" ? "tableau" : o === "parametres" ? "quotidien" : "decouverte");
+export const chapitreDeLOnglet = (o: OngletTuto): Chapitre =>
+  o === "etable" ? "etable" : o === "actions" ? "tableau" : o === "enclos" ? "enclos" : o === "parametres" ? "quotidien" : "decouverte";
 
 /** Position de l'élément ciblé, suivie en continu (défilement, redimensionnement, contenu qui change). */
 function useRect(cible?: string) {
@@ -564,8 +655,8 @@ export function ProposerDidacticiel({ commencer, plusTard, refuser }: { commence
         <div>
           <h2 className="text-xl font-bold">Bienvenue dans Lignée !</h2>
           <p className="mt-2 text-sm text-text-secondary">
-            Veux-tu une visite guidée ? Quatre chapitres courts (≈ 6 minutes en tout) : le tour des écrans, puis comment gérer ton étable et suivre le tableau de bord,
-            en t'exerçant sur une étable d'exemple.
+            Veux-tu une visite guidée ? Cinq chapitres courts (≈ 9 minutes en tout) : le tour des écrans, comment gérer ton étable et suivre le tableau de bord en
+            t'exerçant sur une étable d'exemple, puis les minuteurs d'enclos et les réglages utiles.
           </p>
         </div>
         <div className="flex flex-wrap justify-center gap-2">

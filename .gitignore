@@ -22,3 +22,4 @@ lignee-sauvegarde*.json
 relais/node_modules/
 relais/.wrangler/
 relais/.dev.vars*
+relais/*.local.*

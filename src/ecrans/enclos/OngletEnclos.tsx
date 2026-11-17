@@ -287,7 +287,7 @@ function CarteEnclos({ k, s, setS }: { k: number; s: Sauvegarde; setS: (f: (s: S
       </div>
 
       <div className="flex flex-col gap-4 @xl:flex-row @xl:items-start">
-        <div className="shrink-0">
+        <div className="shrink-0" data-tuto={k === 1 ? "enclos-jauges" : undefined}>
           <Jauges
             charges={chargesAffichees}
             actives={typesActifs}
@@ -304,7 +304,7 @@ function CarteEnclos({ k, s, setS }: { k: number; s: Sauvegarde; setS: (f: (s: S
               Clique la barre des jauges mises en jeu (2 au maximum) pour les activer et régler leur remplissage. L'icône sous la barre active ou désactive.
             </p>
           ) : (
-            <div className="grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-2 text-text-secondary">
+            <div className="grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-2 text-text-secondary" data-tuto={k === 1 ? "enclos-reglages" : undefined}>
               {typesActifs.map((t) => (
                 <Fragment key={t}>
                   <span className="flex items-center gap-1.5">
@@ -396,7 +396,7 @@ function CarteEnclos({ k, s, setS }: { k: number; s: Sauvegarde; setS: (f: (s: S
           )}
 
           {typesActifs.length > 0 && (
-            <div className="flex flex-col gap-1.5 rounded-lg border border-border bg-black/20 p-2.5">
+            <div className="flex flex-col gap-1.5 rounded-lg border border-border bg-black/20 p-2.5" data-tuto={k === 1 ? "enclos-resultat" : undefined}>
               {finMs !== undefined ? (
                 <span className={`text-sm ${termine ? "font-semibold text-status-ok" : "font-medium text-text-primary"}`}>
                   {termine ? `✅ Prêt depuis ${heure(finMs)}` : `⏱️ Prêt à ${heure(finMs)} · dans ${duree((finMs - maintenant) / 1000)}`}
@@ -422,7 +422,7 @@ function CarteEnclos({ k, s, setS }: { k: number; s: Sauvegarde; setS: (f: (s: S
             </div>
           )}
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2" data-tuto={k === 1 ? "enclos-actions" : undefined}>
             {enCours ? (
               <>
                 <Bouton

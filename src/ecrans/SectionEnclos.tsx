@@ -28,6 +28,17 @@ export function SectionEnclos({ s, maj }: { s: Sauvegarde; maj: (o: Partial<Opti
   const [cle, setCle] = useState(enregistre?.cle ?? "");
   const [etat, setEtat] = useState<{ ok: boolean; texte: string } | null>(null);
   const [occupe, setOccupe] = useState(false);
+  const [idDiscord, setIdDiscord] = useState("");
+  const idValide = /^\d{17,20}$/.test(idDiscord.trim());
+  const copierDemande = async () => {
+    const texte = `Salut ! Je voudrais recevoir les notifications d'enclos de Lignée sur Discord. Mon identifiant Discord : ${idDiscord.trim()}`;
+    try {
+      await navigator.clipboard.writeText(texte);
+      notifier("Demande copiée : colle-la en message privé à celui qui gère le relais", { ton: "succes" });
+    } catch {
+      notifier("Copie impossible : sélectionne le texte à la main", { ton: "info" });
+    }
+  };
   const saisie = { url: url.trim().replace(/\/+$/, ""), cle: cle.trim() };
   const valide = urlRelaisValide(saisie.url) && saisie.cle.length >= 32;
   const actif = !!enregistre && enregistre.actif !== false;
@@ -71,7 +82,7 @@ export function SectionEnclos({ s, maj }: { s: Sauvegarde; maj: (o: Partial<Opti
   };
 
   return (
-    <Carte titre="Minuteurs d'enclos">
+    <Carte tuto="minuteurs" titre="Minuteurs d'enclos">
       <Ligne titre="Saisie des jauges" aide="Simple : la barre se cale sur les paliers et demi-paliers (T1 ½, T1 plein… T4 plein). Avancée : valeur exacte, lue en jeu en survolant la jauge.">
         <Choix
           valeur={o.saisieJauges ?? "palier"}
@@ -91,6 +102,33 @@ export function SectionEnclos({ s, maj }: { s: Sauvegarde; maj: (o: Partial<Opti
       >
         <input type="checkbox" className="h-4 w-4 accent-accent" disabled={!enregistre} checked={actif} onChange={(e) => activer(e.target.checked)} />
       </Ligne>
+      {!enregistre && (
+        <div className="flex flex-col gap-2 rounded-lg border border-accent/30 bg-accent-dim/30 p-3 text-xs">
+          <div className="font-semibold text-text-primary">Pas encore de relais ? Demande l'accès</div>
+          <ol className="list-decimal space-y-0.5 pl-4 text-text-secondary">
+            <li>
+              Dans Discord, clique ton avatar en bas à gauche, puis <b>Copier l'identifiant de l'utilisateur</b> (si l'option manque : Paramètres utilisateur → Avancés →
+              Mode développeur).
+            </li>
+            <li>Colle-le ci-dessous, puis copie la demande.</li>
+            <li>Envoie-la en message privé à celui qui gère le relais de ta guilde : il te répondra avec l'adresse et ta clé, à coller plus bas.</li>
+          </ol>
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              className={`${champ} w-56 text-xs`}
+              placeholder="Ton identifiant Discord (que des chiffres)"
+              value={idDiscord}
+              onChange={(e) => setIdDiscord(e.target.value)}
+              inputMode="numeric"
+              spellCheck={false}
+            />
+            <Bouton discret disabled={!idValide} onClick={copierDemande}>
+              Copier ma demande
+            </Bouton>
+            {idDiscord && !idValide && <span className="text-status-err">Un identifiant Discord fait 17 à 20 chiffres.</span>}
+          </div>
+        </div>
+      )}
       <div className="flex flex-col gap-2 border-t border-border pt-3">
         <div className="text-xs text-text-muted">
           Le relais est installé une fois, par toi ou par un membre de ta guilde, puis partagé. Celui qui le gère te donne son <b>adresse</b> et une <b>clé personnelle</b>{" "}

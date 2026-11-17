@@ -25,8 +25,9 @@ Lignée de Tom ─┼─ « enclos 2 prêt à 18:40 » ─► Relais ┤
 Tu n'installes rien.
 
 1. Envoie ton **identifiant Discord** à la personne qui gère le relais.
-   - Discord → **Paramètres utilisateur → Avancés → Mode développeur** : active-le.
-   - Clic droit sur ton pseudo → **Copier l'identifiant de l'utilisateur**. C'est un nombre, par exemple `987654321098765432`. Ce n'est pas un secret.
+   - Dans Discord, clique ton avatar en bas à gauche → **Copier l'identifiant de l'utilisateur**. C'est un nombre, par exemple `987654321098765432`. Ce n'est pas un secret.
+   - Si l'option n'apparaît pas : **Paramètres utilisateur → Avancés → Mode développeur**, puis réessaie.
+   - Le plus simple : dans Lignée, **Paramètres → Minuteurs d'enclos**, colle ton identifiant et clique **Copier ma demande**. Il ne reste qu'à coller le message en privé.
 2. Elle te renvoie, **en message privé**, l'**adresse du relais** et **ta clé personnelle**.
 3. Dans Lignée : **Paramètres → Minuteurs d'enclos**.
    - Colle l'adresse et la clé.
@@ -107,7 +108,22 @@ npx wrangler logout
 
 Envoie à chaque membre, **en message privé** (jamais dans un salon) : l'adresse du relais et **sa** clé. Il suit la partie « Si tu es un membre ».
 
-### Ajouter ou retirer un membre
+### Ajouter ou retirer un membre : le script
+
+Le script `relais/gerer-relais.ps1` fait tout : il génère la clé, met à jour le relais, et **copie dans ton presse-papiers le message privé à envoyer au membre**. Lance-le avec PowerShell 7 :
+
+```powershell
+pwsh -File "C:\chemin\vers\Lignee\relais\gerer-relais.ps1"
+```
+
+Menu : ajouter, retirer, lister, renvoyer son accès à un membre, lui donner une nouvelle clé, mettre à jour le relais. Il se connecte à Cloudflare quand il en a besoin et se déconnecte en quittant.
+
+- Cloudflare ne permet pas de relire un secret : le script garde sa liste dans `relais/membres.local.dat`, **chiffré avec ton compte Windows** (lisible seulement par toi, sur ce PC) et ignoré par git.
+- **Au premier lancement**, il demande l'adresse du relais. Ajoute ensuite chaque membre déjà inscrit, toi compris : colle sa clé actuelle s'il en a une, sinon le script en crée une nouvelle et prépare le message à lui renvoyer.
+- Aucune clé n'est affichée à l'écran. Après avoir collé le message, copie autre chose pour vider le presse-papiers.
+- Si tu changes de PC, relance le premier lancement : redonne les clés existantes ou régénère-les.
+
+### Ajouter ou retirer un membre : à la main
 
 Mets à jour ta liste, puis renvoie-la **en entier** :
 

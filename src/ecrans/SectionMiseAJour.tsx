@@ -24,7 +24,7 @@ export function SectionMiseAJour() {
     }
   };
   return (
-    <Carte titre="Mises à jour">
+    <Carte tuto="mises-a-jour" titre="Mises à jour">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="text-sm font-medium">Version installée : {version ?? "version navigateur"}</div>

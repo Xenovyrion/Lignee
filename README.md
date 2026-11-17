@@ -56,7 +56,7 @@ Finir les succès de génération, c'est **294 couleurs** à faire naître sur t
 
 ## Prise en main
 
-À la première ouverture, une **visite guidée** en quatre chapitres te présente l'outil : Découverte, Gérer l'étable, Suivre le tableau de bord, Au quotidien. Les chapitres pratiques se font sur une **étable d'exemple**, sans toucher à la tienne. On les relance avec le bouton **? Aide** ou depuis *Paramètres → Visite guidée*.
+À la première ouverture, une **visite guidée** en cinq chapitres te présente l'outil : Découverte, Gérer l'étable, Suivre le tableau de bord, Enclos et notifications, Au quotidien. Les chapitres pratiques se font sur une **étable d'exemple**, sans toucher à la tienne. On les relance avec le bouton **? Aide** ou depuis *Paramètres → Visite guidée*.
 
 1. **Choisis la famille** (Dragodindes, Muldos, Volkornes) en haut de l'écran.
 2. **Saisis ton étable** (onglet *Étable*) : pour chaque couleur, le nombre de mâles et de femelles, et leur état (fertile, féconde, stérile). Coche dans *Succès* les couleurs déjà obtenues.

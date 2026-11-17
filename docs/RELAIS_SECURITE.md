@@ -67,7 +67,7 @@ Ces protections ont été testées en local, avec `wrangler dev` accessible depu
 ### Secrets et clés
 - [ ] Secrets **uniquement** via `npx wrangler secret put` : jamais dans `wrangler.jsonc`, jamais dans un commit. Le dépôt ignore déjà `relais/.dev.vars*`, `relais/.wrangler/` et `relais/node_modules/`.
 - [ ] Clés générées avec la commande PowerShell du guide (générateur cryptographique), 64 caractères, **une par membre**.
-- [ ] Liste `MEMBRES` gardée dans un gestionnaire de mots de passe, pas dans un fichier texte ni un message.
+- [ ] Liste `MEMBRES` gardée dans un gestionnaire de mots de passe, ou dans le fichier du script `gerer-relais.ps1` (chiffré avec ton compte Windows), jamais dans un fichier texte ni un message.
 - [ ] Clés envoyées **en message privé**, jamais dans un salon.
 
 ### Discord
