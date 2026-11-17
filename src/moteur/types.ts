@@ -91,4 +91,6 @@ export interface Options {
   saisieJauges?: "palier" | "exacte";
   /** Notifications Windows à la fin des minuteurs d'enclos. */
   notifWindows?: boolean;
+  /** Tableau de bord en vue compacte : seulement les actions, sans les explications. */
+  vueCompacte?: boolean;
 }

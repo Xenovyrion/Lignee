@@ -121,6 +121,10 @@ export interface Evenement {
   titre: string;
   /** Détail chiffré et action à faire. */
   texte: string;
+  /** Avancement de chaque objectif à cet instant (barres du message Discord). */
+  progression: { type: TypeJauge; pct: number; valeur: string }[];
+  /** Sérénité à cet instant. */
+  serenite: number;
 }
 
 export interface Simulation {
@@ -151,7 +155,22 @@ export function simuler(m: Simulable): Simulation {
   const sereniteActive = jauges.find((j) => j.type === "baffeur" || j.type === "caresseur");
   const etat = (j: JaugeEnclos) =>
     j.type === "mangeoire" ? `Niveau ${niveauXp(caracs.mangeoire ?? 0)} sur ${m.niveauCible} visé` : `${COURT[j.type]} à ${nombre(caracs[j.type] ?? 0)} / ${nombre(CARAC_MAX)}`;
-  const ajouter = (e: Evenement) => evenements.push(e);
+  const xpDepart = xpNiveau(m.niveauDepart);
+  const pct = (j: JaugeEnclos) => {
+    const c = caracs[j.type] ?? 0;
+    const p = j.type === "mangeoire" ? (xpCible > xpDepart ? (c - xpDepart) / (xpCible - xpDepart) : 1) : c / CARAC_MAX;
+    return Math.max(0, Math.min(100, Math.floor(p * 100)));
+  };
+  const ajouter = (e: Omit<Evenement, "progression" | "serenite">) =>
+    evenements.push({
+      ...e,
+      serenite: ser,
+      progression: objectifs.map((j) => ({
+        type: j.type,
+        pct: pct(j),
+        valeur: j.type === "mangeoire" ? `niv. ${niveauXp(caracs.mangeoire ?? 0)} / ${m.niveauCible}` : `${nombre(caracs[j.type] ?? 0)} / ${nombre(CARAC_MAX)}`,
+      })),
+    });
 
   for (let tic = 1; tic <= 50_000; tic++) {
     const t = tic * TIC;

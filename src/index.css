@@ -206,6 +206,16 @@ body {
 }
 
 /* Option « Animations » désactivée, ou réglage système. */
+/* Vue compacte du tableau de bord : explications masquées, cartes resserrées. */
+.vue-compacte .aide-detaillee {
+  display: none;
+}
+.vue-compacte section,
+.vue-compacte li[data-type] {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
 .sans-animation *,
 .sans-animation *::before,
 .sans-animation *::after {

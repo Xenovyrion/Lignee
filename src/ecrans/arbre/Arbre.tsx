@@ -11,10 +11,12 @@ import { COULEURS, Etoile, fabriquerStatut, ImageMonture, type RolePlan, type St
 interface Props {
   famille: Famille;
   s: Sauvegarde;
+  /** Couleur à sélectionner à l'ouverture (recherche rapide). */
+  focus?: string | null;
 }
 
-export function Arbre({ famille, s }: Props) {
-  const [selection, setSelection] = useState<string | null>(null);
+export function Arbre({ famille, s, focus = null }: Props) {
+  const [selection, setSelection] = useState<string | null>(focus);
   const [survol, setSurvol] = useState<string | null>(null);
   const [filtre, setFiltre] = useState<FiltreCarte>("tout");
   const [legende, setLegende] = useState(true);

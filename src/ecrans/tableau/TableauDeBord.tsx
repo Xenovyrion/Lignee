@@ -23,7 +23,7 @@ const Cadre = ({ id, titre, sous, children, droite, ton }: { id?: string; titre:
     <div className="mb-3 flex items-start justify-between gap-2">
       <div>
         <h2 className="font-semibold">{titre}</h2>
-        {sous && <p className="text-xs text-text-muted">{sous}</p>}
+        {sous && <p className="aide-detaillee text-xs text-text-muted">{sous}</p>}
       </div>
       {droite}
     </div>
@@ -107,6 +107,7 @@ export function TableauDeBord({ famille, s, setS }: Props) {
   const suivantes = useMemo(() => seancesSuivantes(plan), [plan]);
   const totalSeances = Math.max(1, ...numSeance);
   const [toutesSeances, setToutesSeances] = useState(false);
+  const compacte = !!s.options.vueCompacte;
 
   // Nouvelle couleur obtenue → confettis ; génération complétée → bandeau « Succès obtenu ».
   const [confettis, setConfettis] = useState(0);
@@ -151,13 +152,13 @@ export function TableauDeBord({ famille, s, setS }: Props) {
     );
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className={`flex flex-col ${compacte ? "vue-compacte gap-3" : "gap-4"}`}>
       <Confettis declencheur={confettis} />
       <Bandeau message={bandeau} fermer={fermerBandeau} />
       {/* Progression */}
-      <div className="rounded-xl border border-border bg-bg-card p-4">
+      <div className={`rounded-xl border border-border bg-bg-card ${compacte ? "px-4 py-2.5" : "p-4"}`}>
         <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-          <AnneauTotal faites={obtenues.size} total={objectifs(famille).length} />
+          {!compacte && <AnneauTotal faites={obtenues.size} total={objectifs(famille).length} />}
           <div className="flex min-w-[320px] flex-1 gap-2">
             {gens.map(({ g, faites, total }) => {
               const fini = faites === total;
@@ -180,7 +181,7 @@ export function TableauDeBord({ famille, s, setS }: Props) {
               );
             })}
           </div>
-          <div className="flex gap-2 text-center">
+          <div className="aide-detaillee flex gap-2 text-center">
             {[
               [plan.etapes.length, "naissances"],
               [plan.clonages, "clonages"],
@@ -193,6 +194,22 @@ export function TableauDeBord({ famille, s, setS }: Props) {
                 </div>
                 <div className="text-[10px] uppercase tracking-wide text-text-muted">{l}</div>
               </div>
+            ))}
+          </div>
+          <div data-tuto="vue-compacte" className="ml-auto flex rounded-lg border border-border-light p-0.5 text-xs" title="Vue compacte : seulement les actions, sans les explications">
+            {(
+              [
+                [false, "Détaillée"],
+                [true, "Compacte"],
+              ] as const
+            ).map(([v, l]) => (
+              <button
+                key={l}
+                onClick={() => setS((x) => ({ ...x, options: { ...x.options, vueCompacte: v } }))}
+                className={`rounded-md px-2.5 py-1 ${compacte === v ? "bg-accent-dim text-accent" : "text-text-secondary hover:text-text-primary"}`}
+              >
+                {l}
+              </button>
             ))}
           </div>
         </div>
@@ -211,7 +228,7 @@ export function TableauDeBord({ famille, s, setS }: Props) {
               {gens.find((x) => x.g === objectif.generation)!.faites}/{gens.find((x) => x.g === objectif.generation)!.total} · {objectif.manquantes.length} à obtenir
             </span>
           </div>
-          <p className="mt-1 text-sm text-text-secondary">
+          <p className="aide-detaillee mt-1 text-sm text-text-secondary">
             Chemin pour obtenir <b className="text-text-primary">{nomCouleur(famille, objectif.cible)}</b> avec ton étable :
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -240,7 +257,7 @@ export function TableauDeBord({ famille, s, setS }: Props) {
               );
             })}
           </div>
-          {objectif.manquantes.length > 1 && (
+          {objectif.manquantes.length > 1 && !compacte && (
             <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs text-text-muted">
               Puis, pour compléter le succès :
               {objectif.manquantes
@@ -257,7 +274,7 @@ export function TableauDeBord({ famille, s, setS }: Props) {
       )}
 
       {/* Tuiles : raccourcis vers la première action de chaque type */}
-      <div data-tuto="tuiles" className="grid grid-cols-2 gap-3 md:grid-cols-5">
+      <div data-tuto="tuiles" className="aide-detaillee grid grid-cols-2 gap-3 md:grid-cols-5">
         <Tuile valeur={nbPrets} icone={<IconeNaissance taille={24} />} libelle="accouplements prêts" teinte={TYPES.naissance.teinte} cible={`action-${premier("naissance")}`} />
         <Tuile valeur={clonages.reduce((n, g) => n + g.paires.length, 0)} icone={<IconeClonage taille={24} />} libelle="clonages possibles" teinte={TYPES.clonage.teinte} cible={`action-${premier("clonage")}`} />
         <Tuile valeur={nbAPreparer} icone={<IconePreparer taille={24} />} libelle="montures à préparer" teinte={TYPES.preparer.teinte} cible={`action-${premier("preparer")}`} />
@@ -315,7 +332,7 @@ export function TableauDeBord({ famille, s, setS }: Props) {
       </Cadre>
 
       {/* Séances suivantes */}
-      {suivantes.length > 0 && (
+      {suivantes.length > 0 && !compacte && (
         <Cadre
           id="ensuite"
           titre="Et ensuite"

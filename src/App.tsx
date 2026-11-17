@@ -26,6 +26,29 @@ import { urlFond } from "./fond";
 import { appliquerPalette, themeParId } from "./themes";
 import type { Famille, Sauvegarde } from "./moteur/types";
 import { useSauvegarde } from "./stockage";
+import { RechercheRapide, resultatsMontures, type Resultat } from "./ecrans/RechercheRapide";
+
+/** Réglages trouvables par la recherche rapide : repère (data-tuto) dans Paramètres, titre et mots-clés. */
+const REGLAGES: [string, string, string][] = [
+  ["apparence", "Apparence", "thème fond d'écran image transparence animations lucioles"],
+  ["metier", "Métier d'Éleveur", "niveau enclos"],
+  ["reglages-etable", "Réglages de l'étable", "suivi simple détaillé niveau par défaut nom"],
+  ["minuteurs", "Minuteurs d'enclos et Discord", "notifications relais windows discord"],
+  ["sauvegardes", "Sauvegardes", "export import copie restaurer cloud onedrive google drive"],
+  ["mises-a-jour", "Mises à jour", "version nouveautés"],
+  ["diagnostic", "Diagnostic", "journal problème bug"],
+  ["accouplements", "Accouplements", "makina optimakina animakina takeza almanax"],
+];
+
+/** Fait défiler jusqu'à un repère et le fait briller un instant. */
+function montrer(repere: string) {
+  window.setTimeout(() => {
+    const el = document.querySelector<HTMLElement>(`[data-tuto="${repere}"]`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    el.animate([{ boxShadow: "0 0 0 3px var(--color-accent)" }, { boxShadow: "0 0 0 0 transparent" }], { duration: 1800, easing: "ease-out" });
+  }, 80);
+}
 
 const ONGLETS = { actions: "Tableau de bord", etable: "Étable", enclos: "Enclos", arbre: "Arbre", succes: "Succès", guide: "Guide", parametres: "Paramètres" } as const;
 type Onglet = keyof typeof ONGLETS;
@@ -84,6 +107,18 @@ export function App() {
   const { s, setS, erreur } = useSauvegarde();
   const [famille, setFamille] = useState<Famille>("dragodinde");
   const [onglet, setOnglet] = useState<Onglet>("actions");
+  const [recherche, setRecherche] = useState(false);
+  const [focusArbre, setFocusArbre] = useState<{ f: Famille; id: string } | null>(null);
+  useEffect(() => {
+    const touche = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setRecherche((x) => !x);
+      }
+    };
+    window.addEventListener("keydown", touche);
+    return () => window.removeEventListener("keydown", touche);
+  }, []);
   // Annulation : états précédents de la session (une saisie erronée se défait en un clic).
   const [historique, setHistorique] = useState<Sauvegarde[]>([]);
   // Compteur de modifications : permet aux notifications de savoir si leur « Annuler » est encore le bon.
@@ -164,6 +199,8 @@ export function App() {
       </div>
     );
 
+  // Pendant la démo, les écrans affichent et modifient l'étable d'exemple.
+  const sv = demo ?? s;
   const majReel = (f: (x: Sauvegarde) => Sauvegarde) => {
     setHistorique((h) => [...h.slice(-29), s]);
     setModifications((n) => n + 1);
@@ -199,8 +236,44 @@ export function App() {
       console.error("Mode compagnon : fenêtre non modifiable", e);
     }
   };
-  // Pendant la démo, les écrans affichent et modifient l'étable d'exemple.
-  const sv = demo ?? s;
+  const resultatsRecherche = (): Resultat[] => [
+    ...(Object.keys(ONGLETS) as Onglet[]).map((o) => {
+      const Icone = ICONES_ONGLETS[o];
+      return { cle: `onglet-${o}`, titre: ONGLETS[o], detail: "Onglet", groupe: "Onglets" as const, icone: <Icone taille={18} />, aller: () => setOnglet(o) };
+    }),
+    ...REGLAGES.map(([repere, titre, mots]) => ({
+      cle: `reglage-${repere}`,
+      titre,
+      detail: "Paramètres",
+      groupe: "Réglages" as const,
+      icone: <IconeParametres taille={18} />,
+      mots,
+      aller: () => {
+        setOnglet("parametres");
+        montrer(repere);
+      },
+    })),
+    { cle: "cmd-compagnon", titre: "Mode compagnon", detail: "Fenêtre compacte au premier plan, à côté du jeu", groupe: "Commandes", icone: "⤡", aller: () => basculerCompagnon(true) },
+    { cle: "cmd-aide", titre: "Visite guidée de cet onglet", detail: CHAPITRES[chapitreDeLOnglet(onglet)].titre, groupe: "Commandes", icone: "?", mots: "aide didacticiel tutoriel", aller: () => lancerTuto(chapitreDeLOnglet(onglet)) },
+    {
+      cle: "cmd-compacte",
+      titre: s.options.vueCompacte ? "Vue détaillée du tableau de bord" : "Vue compacte du tableau de bord",
+      detail: s.options.vueCompacte ? "Réafficher les explications" : "Seulement les actions, sans les explications",
+      groupe: "Commandes",
+      icone: "☰",
+      mots: "compact résumé",
+      aller: () => {
+        majReel((x) => ({ ...x, options: { ...x.options, vueCompacte: !x.options.vueCompacte } }));
+        setOnglet("actions");
+      },
+    },
+    { cle: "cmd-nouveautes", titre: "Nouveautés", detail: "Notes des dernières versions", groupe: "Commandes", icone: "✦", mots: "version mise à jour", aller: () => setNouveautes({ ouvert: true }) },
+    ...resultatsMontures(sv, (f, id) => {
+      setFamille(f);
+      setFocusArbre({ f, id });
+      setOnglet("arbre");
+    }),
+  ];
   const props = { famille, s: sv, setS: majS };
   // Opacité des panneaux (0 à 1), lue par les couleurs de fond du thème (index.css).
   document.documentElement.style.setProperty("--voile", String((s.options.voile ?? 70) / 100));
@@ -296,6 +369,7 @@ export function App() {
         {!s.options.didacticiel && !tutoReporte && !tuto && !nouveautes.ouvert && (
           <ProposerDidacticiel commencer={() => lancerTuto("decouverte")} plusTard={() => setTutoReporte(true)} refuser={() => fixerTuto("refuse")} />
         )}
+        {recherche && <RechercheRapide resultats={resultatsRecherche()} fermer={() => setRecherche(false)} />}
         {tuto && <Didacticiel chapitre={tuto} s={sv} allerA={allerA} fermer={fermerTuto} lancer={lancerTuto} />}
         {demo && (
           <div className="pointer-events-none fixed left-1/2 top-3 z-[61] -translate-x-1/2 rounded-full border border-accent/60 bg-bg-card px-4 py-1.5 text-xs font-medium text-accent shadow-xl">
@@ -323,6 +397,14 @@ export function App() {
           })}
           <span className="flex-1" />
           <button
+            onClick={() => setRecherche(true)}
+            title="Recherche rapide : une couleur, un onglet, un réglage (Ctrl+K)"
+            className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm text-text-secondary hover:bg-white/8 hover:text-text-primary"
+          >
+            ⌕ Rechercher
+            <kbd className="rounded border border-border-light px-1.5 text-[11px] text-text-muted">Ctrl K</kbd>
+          </button>
+          <button
             data-tuto="aide"
             onClick={() => lancerTuto(chapitreDeLOnglet(onglet))}
             title={`Visite guidée : ${CHAPITRES[chapitreDeLOnglet(onglet)].titre}`}
@@ -338,7 +420,7 @@ export function App() {
           {onglet === "actions" && <TableauDeBord {...props} />}
           {onglet === "etable" && <Etable key={`${famille}-${demo ? "demo" : "reel"}`} {...props} />}
           {onglet === "enclos" && <OngletEnclos s={s} setS={majReel} />}
-          {onglet === "arbre" && <Arbre key={famille} famille={famille} s={sv} />}
+          {onglet === "arbre" && <Arbre key={`${famille}-${focusArbre?.id}`} famille={famille} s={sv} focus={focusArbre?.f === famille ? focusArbre.id : null} />}
           {onglet === "succes" && <Succes {...props} setFamille={setFamille} />}
           {onglet === "guide" && <Guide allerA={allerA} lancerVisite={lancerTuto} />}
           {onglet === "parametres" && <Parametres s={s} setS={majReel} lancerDidacticiel={lancerTuto} />}

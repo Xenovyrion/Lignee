@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { nettoyerMontures, sauvegardeVide } from "./moteur/actions";
 import type { Sauvegarde } from "./moteur/types";
 import { copieAutomatique } from "./sauvegardes";
+import { copieCloudPeriodique } from "./cloud";
 
 const FICHIER = "lignee-sauvegarde.json";
 const enTauri = typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
@@ -45,6 +46,7 @@ export function useSauvegarde() {
     lire().then((s) => {
       setS(s);
       copieAutomatique(s).catch((e) => console.error("Copie automatique impossible", e));
+      copieCloudPeriodique(s, true);
     });
   }, []);
 
@@ -53,7 +55,10 @@ export function useSauvegarde() {
     window.clearTimeout(minuteur.current);
     minuteur.current = window.setTimeout(() => {
       ecrire(s).then(
-        () => setErreur(null),
+        () => {
+          setErreur(null);
+          copieCloudPeriodique(s);
+        },
         (e) => {
           setErreur(String(e));
           journaliser("erreur", `Écriture de la sauvegarde impossible : ${String(e)}`);

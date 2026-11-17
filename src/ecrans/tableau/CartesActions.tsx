@@ -63,7 +63,7 @@ function CadreAction(p: {
         {p.children}
         {p.droite}
       </div>
-      {p.pied && <div className="mt-2 flex flex-wrap gap-x-4 sm:pl-[8.5rem] text-xs text-text-muted">{p.pied}</div>}
+      {p.pied && <div className="aide-detaillee mt-2 flex flex-wrap gap-x-4 sm:pl-[8.5rem] text-xs text-text-muted">{p.pied}</div>}
       {p.formulaire}
     </li>
   );

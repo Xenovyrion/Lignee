@@ -3,7 +3,7 @@
 // et le relais ne mentionne que lui. Mise en place : docs/RELAIS_DISCORD.md.
 // L'adresse et la clé restent sur ce PC (localStorage) : elles ne sont ni dans la sauvegarde ni dans les exports.
 import { journaliser } from "./diagnostic";
-import { COURT, simuler, type MinuteurEnclos } from "./moteur/enclos";
+import { COURT, dependDeLaSerenite, simuler, type MinuteurEnclos } from "./moteur/enclos";
 
 const CLE_STOCKAGE = "lignee-relais";
 
@@ -66,15 +66,29 @@ export const testerRelais = (c: ConfigRelais) => appeler("/test", { method: "POS
 export function messagesMinuteur(m: MinuteurEnclos, nomEnclos: string) {
   const debut = Date.parse(m.debut);
   const lancement = new Date(debut).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
-  const pied = `${m.jauges.map((j) => COURT[j.type]).join(" + ")} · ${m.montures} monture${m.montures > 1 ? "s" : ""} · lancé à ${lancement}`;
-  return simuler(m)
-    .evenements.map((e) => ({
+  const jauges = m.jauges.map((j) => COURT[j.type]).join(" + ");
+  const pied = `${jauges} · ${m.montures} monture${m.montures > 1 ? "s" : ""} · lancé à ${lancement}`;
+  const sim = simuler(m);
+  const fin = sim.fin === undefined ? undefined : debut + sim.fin * 1000;
+  return sim.evenements
+    .map((e) => ({
       at: debut + e.t * 1000,
       message: `${nomEnclos} : ${e.titre}. ${e.texte}`,
       type: e.type,
       titre: `${nomEnclos} — ${e.titre}`,
       texte: e.texte,
       pied,
+      // Relais 1.0.18 et plus : message détaillé (barres, cases, heures dans le fuseau de chaque lecteur).
+      details: {
+        enclos: nomEnclos,
+        titre: e.titre,
+        jauges,
+        barres: e.progression.map((p) => ({ jauge: p.type, nom: COURT[p.type], pct: p.pct, valeur: p.valeur })),
+        serenite: dependDeLaSerenite(m.jauges.map((j) => j.type)) ? e.serenite : undefined,
+        montures: m.montures,
+        debut,
+        fin,
+      },
     }))
     .filter((e) => e.at > Date.now());
 }
