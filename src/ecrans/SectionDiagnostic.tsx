@@ -26,7 +26,7 @@ export function SectionDiagnostic({ s }: { s: Sauvegarde }) {
   };
 
   return (
-    <Carte titre="Journal de diagnostic">
+    <Carte tuto="diagnostic" titre="Journal de diagnostic">
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="max-w-2xl text-xs text-text-muted">

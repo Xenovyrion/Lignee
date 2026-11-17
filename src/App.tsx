@@ -15,7 +15,8 @@ import { Compagnon } from "./ecrans/Compagnon";
 import { FournisseurNotifications, useAnnuler } from "./notifications";
 import { chercherMiseAJour, versionActuelle, versionNouvellementInstallee, type MiseAJour } from "./miseAJour";
 import { NotesDeVersion } from "./ecrans/NotesDeVersion";
-import { Didacticiel, ProposerDidacticiel } from "./ecrans/Didacticiel";
+import { chapitreDeLOnglet, CHAPITRES, Didacticiel, ProposerDidacticiel, type Chapitre } from "./ecrans/Didacticiel";
+import { construireDemo } from "./demo";
 import { BarreChargement } from "./ui";
 import { BandeauMiseAJour } from "./ecrans/BandeauMiseAJour";
 import { Lucioles } from "./effets";
@@ -115,14 +116,38 @@ export function App() {
     precedent.current = s;
   }, [s]);
   // Visite guidée : proposée à l'ouverture tant qu'elle n'a été ni faite ni refusée.
-  const [tuto, setTuto] = useState(false);
+  const [tuto, setTuto] = useState<Chapitre | null>(null);
   const [tutoReporte, setTutoReporte] = useState(false);
+  // Étable de démonstration des chapitres Étable et Tableau de bord : affichée à la place de la vraie, jamais enregistrée.
+  const [demo, setDemo] = useState<Sauvegarde | null>(null);
+  const [historiqueDemo, setHistoriqueDemo] = useState<Sauvegarde[]>([]);
+  const familleAvantDemo = useRef<Famille | null>(null);
   const allerA = useCallback((o: Onglet) => setOnglet(o), []);
   const fixerTuto = useCallback((v: "vu" | "refuse") => setS((x) => (x ? { ...x, options: { ...x.options, didacticiel: v } } : x)), [setS]);
+  const quitterDemo = useCallback(() => {
+    setDemo(null);
+    setHistoriqueDemo([]);
+    if (familleAvantDemo.current) setFamille(familleAvantDemo.current);
+    familleAvantDemo.current = null;
+  }, []);
+  const lancerTuto = useCallback(
+    (c: Chapitre) => {
+      setTuto(c);
+      if (!CHAPITRES[c].demo) return quitterDemo();
+      if (!s) return;
+      journaliser("info", `Visite guidée : chapitre « ${CHAPITRES[c].titre} » (étable de démonstration)`);
+      if (!familleAvantDemo.current) familleAvantDemo.current = famille;
+      setFamille("dragodinde");
+      setDemo(construireDemo(s.options));
+      setHistoriqueDemo([]);
+    },
+    [s, famille, quitterDemo],
+  );
   const fermerTuto = useCallback(() => {
-    setTuto(false);
+    setTuto(null);
+    quitterDemo();
     fixerTuto("vu");
-  }, [fixerTuto]);
+  }, [fixerTuto, quitterDemo]);
   useEffect(() => {
     versionNouvellementInstallee()
       .then((v) => v && setNouveautes({ ouvert: true, version: v }))
@@ -137,12 +162,26 @@ export function App() {
       </div>
     );
 
-  const majS = (f: (x: Sauvegarde) => Sauvegarde) => {
+  const majReel = (f: (x: Sauvegarde) => Sauvegarde) => {
     setHistorique((h) => [...h.slice(-29), s]);
     setModifications((n) => n + 1);
     setS((x) => (x ? f(x) : x));
   };
+  const majS = (f: (x: Sauvegarde) => Sauvegarde) => {
+    if (!demo) return majReel(f);
+    setHistoriqueDemo((h) => [...h, demo]);
+    setModifications((n) => n + 1);
+    setDemo((x) => (x ? f(x) : x));
+  };
   const annuler = () => {
+    if (demo) {
+      const avant = historiqueDemo[historiqueDemo.length - 1];
+      if (!avant) return;
+      setHistoriqueDemo((h) => h.slice(0, -1));
+      setModifications((n) => n - 1);
+      setDemo(avant);
+      return;
+    }
     const precedent = historique[historique.length - 1];
     if (!precedent) return;
     setHistorique((h) => h.slice(0, -1));
@@ -158,7 +197,9 @@ export function App() {
       console.error("Mode compagnon : fenêtre non modifiable", e);
     }
   };
-  const props = { famille, s, setS: majS };
+  // Pendant la démo, les écrans affichent et modifient l'étable d'exemple.
+  const sv = demo ?? s;
+  const props = { famille, s: sv, setS: majS };
   // Opacité des panneaux (0 à 1), lue par les couleurs de fond du thème (index.css).
   document.documentElement.style.setProperty("--voile", String((s.options.voile ?? 70) / 100));
   appliquerPalette(themeParId(s.options.theme ?? "dore"));
@@ -178,7 +219,7 @@ export function App() {
           <Compagnon
             famille={famille}
             setFamille={setFamille}
-            s={s}
+            s={sv}
             setS={majS}
             epingle={epingle}
             setEpingle={(oui) => {
@@ -233,7 +274,7 @@ export function App() {
             })}
             </div>
             <span data-tuto="annuler">
-              <BoutonAnnuler possibles={historique.length} />
+              <BoutonAnnuler possibles={demo ? historiqueDemo.length : historique.length} />
             </span>
 
             <button
@@ -249,10 +290,15 @@ export function App() {
         {maj && <BandeauMiseAJour maj={maj} fermer={() => setMaj(null)} voirNouveautes={() => setNouveautes({ ouvert: true })} />}
       {nouveautes.ouvert && <NotesDeVersion miseEnAvant={nouveautes.version} fermer={fermerNouveautes} />}
         {!s.options.didacticiel && !tutoReporte && !tuto && !nouveautes.ouvert && (
-          <ProposerDidacticiel commencer={() => setTuto(true)} plusTard={() => setTutoReporte(true)} refuser={() => fixerTuto("refuse")} />
+          <ProposerDidacticiel commencer={() => lancerTuto("decouverte")} plusTard={() => setTutoReporte(true)} refuser={() => fixerTuto("refuse")} />
         )}
-        {tuto && <Didacticiel allerA={allerA} fermer={fermerTuto} />}
-        <nav className="surface flex flex-wrap gap-1.5 rounded-2xl border border-border p-1.5">
+        {tuto && <Didacticiel chapitre={tuto} s={sv} allerA={allerA} fermer={fermerTuto} lancer={lancerTuto} />}
+        {demo && (
+          <div className="pointer-events-none fixed left-1/2 top-3 z-[61] -translate-x-1/2 rounded-full border border-accent/60 bg-bg-card px-4 py-1.5 text-xs font-medium text-accent shadow-xl">
+            Démo : étable d'exemple. Ta vraie étable revient à la fin de la visite.
+          </div>
+        )}
+        <nav data-tuto="onglets" className="surface flex flex-wrap gap-1.5 rounded-2xl border border-border p-1.5">
           {(Object.keys(ONGLETS) as Onglet[]).map((o) => {
             const Icone = ICONES_ONGLETS[o];
             const actif = o === onglet;
@@ -271,16 +317,26 @@ export function App() {
               </button>
             );
           })}
+          <span className="flex-1" />
+          <button
+            data-tuto="aide"
+            onClick={() => lancerTuto(chapitreDeLOnglet(onglet))}
+            title={`Visite guidée : ${CHAPITRES[chapitreDeLOnglet(onglet)].titre}`}
+            className="flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm text-text-secondary hover:bg-white/8 hover:text-text-primary"
+          >
+            <span className="flex h-5 w-5 items-center justify-center rounded-full border border-current text-xs font-bold">?</span>
+            Aide
+          </button>
         </nav>
         {erreur && <div className="rounded-md bg-status-err/15 p-2 text-sm text-status-err">Sauvegarde impossible : {erreur}</div>}
         {/* Voile commun derrière chaque écran : lisibilité uniforme quelle que soit l'image de fond. */}
         <main data-tuto="ecran" className="surface rounded-2xl border border-border p-4">
           {onglet === "actions" && <TableauDeBord {...props} />}
-          {onglet === "etable" && <Etable key={famille} {...props} />}
-          {onglet === "arbre" && <Arbre key={famille} famille={famille} s={s} />}
+          {onglet === "etable" && <Etable key={`${famille}-${demo ? "demo" : "reel"}`} {...props} />}
+          {onglet === "arbre" && <Arbre key={famille} famille={famille} s={sv} />}
           {onglet === "succes" && <Succes {...props} setFamille={setFamille} />}
-          {onglet === "guide" && <Guide allerA={allerA} lancerVisite={() => setTuto(true)} />}
-          {onglet === "parametres" && <Parametres s={s} setS={majS} lancerDidacticiel={() => setTuto(true)} />}
+          {onglet === "guide" && <Guide allerA={allerA} lancerVisite={lancerTuto} />}
+          {onglet === "parametres" && <Parametres s={s} setS={majReel} lancerDidacticiel={lancerTuto} />}
         </main>
       </div>
     </FournisseurNotifications>

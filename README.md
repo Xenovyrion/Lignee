@@ -16,7 +16,7 @@ Outil de pilotage de l'élevage pour **Dofus 3.7** (Dragodindes, Muldos, Volkorn
 
 ## Prise en main
 
-À la première ouverture, Lignée propose une **visite guidée** qui présente chaque écran (relançable dans *Paramètres → Visite guidée*). En résumé :
+À la première ouverture, Lignée propose une **visite guidée** en quatre chapitres : Découverte, Gérer l'étable, Suivre le tableau de bord, Au quotidien. Les chapitres sur l'Étable et le tableau de bord se pratiquent sur une **étable d'exemple** (ta vraie étable n'est pas touchée). Chaque chapitre se relance avec le bouton **? Aide** de l'écran affiché, ou depuis *Paramètres → Visite guidée*. En résumé :
 
 1. **Choisis la famille** (Dragodindes, Muldos, Volkornes) en haut de l'écran.
 2. **Saisis ton étable** (onglet *Étable*) : pour chaque couleur, le nombre de mâles et de femelles, et leur état (fertile, féconde, stérile). Coche dans *Succès* les couleurs déjà obtenues avant d'utiliser l'outil.

@@ -200,7 +200,7 @@ export function TableauDeBord({ famille, s, setS }: Props) {
 
       {/* Prochain objectif et chemin */}
       {objectif && (
-        <section className="rounded-xl border border-accent/40 bg-linear-to-br from-accent/10 to-transparent p-4">
+        <section data-tuto="objectif" className="rounded-xl border border-accent/40 bg-linear-to-br from-accent/10 to-transparent p-4">
           <div className="flex flex-wrap items-baseline gap-x-3">
             <span className="ruban self-center text-xs font-bold uppercase tracking-wide">🏆 Prochain objectif</span>
             <h2 className="text-xl font-bold">
@@ -317,6 +317,7 @@ export function TableauDeBord({ famille, s, setS }: Props) {
       {/* Séances suivantes */}
       {suivantes.length > 0 && (
         <Cadre
+          id="ensuite"
           titre="Et ensuite"
           sous="Chaque séance utilise les bébés de la précédente (et les clones de leurs parents devenus stériles). Prévision si tout réussit, recalculée après chaque naissance."
         >

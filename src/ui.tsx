@@ -2,8 +2,8 @@ import { useRef, useState, type ReactNode } from "react";
 import { nomCouleur } from "./moteur/donnees";
 import type { Monture } from "./moteur/types";
 
-export const Carte = ({ titre, children, droite }: { titre?: ReactNode; children: ReactNode; droite?: ReactNode }) => (
-  <section className="rounded-xl border border-border bg-bg-card p-4">
+export const Carte = ({ titre, children, droite, tuto }: { titre?: ReactNode; children: ReactNode; droite?: ReactNode; tuto?: string }) => (
+  <section data-tuto={tuto} className="rounded-xl border border-border bg-bg-card p-4">
     {(titre || droite) && (
       <div className="mb-3 flex items-center justify-between gap-2">
         <h2 className="font-semibold">{titre}</h2>

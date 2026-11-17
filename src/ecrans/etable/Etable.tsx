@@ -117,6 +117,7 @@ export function Etable({ famille, s, setS }: Props) {
 
       <div className="flex min-w-0 flex-1 flex-col gap-3">
         <div className="flex flex-wrap items-center gap-3">
+          <div data-tuto="vues">
           <Segments
             valeur={vue}
             onChange={setVue}
@@ -139,6 +140,7 @@ export function Etable({ famille, s, setS }: Props) {
               ] as { valeur: typeof vue; libelle: string; icone: ReactNode; badge?: ReactNode }[]
             ).filter((o) => !simple || o.valeur === "couleurs" || o.valeur === "steriles")}
           />
+          </div>
           <span className="text-sm text-text-secondary">
             {affichees.length} / {deLaFamille.length} affichée(s)
           </span>
@@ -167,11 +169,11 @@ export function Etable({ famille, s, setS }: Props) {
             </span>
           </div>
           <span className="flex-1" />
-          {!saisie && <Bouton onClick={() => setSaisie(true)}>+ Ajouter des montures</Bouton>}
+          {!saisie && <Bouton data-tuto="ajouter" onClick={() => setSaisie(true)}>+ Ajouter des montures</Bouton>}
         </div>
 
         {vue !== "enclos" && vue !== "steriles" && (
-          <div className="flex flex-wrap gap-1.5">
+          <div data-tuto="raccourcis" className="flex flex-wrap gap-1.5">
             {RACCOURCIS.map((r) => {
               const f = { ...filtreVide(), ...r.filtre };
               const actif = JSON.stringify(f) === JSON.stringify(filtre);

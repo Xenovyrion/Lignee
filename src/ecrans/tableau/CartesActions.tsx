@@ -36,6 +36,7 @@ function CadreAction(p: {
   return (
     <li
       id={p.id}
+      data-type={p.type}
       className={`apparition scroll-mt-4 rounded-xl border p-3 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(0,0,0,0.4)] ${p.attente ? "hachure border-border" : "border-border-light bg-bg-secondary"} ${vedette ? "halo" : ""}`}
       style={{ borderLeft: `4px solid ${p.attente ? "rgba(255,255,255,0.15)" : t.teinte}`, animationDelay: `${Math.min(p.numero, 12) * 45}ms`, ["--halo" as string]: t.teinte }}
     >
@@ -174,7 +175,7 @@ function SaisieResultats({
   );
 }
 
-const Formulaire = ({ children }: { children: ReactNode }) => <div className="mt-3 flex flex-col gap-3 border-t border-border pt-3 text-sm">{children}</div>;
+const Formulaire = ({ children, tuto }: { children: ReactNode; tuto?: string }) => <div data-tuto={tuto} className="mt-3 flex flex-col gap-3 border-t border-border pt-3 text-sm">{children}</div>;
 
 const repartir = (n: number, sexe?: Sexe) => (sexe === "M" ? { M: n, F: 0 } : sexe === "F" ? { M: 0, F: n } : { M: Math.ceil(n / 2), F: Math.floor(n / 2) });
 
@@ -229,6 +230,7 @@ export function CarteNaissance({
       droite={
         <>
           <div
+            data-tuto="chance"
             className="flex cursor-help items-center gap-2"
             title={`${NOM_MAKINA[a.makina.makina]} : ${a.makina.raison}.${
               a.niveauConseille ? `
@@ -242,7 +244,7 @@ Pour 100 % avec Optimakina : niveaux cumulés ${a.niveauConseille} (actuellement
               avec {NOM_MAKINA[a.makina.makina]}
             </div>
           </div>
-          <Bouton discret={!pret || ouvert} onClick={() => setOuvert(!ouvert)}>
+          <Bouton data-tuto="enregistrer" discret={!pret || ouvert} onClick={() => setOuvert(!ouvert)}>
             {ouvert ? "Annuler" : "Enregistrer"}
           </Bouton>
         </>
@@ -320,7 +322,7 @@ export function FormNaissances({ famille, a, setS, niveauBebes, fermer }: { fami
     }
   };
   return (
-    <Formulaire>
+    <Formulaire tuto="form-naissance">
       <div className="flex flex-wrap items-center gap-3">
         <span className="text-text-secondary">Accouplements faits</span>
         <Compteur valeur={n} setValeur={changerNombre} min={1} max={a.nombre} />

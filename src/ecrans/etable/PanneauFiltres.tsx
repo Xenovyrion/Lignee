@@ -42,7 +42,7 @@ export function PanneauFiltres({ famille, montures, reservees, filtre: f, setFil
   const nbReservees = montures.filter((m) => reservees.has(m.id)).length;
 
   return (
-    <aside className="sticky top-4 flex max-h-[calc(100vh-2rem)] w-64 shrink-0 flex-col overflow-y-auto rounded-xl border border-border bg-bg-card p-3">
+    <aside data-tuto="filtres" className="sticky top-4 flex max-h-[calc(100vh-2rem)] w-64 shrink-0 flex-col overflow-y-auto rounded-xl border border-border bg-bg-card p-3">
       <div className="flex items-center justify-between pb-2">
         <span className="font-semibold">Filtres</span>
         {!estFiltreVide(f) && (

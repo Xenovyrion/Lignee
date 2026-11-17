@@ -3,6 +3,7 @@
 // Règles 3.7 : docs/REFERENCE_ELEVAGE_3.7.md ; source principale : guide de l'éleveur (édition 2026)
 // de Dofus pour les noobs. Les textes sont rédigés pour Lignée ; aucune image du jeu n'est incluse.
 import { useState, type ReactNode } from "react";
+import { ChoixChapitres, type Chapitre } from "../Didacticiel";
 import { couleurs, NOMS_FAMILLE } from "../../moteur/donnees";
 import { probaCible, sommeNiveauxPour100 } from "../../moteur/regles";
 import type { Famille } from "../../moteur/types";
@@ -274,7 +275,7 @@ function Sauvages({ famille, zone }: { famille: Famille; zone: string }) {
 
 // ---------------------------------------------------------------------------------------------
 
-export function Guide({ allerA, lancerVisite }: { allerA: (o: OngletGuide) => void; lancerVisite: () => void }) {
+export function Guide({ allerA, lancerVisite }: { allerA: (o: OngletGuide) => void; lancerVisite: (c: Chapitre) => void }) {
   const aller = (id: string) => document.getElementById(`guide-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
   const Lien = ({ vers, children }: { vers: OngletGuide; children: ReactNode }) => (
     <button className="font-medium text-accent hover:underline" onClick={() => allerA(vers)}>
@@ -309,7 +310,7 @@ export function Guide({ allerA, lancerVisite }: { allerA: (o: OngletGuide) => vo
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             <Bouton onClick={() => aller("bases")}>Commencer la lecture</Bouton>
-            <Bouton discret onClick={lancerVisite}>
+            <Bouton discret onClick={() => lancerVisite("decouverte")}>
               Visite guidée de Lignée
             </Bouton>
           </div>
@@ -572,10 +573,9 @@ export function Guide({ allerA, lancerVisite }: { allerA: (o: OngletGuide) => vo
               <Lien vers="parametres">Paramètres</Lien> et transmets le fichier.
             </li>
           </ol>
-          <div>
-            <Bouton discret onClick={lancerVisite}>
-              Lancer la visite guidée de Lignée
-            </Bouton>
+          <div className="flex flex-col gap-2">
+            <span className="text-text-secondary">Pour apprendre en manipulant une étable d'exemple, lance un chapitre de la visite guidée :</span>
+            <ChoixChapitres lancer={lancerVisite} />
           </div>
         </Section>
 

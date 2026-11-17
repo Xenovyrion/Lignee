@@ -73,7 +73,7 @@ export function SectionSauvegardes({ s, setS }: Props) {
   };
 
   return (
-    <Carte titre="Sauvegardes">
+    <Carte tuto="sauvegardes" titre="Sauvegardes">
       <Ligne titre="Exporter une sauvegarde" aide={`Crée un fichier .json à garder où tu veux (clé USB, cloud…). Actuellement : ${resume(s)}.`}>
         <Bouton onClick={() => agir(exporterFichier)}>Exporter…</Bouton>
       </Ligne>

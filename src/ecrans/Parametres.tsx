@@ -2,17 +2,18 @@ import type { ReactNode } from "react";
 import { appliquerNiveauUnique, nombreEnclos, prochainPalierEnclos } from "../moteur/etable";
 import type { Options, Sauvegarde } from "../moteur/types";
 import { choisirFond, FONDS_ANKAMA, idGalerie, SOURCE_FONDS, supprimerFond, valeurGalerie } from "../fond";
-import { Bouton, Carte, champ } from "../ui";
+import { Carte, champ } from "../ui";
 import { SectionSauvegardes } from "./SectionSauvegardes";
 import { SectionMiseAJour } from "./SectionMiseAJour";
 import { SectionDiagnostic } from "./SectionDiagnostic";
+import { ChoixChapitres, type Chapitre } from "./Didacticiel";
 import { fondDuTheme, themeParId, THEMES, type Theme } from "../themes";
 import { useNotifier } from "../notifications";
 
 interface Props {
   s: Sauvegarde;
   setS: (f: (s: Sauvegarde) => Sauvegarde) => void;
-  lancerDidacticiel?: () => void;
+  lancerDidacticiel?: (c: Chapitre) => void;
 }
 
 const Ligne = ({ titre, aide, children }: { titre: string; aide: string; children: ReactNode }) => (
@@ -231,18 +232,19 @@ export function Parametres({ s, setS, lancerDidacticiel }: Props) {
       </Carte>
       {lancerDidacticiel && (
         <Carte titre="Visite guidée">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="text-sm text-text-secondary">Revoir la présentation de l'outil, écran par écran.</div>
-            <Bouton discret onClick={lancerDidacticiel}>
-              Lancer la visite guidée
-            </Bouton>
+          <div className="flex flex-col gap-3">
+            <div className="text-sm text-text-secondary">
+              Quatre chapitres courts, à suivre dans l'ordre ou séparément. Les chapitres sur l'Étable et le tableau de bord utilisent une étable d'exemple : ta vraie
+              étable n'est pas touchée.
+            </div>
+            <ChoixChapitres lancer={lancerDidacticiel} />
           </div>
         </Carte>
       )}
       <SectionSauvegardes s={s} setS={setS} />
       <SectionMiseAJour />
       <SectionDiagnostic s={s} />
-      <Carte titre="Accouplements">
+      <Carte tuto="accouplements" titre="Accouplements">
         <Ligne
           titre="Makina conseillée"
           aide="Optimakina : +20 % de chance d'atteindre la génération cible, sexe au hasard. Animakina : sexe choisi, sans bonus. Automatique : la meilleure chance globale selon que le sexe compte ou non. Reste modifiable à chaque saisie."

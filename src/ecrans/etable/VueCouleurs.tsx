@@ -33,7 +33,7 @@ const ETATS_SIMPLE: [Etat, string, string][] = [
 /** Tableau 2 × 3 (sexe × état) avec −/+ dans chaque case. */
 function GrilleStock({ c, simple }: { c: string; simple: NonNullable<Props["simple"]> }) {
   return (
-    <table className="w-full text-center text-xs" onClick={(e) => e.stopPropagation()}>
+    <table data-tuto="grille" className="w-full text-center text-xs" onClick={(e) => e.stopPropagation()}>
       <thead>
         <tr className="text-[11px]">
           <th className="w-6" />
@@ -74,6 +74,7 @@ function GrilleStock({ c, simple }: { c: string; simple: NonNullable<Props["simp
                   {etat === "fertile" && (
                     <td>
                       <button
+                        data-tuto="rendre-feconde"
                         disabled={!n}
                         onClick={() => simple.rendrePrete(c, sexe)}
                         className="rounded-full px-0.5 text-sm leading-4 text-status-ok hover:bg-status-ok/20 disabled:opacity-0"
@@ -155,6 +156,7 @@ export function VueCouleurs({ famille, montures, besoins, ajouter, retirer, ouvr
                 return (
                   <div
                     key={c.id}
+                    data-couleur={c.id}
                     onClick={() => !simple && ouvrirCouleur(c.id)}
                     title={simple ? undefined : "Voir ces montures dans la liste"}
                     className={`apparition flex flex-col gap-2 rounded-xl border border-border bg-bg-secondary p-2.5 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_28px_rgba(0,0,0,0.4)] ${simple ? "" : "cursor-pointer hover:border-border-light"}`}
@@ -175,7 +177,7 @@ export function VueCouleurs({ famille, montures, besoins, ajouter, retirer, ouvr
                         </div>
                       </div>
                     </div>
-                    <div className="flex flex-wrap gap-1 text-[11px]">
+                    <div data-tuto="etiquettes" className="flex flex-wrap gap-1 text-[11px]">
                       {!simple && n.fecondes > 0 && (
                         <span className="rounded-sm bg-status-ok/15 px-1.5 text-status-ok">
                           {n.fecondes} féconde{n.fecondes > 1 ? "s" : ""}
