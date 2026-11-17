@@ -31,8 +31,10 @@ describe("minuteurs d'enclos", () => {
     ]);
     const zone = r.evenements.find((e) => e.type === "zone");
     expect(zone?.t).toBe(2_010);
+    expect(zone?.texte).toContain("Retire le Baffeur");
     expect(r.fin).toBeUndefined();
-    expect(r.evenements[r.evenements.length - 1].type).toBe("arret");
+    // La sortie de zone dit déjà la cause : pas de second message « ne progresse pas ».
+    expect(r.evenements.map((e) => e.type)).toEqual(["zone"]);
   });
 
   it("sérénité de départ déduite : Amour seul progresse (montures supposées en zone positive)", () => {
@@ -49,18 +51,21 @@ describe("minuteurs d'enclos", () => {
     const r = sim([{ type: "endurance", charge: 200_000 }], 1, 1, 0);
     expect(r.evenements).toHaveLength(1);
     expect(r.evenements[0]).toMatchObject({ type: "arret", t: 10 });
+    expect(r.evenements[0].titre).toBe("L'Endurance ne progresse pas");
     expect(r.evenements[0].texte).toContain("Baffeur");
   });
 
   it("jauge vide avant la fin", () => {
     const r = sim([{ type: "amour", charge: 10_000 }, { type: "caresseur", charge: 200_000 }]);
-    expect(r.evenements.some((e) => e.cle === "vide-amour")).toBe(true);
+    expect(r.evenements).toHaveLength(1);
+    expect(r.evenements[0]).toMatchObject({ cle: "vide-amour", titre: "Jauge Amour vide", texte: "Amour à 10 000 / 20 000. Recharge la jauge pour finir." });
     expect(r.fin).toBeUndefined();
   });
 
   it("Mangeoire : plafonnée au niveau visé", () => {
     const r = sim([{ type: "mangeoire", charge: 200_000 }], 1, 20);
     expect(r.caracs.mangeoire).toBe(xpNiveau(20));
+    expect(r.evenements[r.evenements.length - 1]).toMatchObject({ titre: "Enclos prêt", texte: "Niveau 20 atteint" });
     expect(r.fin).toBeGreaterThan(0);
     expect(xpNiveau(100)).toBe(172_668);
     expect(xpNiveau(200)).toBe(867_582);

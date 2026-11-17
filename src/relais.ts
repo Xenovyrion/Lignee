@@ -3,7 +3,7 @@
 // et le relais ne mentionne que lui. Mise en place : docs/RELAIS_DISCORD.md.
 // L'adresse et la clé restent sur ce PC (localStorage) : elles ne sont ni dans la sauvegarde ni dans les exports.
 import { journaliser } from "./diagnostic";
-import { simuler, type MinuteurEnclos } from "./moteur/enclos";
+import { COURT, simuler, type MinuteurEnclos } from "./moteur/enclos";
 
 const CLE_STOCKAGE = "lignee-relais";
 
@@ -59,11 +59,23 @@ async function appeler(chemin: string, init: RequestInit, c = lireRelais()): Pro
 
 export const testerRelais = (c: ConfigRelais) => appeler("/test", { method: "POST" }, c);
 
-/** Messages envoyés pour un minuteur (évènements à venir uniquement). */
+/**
+ * Messages envoyés pour un minuteur (évènements à venir uniquement). Le relais en fait un message mis en forme
+ * (titre, couleur selon le type, pied) ; « message » reste la version texte, comprise par les relais plus anciens.
+ */
 export function messagesMinuteur(m: MinuteurEnclos, nomEnclos: string) {
   const debut = Date.parse(m.debut);
+  const lancement = new Date(debut).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+  const pied = `${m.jauges.map((j) => COURT[j.type]).join(" + ")} · ${m.montures} monture${m.montures > 1 ? "s" : ""} · lancé à ${lancement}`;
   return simuler(m)
-    .evenements.map((e) => ({ at: debut + e.t * 1000, message: `${nomEnclos} : ${e.texte}` }))
+    .evenements.map((e) => ({
+      at: debut + e.t * 1000,
+      message: `${nomEnclos} : ${e.titre}. ${e.texte}`,
+      type: e.type,
+      titre: `${nomEnclos} — ${e.titre}`,
+      texte: e.texte,
+      pied,
+    }))
     .filter((e) => e.at > Date.now());
 }
 

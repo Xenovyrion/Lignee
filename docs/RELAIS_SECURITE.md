@@ -33,9 +33,10 @@ Une fois enregistrés, les secrets Cloudflare sont chiffrés. On ne peut plus le
 3. **Destination figée.** Le webhook est un secret du relais, jamais transmis par l'appli. Même avec une clé, on ne peut écrire **que dans ce salon** : le relais ne peut pas servir à écrire sur n'importe quel Discord.
 4. **Mentions verrouillées.**
    - `allowed_mentions` n'autorise que le membre concerné : ni `@everyone`, ni `@here`, ni rôles.
-   - Les caractères `@`, `<` et `>` sont retirés des textes reçus.
+   - Les caractères `@`, `<`, `>`, `[` et `]` sont retirés des textes reçus (ni mention ni lien glissé).
 5. **Entrées bornées.**
-   - Requête de 8 000 caractères au plus, 300 caractères par message.
+   - Requête de 16 000 caractères au plus, 300 caractères par texte, 120 par titre.
+   - Type de message limité à une liste fixe (prêt, sérénité hors zone, jauge vide, blocage) ; liens retirés des textes.
    - 10 messages par enclos, 12 enclos par membre, 50 membres.
    - Pas plus de 8 jours à l'avance, et des noms de groupe limités à `a-z 0-9 -`.
    - Le reste est refusé.

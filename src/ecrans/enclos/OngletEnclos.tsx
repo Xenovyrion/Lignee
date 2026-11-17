@@ -2,7 +2,7 @@
 // On active au plus deux jauges, on règle leur remplissage (crans cliquables en mode simple, glisser en mode
 // avancé), et Lignée calcule l'heure où les montures sont prêtes. Indépendant de la famille.
 // Hypothèses : caractéristiques à 0 ; sérénité de départ déduite des jauges (montures dans la bonne zone) ou choisie.
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import {
   CHARGE_MAX,
   chargeApres,
@@ -273,148 +273,187 @@ function CarteEnclos({ k, s, setS }: { k: number; s: Sauvegarde; setS: (f: (s: S
   const estimation = dependDeLaSerenite(typesActifs);
   const signe = (v: number) => `${v > 0 ? "+" : ""}${v.toLocaleString("fr-FR")}`;
 
+  const couleurEvt = (t: string) => (t === "fin" ? "text-status-ok" : t === "zone" ? "text-status-warn" : "text-status-err");
+  const libelle = (t: TypeJauge) => NOMS_JAUGE[t].split(" (")[0];
+  const chargesLancement = enCours ? Object.fromEntries(m.jauges.map((j) => [j.type, j.charge])) : b.charges;
+
   return (
-    <section className={`flex flex-col gap-3 rounded-xl border bg-bg-secondary p-3 ${termine ? "border-status-ok" : enCours ? "border-accent/60" : "border-border"}`}>
+    <section className={`@container flex flex-col gap-3 rounded-xl border bg-bg-secondary p-3 ${termine ? "border-status-ok" : enCours ? "border-accent/60" : "border-border"}`}>
       <div className="flex items-center justify-between gap-2">
         <h3 className="font-semibold">Enclos {k}</h3>
-        <span className="text-xs text-text-muted">{typesActifs.length}/2 jauges activées</span>
+        <span className="text-xs text-text-muted">
+          {enCours ? (termine ? "terminé" : "minuteur en cours") : `${typesActifs.length}/2 jauges activées`}
+        </span>
       </div>
 
-      <Jauges
-        charges={chargesAffichees}
-        actives={enCours ? m.jauges.map((j) => j.type) : b.actives}
-        modifiable={!enCours}
-        exacte={exacte}
-        basculer={basculer}
-        regler={(t, c) => setB((x) => ({ ...x, charges: { ...x.charges, [t]: c } }))}
-      />
+      <div className="flex flex-col gap-4 @xl:flex-row @xl:items-start">
+        <div className="shrink-0">
+          <Jauges
+            charges={chargesAffichees}
+            actives={typesActifs}
+            modifiable={!enCours}
+            exacte={exacte}
+            basculer={basculer}
+            regler={(t, c) => setB((x) => ({ ...x, charges: { ...x.charges, [t]: c } }))}
+          />
+        </div>
 
-      {!enCours && (
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-text-secondary">
-          {exacte &&
-            b.actives.map((t) => (
-              <label key={t} className="flex items-center gap-1.5">
-                <span style={{ color: COULEURS_JAUGE[t] }}>{NOMS_JAUGE[t].split(" (")[0]}</span>
-                <input
-                  type="number"
-                  min={0}
-                  max={CHARGE_MAX}
-                  step={1000}
-                  value={b.charges[t]}
-                  onChange={(e) => setB((x) => ({ ...x, charges: { ...x.charges, [t]: Math.max(0, Math.min(CHARGE_MAX, Number(e.target.value) || 0)) } }))}
-                  className={`${champ} w-24 text-xs`}
-                />
-              </label>
-            ))}
-          {b.actives.length > 0 && (
-            <div className="flex w-full flex-wrap items-center gap-1.5" title="Sérénité des montures au lancement. Par défaut, on suppose qu'elles sont dans la zone de la jauge travaillée.">
-              <span style={{ color: COULEURS_JAUGE.caresseur }}>Sérénité de départ</span>
-              <div className="flex rounded-lg border border-border-light p-0.5">
-                {SERENITES.map((x) => (
-                  <button
-                    key={x.nom}
-                    onClick={() => setB((y) => ({ ...y, serenite: x.valeur }))}
-                    className={`rounded-md px-2 py-0.5 ${serenite === x.valeur ? "bg-accent-dim text-accent" : "text-text-secondary"}`}
-                  >
-                    {x.nom}
-                  </button>
-                ))}
-              </div>
-              {exacte && (
-                <input
-                  type="number"
-                  min={-SERENITE_MAX}
-                  max={SERENITE_MAX}
-                  step={100}
-                  value={serenite}
-                  onChange={(e) => setB((y) => ({ ...y, serenite: Math.max(-SERENITE_MAX, Math.min(SERENITE_MAX, Math.round(Number(e.target.value) || 0))) }))}
-                  className={`${champ} w-20 text-xs`}
-                />
-              )}
-              {b.serenite === null ? (
-                <span className="text-text-muted">auto, d'après les jauges</span>
+        <div className="flex min-w-0 flex-1 flex-col gap-3 text-xs">
+          {!typesActifs.length ? (
+            <p className="text-text-muted">
+              Clique la barre des jauges mises en jeu (2 au maximum) pour les activer et régler leur remplissage. L'icône sous la barre active ou désactive.
+            </p>
+          ) : (
+            <div className="grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-2 text-text-secondary">
+              {typesActifs.map((t) => (
+                <Fragment key={t}>
+                  <span className="flex items-center gap-1.5">
+                    <span className="h-2.5 w-2.5 rounded-full" style={{ background: COULEURS_JAUGE[t] }} />
+                    {libelle(t)}
+                  </span>
+                  {exacte && !enCours ? (
+                    <input
+                      type="number"
+                      min={0}
+                      max={CHARGE_MAX}
+                      step={1000}
+                      value={b.charges[t]}
+                      onChange={(e) => setB((x) => ({ ...x, charges: { ...x.charges, [t]: Math.max(0, Math.min(CHARGE_MAX, Number(e.target.value) || 0)) } }))}
+                      className={`${champ} w-28 text-xs`}
+                    />
+                  ) : (
+                    <span className="text-text-primary">
+                      {libelleCharge(chargesLancement[t] ?? 0, false)}
+                      <span className="text-text-muted"> · {(chargesLancement[t] ?? 0).toLocaleString("fr-FR")}</span>
+                      {enCours && <span className="text-text-muted"> au lancement</span>}
+                    </span>
+                  )}
+                </Fragment>
+              ))}
+
+              <span style={{ color: COULEURS_JAUGE.caresseur }}>Sérénité</span>
+              {enCours ? (
+                <span className="text-text-primary">{signe(m.sereniteDepart ?? sereniteParDefaut(typesActifs))} au départ</span>
               ) : (
-                <button className="text-text-muted underline-offset-2 hover:underline" onClick={() => setB((y) => ({ ...y, serenite: null }))}>
-                  revenir à l'auto
-                </button>
+                <div className="flex flex-wrap items-center gap-1.5" title="Sérénité des montures au lancement. Par défaut, on suppose qu'elles sont dans la zone de la jauge travaillée.">
+                  {exacte ? (
+                    <input
+                      type="number"
+                      min={-SERENITE_MAX}
+                      max={SERENITE_MAX}
+                      step={100}
+                      value={serenite}
+                      onChange={(e) => setB((y) => ({ ...y, serenite: Math.max(-SERENITE_MAX, Math.min(SERENITE_MAX, Math.round(Number(e.target.value) || 0))) }))}
+                      className={`${champ} w-28 text-xs`}
+                    />
+                  ) : (
+                    <div className="flex rounded-lg border border-border-light p-0.5">
+                      {SERENITES.map((x) => (
+                        <button
+                          key={x.nom}
+                          onClick={() => setB((y) => ({ ...y, serenite: x.valeur }))}
+                          className={`rounded-md px-2 py-0.5 ${serenite === x.valeur ? "bg-accent-dim text-accent" : "text-text-secondary"}`}
+                        >
+                          {x.nom}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {b.serenite === null ? (
+                    <span className="text-text-muted">auto</span>
+                  ) : (
+                    <button className="text-text-muted underline-offset-2 hover:underline" onClick={() => setB((y) => ({ ...y, serenite: null }))}>
+                      auto
+                    </button>
+                  )}
+                </div>
+              )}
+
+              <span>Montures</span>
+              {enCours ? (
+                <span className="text-text-primary">{m.montures}</span>
+              ) : (
+                <input type="number" min={1} max={10} value={b.montures} onChange={(e) => setB((x) => ({ ...x, montures: Math.max(1, Math.min(10, Number(e.target.value) || 1)) }))} className={`${champ} w-16 text-xs`} />
+              )}
+
+              {typesActifs.includes("mangeoire") && (
+                <>
+                  <span>Niveau</span>
+                  {enCours ? (
+                    <span className="text-text-primary">
+                      {m.niveauDepart} → {m.niveauCible}
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1.5">
+                      <input type="number" min={1} max={200} value={b.niveauDepart} onChange={(e) => setB((x) => ({ ...x, niveauDepart: Math.max(1, Math.min(200, Number(e.target.value) || 1)) }))} className={`${champ} w-16 text-xs`} />
+                      → visé
+                      <input type="number" min={1} max={200} value={b.niveauCible} onChange={(e) => setB((x) => ({ ...x, niveauCible: Math.max(1, Math.min(200, Number(e.target.value) || 1)) }))} className={`${champ} w-16 text-xs`} />
+                    </span>
+                  )}
+                </>
               )}
             </div>
           )}
-          <label className="flex items-center gap-1.5">
-            Montures
-            <input type="number" min={1} max={10} value={b.montures} onChange={(e) => setB((x) => ({ ...x, montures: Math.max(1, Math.min(10, Number(e.target.value) || 1)) }))} className={`${champ} w-14 text-xs`} />
-          </label>
-          {b.actives.includes("mangeoire") && (
-            <label className="flex items-center gap-1.5">
-              Niveau
-              <input type="number" min={1} max={200} value={b.niveauDepart} onChange={(e) => setB((x) => ({ ...x, niveauDepart: Math.max(1, Math.min(200, Number(e.target.value) || 1)) }))} className={`${champ} w-14 text-xs`} />
-              → visé
-              <input type="number" min={1} max={200} value={b.niveauCible} onChange={(e) => setB((x) => ({ ...x, niveauCible: Math.max(1, Math.min(200, Number(e.target.value) || 1)) }))} className={`${champ} w-14 text-xs`} />
-            </label>
+
+          {typesActifs.length > 0 && (
+            <div className="flex flex-col gap-1.5 rounded-lg border border-border bg-black/20 p-2.5">
+              {finMs !== undefined ? (
+                <span className={`text-sm ${termine ? "font-semibold text-status-ok" : "font-medium text-text-primary"}`}>
+                  {termine ? `✅ Prêt depuis ${heure(finMs)}` : `⏱️ Prêt à ${heure(finMs)} · dans ${duree((finMs - maintenant) / 1000)}`}
+                </span>
+              ) : (
+                <span className="text-sm font-medium text-status-err">Pas d'heure de fin : voir ci-dessous</span>
+              )}
+              {estimation && <span className="text-text-muted">Estimation : dépend de la sérénité réelle des montures.</span>}
+              {evenements
+                .filter((e) => e.type !== "fin")
+                .map((e) => {
+                  const t = (enCours ? debut : maintenant) + e.t * 1000;
+                  const passe = enCours && t <= maintenant;
+                  return (
+                    <div key={e.cle} className={passe ? "text-text-muted line-through" : ""}>
+                      <span className={`font-semibold ${passe ? "" : couleurEvt(e.type)}`}>
+                        {e.t <= 10 && !enCours ? "Tout de suite" : heure(t)} · {e.titre}
+                      </span>
+                      <span className="block text-text-secondary">{e.texte}</span>
+                    </div>
+                  );
+                })}
+            </div>
           )}
-        </div>
-      )}
-      {enCours && (
-        <div className="text-xs text-text-secondary">
-          {m.montures} monture{m.montures > 1 ? "s" : ""}
-          {m.jauges.some((j) => j.type === "mangeoire") && ` · niveau ${m.niveauDepart} → ${m.niveauCible}`}
-          {` · sérénité de départ ${signe(m.sereniteDepart ?? sereniteParDefaut(typesActifs))}`}
-        </div>
-      )}
 
-      <div className="flex flex-col gap-1 text-sm">
-        {!b.actives.length && !enCours ? (
-          <span className="text-xs text-text-muted">
-            Clique la barre des jauges mises en jeu (2 au maximum) pour les activer et régler leur remplissage ; l'icône dessous active ou désactive.
-          </span>
-        ) : finMs !== undefined ? (
-          <span className={termine ? "font-semibold text-status-ok" : enCours ? "font-medium" : "text-status-ok"}>
-            {termine ? `Prêt depuis ${heure(finMs)}` : `Prêt à ${heure(finMs)} · dans ${duree((finMs - maintenant) / 1000)}`}
-            {estimation && <span className="ml-1 text-xs font-normal text-text-muted">(estimation : dépend de la sérénité de départ)</span>}
-          </span>
-        ) : null}
-        {evenements
-          .filter((e) => e.type !== "fin")
-          .map((e) => {
-            const t = (enCours ? debut : maintenant) + e.t * 1000;
-            return (
-              <span key={e.cle} className={`text-xs ${enCours && t <= maintenant ? "text-text-muted line-through" : "text-status-warn"}`}>
-                {e.t <= 10 && !enCours ? "Tout de suite" : heure(t)} : {e.texte}
-              </span>
-            );
-          })}
-      </div>
-
-      <div className="flex flex-wrap items-center gap-2">
-        {enCours ? (
-          <>
-            <Bouton
-              discret
-              onClick={() => {
-                setB(depuis(m));
-                setEdition(true);
-              }}
-              title="Changer les jauges et relancer à partir de maintenant"
-            >
-              Relancer
-            </Bouton>
-            <Bouton discret onClick={arreter}>
-              Arrêter
-            </Bouton>
-            {lireRelais() && <span className="text-xs text-text-muted">Discord programmé</span>}
-          </>
-        ) : (
-          <>
-            <Bouton disabled={!b.actives.length} onClick={lancer}>
-              Lancer le minuteur
-            </Bouton>
-            {m && (
-              <Bouton discret onClick={() => setEdition(false)}>
-                Annuler
-              </Bouton>
+          <div className="flex flex-wrap items-center gap-2">
+            {enCours ? (
+              <>
+                <Bouton
+                  discret
+                  onClick={() => {
+                    setB(depuis(m));
+                    setEdition(true);
+                  }}
+                  title="Changer les jauges et relancer à partir de maintenant"
+                >
+                  Relancer
+                </Bouton>
+                <Bouton discret onClick={arreter}>
+                  Arrêter
+                </Bouton>
+                {lireRelais() && <span className="text-text-muted">Discord programmé</span>}
+              </>
+            ) : (
+              <>
+                <Bouton disabled={!b.actives.length} onClick={lancer}>
+                  Lancer le minuteur
+                </Bouton>
+                {m && (
+                  <Bouton discret onClick={() => setEdition(false)}>
+                    Annuler
+                  </Bouton>
+                )}
+              </>
             )}
-          </>
-        )}
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -434,7 +473,7 @@ export function OngletEnclos({ s, setS }: { s: Sauvegarde; setS: (f: (s: Sauvega
           monture gagne autant et la jauge se vide pareil. Notifications et saisie des jauges : Paramètres.
         </span>
       </div>
-      <div className="grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
+      <div className="grid gap-3 xl:grid-cols-2">
         {Array.from({ length: nb }, (_, i) => (
           <CarteEnclos key={i + 1} k={i + 1} s={s} setS={setS} />
         ))}

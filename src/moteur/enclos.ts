@@ -58,7 +58,10 @@ export const NOMS_JAUGE: Record<TypeJauge, string> = {
   amour: "Amour (Dragofesse)",
   mangeoire: "Mangeoire (XP)",
 };
-const COURT: Record<TypeJauge, string> = { baffeur: "Baffeur", caresseur: "Caresseur", endurance: "Endurance", maturite: "Maturité", amour: "Amour", mangeoire: "XP" };
+export const COURT: Record<TypeJauge, string> = { baffeur: "Baffeur", caresseur: "Caresseur", endurance: "Endurance", maturite: "Maturité", amour: "Amour", mangeoire: "XP" };
+const ARTICLE: Partial<Record<TypeJauge, string>> = { endurance: "L'Endurance", maturite: "La Maturité", amour: "L'Amour", mangeoire: "L'XP" };
+const nombre = (n: number) => Math.round(n).toLocaleString("fr-FR");
+const signe = (n: number) => `${n > 0 ? "+" : ""}${nombre(n)}`;
 
 /** Ordre et couleurs des jauges comme dans l'interface du jeu (sérénité | caractéristiques | expérience). */
 export const GROUPES_JAUGES: TypeJauge[][] = [["baffeur", "caresseur"], ["endurance", "maturite", "amour"], ["mangeoire"]];
@@ -83,6 +86,8 @@ export function chargeApres(charge: number, secondes: number) {
 
 /** XP cumulée pour atteindre un niveau (1 à 200). */
 export const xpNiveau = (n: number) => (XP as number[])[Math.min(200, Math.max(1, Math.round(n))) - 1];
+/** Niveau atteint avec une XP cumulée donnée. */
+export const niveauXp = (xp: number) => Math.max(1, (XP as number[]).filter((x) => x <= xp).length);
 
 /** Zone de sérénité où chaque caractéristique progresse. */
 const ZONES: Partial<Record<TypeJauge, [number, number]>> = { endurance: [-SERENITE_MAX, -1], maturite: [-2000, 2000], amour: [1, SERENITE_MAX] };
@@ -112,6 +117,9 @@ export interface Evenement {
   /** Secondes depuis le lancement. */
   t: number;
   type: "fin" | "zone" | "vide" | "arret";
+  /** Court : « Enclos prêt », « Jauge Amour vide »… */
+  titre: string;
+  /** Détail chiffré et action à faire. */
   texte: string;
 }
 
@@ -138,6 +146,12 @@ export function simuler(m: Simulable): Simulation {
   for (const j of objectifs) caracs[j.type] = j.type === "mangeoire" ? xpNiveau(m.niveauDepart) : 0;
   const atteint = (j: JaugeEnclos) => (j.type === "mangeoire" ? (caracs.mangeoire ?? 0) >= xpCible : (caracs[j.type] ?? 0) >= CARAC_MAX);
   const progressait = new Map<TypeJauge, boolean>();
+  /** Caractéristiques déjà signalées (jauge vide, sortie de zone) : pas de second message pour la même cause. */
+  const signalees = new Set<TypeJauge>();
+  const sereniteActive = jauges.find((j) => j.type === "baffeur" || j.type === "caresseur");
+  const etat = (j: JaugeEnclos) =>
+    j.type === "mangeoire" ? `Niveau ${niveauXp(caracs.mangeoire ?? 0)} sur ${m.niveauCible} visé` : `${COURT[j.type]} à ${nombre(caracs[j.type] ?? 0)} / ${nombre(CARAC_MAX)}`;
+  const ajouter = (e: Evenement) => evenements.push(e);
 
   for (let tic = 1; tic <= 50_000; tic++) {
     const t = tic * TIC;
@@ -152,7 +166,9 @@ export function simuler(m: Simulable): Simulation {
       j.charge = Math.max(0, j.charge - d);
       if (j.type === "baffeur" || j.type === "caresseur") {
         ser = Math.max(-SERENITE_MAX, Math.min(SERENITE_MAX, ser + (j.type === "baffeur" ? -d : d)));
-        if (!j.charge) evenements.push({ cle: `vide-${j.type}`, t, type: "vide", texte: `Jauge ${COURT[j.type]} vide` });
+        // Sans caractéristique à monter, la fin du minuteur le dit déjà.
+        if (!j.charge && objectifs.length)
+          ajouter({ cle: `vide-${j.type}`, t, type: "vide", titre: `Jauge ${COURT[j.type]} vide`, texte: `Sérénité à ${signe(ser)}. Recharge-la si une caractéristique en a encore besoin.` });
       }
     }
     for (const j of objectifs) {
@@ -162,48 +178,59 @@ export function simuler(m: Simulable): Simulation {
       if (ok) {
         progres = true;
         caracs[j.type] = Math.min(j.type === "mangeoire" ? xpCible : CARAC_MAX, (caracs[j.type] ?? 0) + gain);
-      } else if (gain > 0 && progressait.get(j.type))
-        evenements.push({
+      } else if (!gain) {
+        signalees.add(j.type);
+        ajouter({ cle: `vide-${j.type}`, t, type: "vide", titre: `Jauge ${COURT[j.type]} vide`, texte: `${etat(j)}. Recharge la jauge pour finir.` });
+      } else if (progressait.get(j.type)) {
+        signalees.add(j.type);
+        ajouter({
           cle: `zone-${j.type}`,
           t,
           type: "zone",
-          texte: `La sérénité sort de la zone ${j.type === "endurance" ? "de l'Endurance" : j.type === "amour" ? "de l'Amour" : "de la Maturité"} : retire la jauge de sérénité`,
+          titre: "Sérénité hors zone",
+          texte: `${ARTICLE[j.type]} s'arrête à ${nombre(caracs[j.type] ?? 0)} / ${nombre(CARAC_MAX)} (sérénité ${signe(ser)}).${sereniteActive ? ` Retire le ${COURT[sereniteActive.type]}.` : ""}`,
         });
-      else if (!gain) evenements.push({ cle: `vide-${j.type}`, t, type: "vide", texte: `Jauge ${COURT[j.type]} vide avant la fin : recharge-la` });
+      }
       progressait.set(j.type, ok);
     }
     if (objectifs.length && objectifs.every(atteint)) {
-      evenements.push({ cle: "fin", t, type: "fin", texte: texteFin(objectifs.map((j) => j.type), m.niveauCible) });
+      const texte = objectifs.map((j) => (j.type === "mangeoire" ? `Niveau ${m.niveauCible} atteint` : `${COURT[j.type]} ${nombre(CARAC_MAX)} / ${nombre(CARAC_MAX)}`)).join(" · ");
+      ajouter({ cle: "fin", t, type: "fin", titre: "Enclos prêt", texte });
       return { evenements: unique(evenements), fin: t, serenite: ser, caracs };
     }
     if (!objectifs.length && (Math.abs(ser) === SERENITE_MAX || jauges.every((j) => !j.charge))) {
-      evenements.push({ cle: "fin", t, type: "fin", texte: `Sérénité à ${ser > 0 ? "+" : ""}${ser}` });
+      const borne = Math.abs(ser) === SERENITE_MAX;
+      ajouter({ cle: "fin", t, type: "fin", titre: borne ? "Sérénité au maximum" : "Jauge de sérénité vide", texte: `Sérénité à ${signe(ser)} (bornes : ±${nombre(SERENITE_MAX)}).` });
       return { evenements: unique(evenements), fin: t, serenite: ser, caracs };
     }
-    // Plus rien ne bouge : certains objectifs ne seront jamais atteints.
+    // Plus rien ne bouge : certains objectifs ne seront jamais atteints. Message seulement si la cause n'a pas déjà été dite.
     if (!progres && ser === serAvant) {
-      const manquants = objectifs.filter((j) => !atteint(j)).map((j) => COURT[j.type]);
-      evenements.push({ cle: "arret", t, type: "arret", texte: `Plus rien ne progresse (${manquants.join(", ")}) : ${conseilArret(objectifs.filter((j) => !atteint(j)).map((j) => j.type), ser)}` });
+      const bloques = objectifs.filter((j) => !atteint(j) && !signalees.has(j.type)).map((j) => j.type);
+      if (bloques.length)
+        ajouter({
+          cle: "arret",
+          t,
+          type: "arret",
+          titre: `${bloques.map((x) => ARTICLE[x]).join(" et ")} ne progresse${bloques.length > 1 ? "nt" : ""} pas`,
+          texte: conseil(bloques, ser),
+        });
       return { evenements: unique(evenements), serenite: ser, caracs };
     }
   }
   return { evenements: unique(evenements), serenite: ser, caracs };
 }
 
+function conseil(types: TypeJauge[], ser: number) {
+  if (types.includes("endurance") && ser >= 0)
+    return "Il faut une sérénité négative : active le Baffeur, ou mets la sérénité de départ sur « Négative » si tes montures y sont déjà.";
+  if (types.includes("amour") && ser <= 0)
+    return "Il faut une sérénité positive : active le Caresseur, ou mets la sérénité de départ sur « Positive » si tes montures y sont déjà.";
+  if (types.includes("maturite"))
+    return "Il faut une sérénité entre −2 000 et +2 000 : mets la sérénité de départ sur « Neutre » si tes montures y sont, sinon ramène-la avec le Baffeur ou le Caresseur.";
+  return "Vérifie que la jauge est remplie.";
+}
+
 const unique = (l: Evenement[]) => l.filter((e, i) => l.findIndex((x) => x.cle === e.cle) === i);
-
-function texteFin(types: TypeJauge[], cible: number) {
-  return `Enclos prêt : ${types.map((t) => (t === "mangeoire" ? `niveau ${cible}` : `${COURT[t]} 20 000`)).join(", ")}`;
-}
-
-function conseilArret(types: TypeJauge[], ser: number) {
-  if (types.some((t) => !dansZone(t, ser) && t !== "mangeoire")) {
-    if (types.includes("endurance") && ser >= 0) return "l'Endurance demande une sérénité négative (Baffeur)";
-    if (types.includes("amour") && ser <= 0) return "l'Amour demande une sérénité positive (Caresseur)";
-    return "la sérénité est hors de la zone (Maturité : entre −2 000 et +2 000)";
-  }
-  return "jauge vide, recharge-la";
-}
 
 /** Formate une durée en secondes : « 3 h 12 », « 45 min ». */
 export function duree(s: number) {

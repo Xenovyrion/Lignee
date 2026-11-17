@@ -45,10 +45,10 @@ export function SurveillanceMinuteurs({ s, setS }: { s: Sauvegarde; setS: (f: (x
       if (!nouveaux.length) return;
       for (const { m, evts } of nouveaux)
         for (const e of evts) {
-          const texte = `Enclos ${m.enclos} : ${e.texte}`;
+          const texte = `Enclos ${m.enclos} · ${e.titre} : ${e.texte}`;
           journaliser("etat", texte);
           notifier(texte, { ton: e.type === "fin" ? "succes" : "info" });
-          if (ref.current.options.notifWindows !== false) void notifierWindows(`Lignée · Enclos ${m.enclos}`, e.texte);
+          if (ref.current.options.notifWindows !== false) void notifierWindows(`Enclos ${m.enclos} · ${e.titre}`, e.texte);
         }
       // Marque les évènements signalés (hors historique d'annulation : ce n'est pas une saisie).
       setS((x) =>

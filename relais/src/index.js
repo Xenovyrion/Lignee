@@ -8,22 +8,34 @@
 //   DISCORD_WEBHOOK  URL du webhook du salon
 //   MEMBRES          « identifiantDiscord:clé,identifiantDiscord:clé » (clés de 32 caractères minimum)
 // API (en-tête « Authorization: Bearer <clé du membre> ») :
-//   PUT    /planning/<groupe>  { "evenements": [{ "at": <ms epoch>, "message": "…" }] }  remplace le groupe
+//   PUT    /planning/<groupe>  { "evenements": [{ "at": <ms epoch>, "message": "…",       remplace le groupe
+//                                  "type"?, "titre"?, "texte"?, "pied"? }] }
+//          avec titre : message mis en forme (embed coloré selon le type), sinon texte simple.
 //   DELETE /planning/<groupe>                                                          vide le groupe
 //   POST   /test                                                                       message immédiat
 import { DurableObject } from "cloudflare:workers";
 
 export const LIMITES = {
-  corps: 8_000, // caractères
+  corps: 16_000, // caractères
   groupes: 12, // par membre
   membres: 50,
   parGroupe: 10,
   message: 300, // caractères
+  titre: 120,
+  pied: 160,
   horizon: 8 * 24 * 3600 * 1000, // 8 jours
   essais: 5,
 };
 const GROUPE = /^[a-z0-9-]{1,40}$/;
 const WEBHOOK = /^https:\/\/(?:discord\.com|discordapp\.com)\/api\/webhooks\/\d+\/[\w-]+$/;
+/** Couleur (barre latérale) et pictogramme de chaque type de message. */
+const STYLES = {
+  fin: { couleur: 0x3fb950, picto: "✅" },
+  zone: { couleur: 0xf0a020, picto: "⚠️" },
+  vide: { couleur: 0xe5534b, picto: "🪫" },
+  arret: { couleur: 0xe5534b, picto: "⛔" },
+  test: { couleur: 0x3fb6e3, picto: "🔔" },
+};
 
 export default {
   async fetch(requete, env) {
@@ -41,7 +53,14 @@ export default {
     const m = url.pathname.match(/^\/planning\/([^/]+)$/);
 
     if (requete.method === "POST" && url.pathname === "/test") {
-      const ok = await envoyerDiscord(env, membre, "Test du relais : les notifications d'enclos arriveront ici.");
+      const ok = await envoyerDiscord(env, membre, {
+        message: "Test du relais : les notifications d'enclos arriveront ici.",
+        type: "test",
+        titre: "Test du relais",
+        texte: "Les notifications de tes minuteurs d'enclos arriveront ici, avec une mention pour toi seul.",
+        pied: "Lignée",
+        at: Date.now(),
+      });
       return repondre(ok ? 200 : 502, ok ? { ok: true } : { erreur: "Discord a refusé le message (webhook ou identifiant ?)" });
     }
     if (m && GROUPE.test(m[1])) {
@@ -77,7 +96,7 @@ export class Planificateur extends DurableObject {
       const restants = [];
       for (const e of liste) {
         if (e.at > maintenant) restants.push(e);
-        else if (!(await envoyerDiscord(this.env, e.membre, e.message)) && e.essais + 1 < LIMITES.essais)
+        else if (!(await envoyerDiscord(this.env, e.membre, e)) && e.essais + 1 < LIMITES.essais)
           restants.push({ ...e, essais: e.essais + 1, at: maintenant + 60_000 * (e.essais + 1) });
       }
       if (restants.length) groupes[g] = restants;
@@ -96,14 +115,31 @@ export class Planificateur extends DurableObject {
   }
 }
 
-async function envoyerDiscord(env, membre, message) {
+/** Envoie un évènement : message mis en forme s'il a un titre, sinon texte simple (anciennes versions de Lignée). */
+async function envoyerDiscord(env, membre, e) {
+  const style = STYLES[e.type] ?? STYLES.test;
+  const contenu = e.titre
+    ? {
+        // La mention reste hors du cadre : c'est elle qui fait sonner le téléphone.
+        content: `<@${membre}>`,
+        embeds: [
+          {
+            title: `${style.picto} ${e.titre}`,
+            description: e.texte || undefined,
+            color: style.couleur,
+            footer: e.pied ? { text: e.pied } : undefined,
+            timestamp: new Date(e.at).toISOString(),
+          },
+        ],
+      }
+    : { content: `<@${membre}> ${e.message}` };
   try {
     const r = await fetch(env.DISCORD_WEBHOOK, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         username: "Lignée",
-        content: `<@${membre}> ${message}`,
+        ...contenu,
         // Seul le membre concerné est notifié : ni @everyone, ni @here, ni rôles, ni autre membre.
         allowed_mentions: { parse: [], users: [membre] },
       }),
@@ -175,11 +211,21 @@ export function validerEvenements(l, maintenant) {
   for (const e of l) {
     if (!e || typeof e.at !== "number" || !Number.isFinite(e.at) || typeof e.message !== "string") return null;
     if (e.at > maintenant + LIMITES.horizon) return null;
-    // Pas de mention ni de balise glissée dans le texte.
-    const message = e.message.replace(/[@<>]/g, "").slice(0, LIMITES.message).trim();
+    // Pas de mention, de balise ni de lien glissé dans les textes.
+    const nettoyer = (x, max) => (typeof x === "string" ? x.replace(/[@<>[\]]/g, "").slice(0, max).trim() : "");
+    const message = nettoyer(e.message, LIMITES.message);
     if (!message) return null;
+    const riche = {};
+    if (e.titre !== undefined) {
+      if (!Object.hasOwn(STYLES, e.type) || e.type === "test") return null;
+      riche.type = e.type;
+      riche.titre = nettoyer(e.titre, LIMITES.titre);
+      riche.texte = nettoyer(e.texte, LIMITES.message);
+      riche.pied = nettoyer(e.pied, LIMITES.pied);
+      if (!riche.titre) return null;
+    }
     // Évènement déjà passé : ignoré (Lignée l'a déjà signalé si elle était ouverte).
-    if (e.at > maintenant - 60_000) r.push({ at: Math.max(e.at, maintenant), message });
+    if (e.at > maintenant - 60_000) r.push({ at: Math.max(e.at, maintenant), message, ...riche });
   }
   return r;
 }
