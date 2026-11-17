@@ -1,6 +1,6 @@
 // Copies de sécurité : sauvegardes automatiques (une par jour, dans AppData/sauvegardes, les 15
 // plus récentes gardées), export vers un fichier choisi et import d'un fichier exporté.
-import { sauvegardeVide } from "./moteur/actions";
+import { nettoyerMontures, sauvegardeVide } from "./moteur/actions";
 import type { Sauvegarde } from "./moteur/types";
 
 const enTauri = typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
@@ -26,7 +26,7 @@ export function lireTexteSauvegarde(texte: string): Sauvegarde {
   }
   if (!lue || !Array.isArray(lue.montures) || typeof lue.obtenues !== "object") throw new Error("Ce fichier n'est pas une sauvegarde Lignée.");
   const vide = sauvegardeVide();
-  return { ...vide, ...lue, obtenues: { ...vide.obtenues, ...lue.obtenues }, options: { ...vide.options, ...lue.options } } as Sauvegarde;
+  return { ...vide, ...lue, montures: nettoyerMontures(lue.montures), obtenues: { ...vide.obtenues, ...lue.obtenues }, options: { ...vide.options, ...lue.options } } as Sauvegarde;
 }
 
 /** Copie automatique du jour (remplace celle du même jour) et purge des plus anciennes. */

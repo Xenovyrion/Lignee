@@ -82,7 +82,10 @@ Capacités tirées à la naissance **sans makina** (3.7) : Reproducteur 3 %, Sag
 - Toutes les 10 s, chaque monture de l'enclos gagne 10 / 20 / 30 / 40 selon le palier. Consommation identique avec 1 ou 10 montures → **toujours remplir l'enclos (10 places)**.
 - 2 jauges actives maximum. Sérénité : Endurance (-5 000 à -1), Maturité (-2 000 à +2 000), Amour (+1 à +5 000).
 - 6 enclos de 10 places (débloqués aux niveaux d'éleveur 1/40/80/120/160/200). Étable : **500 places** (3.7).
-- XP : uniquement via la Mangeoire, niveau max 200.
+- Consommation : à chaque tic (10 s), la jauge perd exactement ce que gagne chaque monture (10 / 20 / 30 / 40), d'où T1 → T2 → T3 → T4 qui redescendent en se vidant. Sources : dofuspourlespros.com (guide de l'éleveur 2026), maitre-eleveur-dofus.pages.dev.
+- Sérénité bornée à **-5 000 / +5 000**. Baffeur (-) et Caresseur (+) : même débit par palier, un seul des deux actif à la fois. Endurance, Maturité, Amour plafonnées à **20 000**.
+- Les gènes Endurante, Précoce, Amoureuse et Sage doublent le gain de leur jauge (Sage : XP).
+- XP : uniquement via la Mangeoire (même débit 10 / 20 / 30 / 40 par tic), niveau max 200. Table cumulée niveau 1 à 200 : `src/donnees/xp_monture.json` 🟡 (dofuspourlesnoobs.com, onglet « XP Monture » ; niv. 100 = 172 668 et niv. 200 = 867 582 confirmés par dofuspourlespros.com).
 
 ## 7. Génétons 🟢
 

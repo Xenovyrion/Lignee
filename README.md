@@ -32,6 +32,7 @@ Outil de pilotage de l'élevage pour **Dofus 3.7** (Dragodindes, Muldos, Volkorn
   - Puis le résumé des séances suivantes jusqu'à la génération 10.
 - **Mode compagnon** (bouton en haut à droite) : une petite fenêtre toujours au premier plan, à garder à côté du jeu, avec les mêmes actions en version compacte.
 - **Étable** : tes montures par couleur, avec des filtres (à préparer, fécondes, stériles, utiles au plan, à vendre…). Les montures dont le plan n'a plus besoin sont signalées *à vendre*.
+- **Enclos** : les jauges de chaque enclos comme en jeu. Tu actives les deux jauges utilisées et règles leur remplissage (par palier, ou valeur exacte en mode avancé) : Lignée calcule l'heure où les montures sont prêtes, prévient quand la sérénité sort de la zone ou qu'une jauge se vide, et envoie une notification Windows. Avec un relais Cloudflare gratuit, partageable dans une guilde, la notification arrive aussi sur Discord avec une mention pour toi seul, même Lignée fermée : voir [docs/RELAIS_DISCORD.md](docs/RELAIS_DISCORD.md) et [docs/RELAIS_SECURITE.md](docs/RELAIS_SECURITE.md).
 - **Arbre** : la carte de toutes les couleurs par génération, avec les liens de parenté, le chemin pour obtenir une couleur et ce que tu as déjà.
 - **Succès** : les couleurs par génération et les paliers de naissances, cochés automatiquement à chaque naissance enregistrée.
 - **Paramètres** : thèmes, fond d'écran (galerie Ankama ou image perso), transparence, animations, niveau par défaut, almanax Takeza, sauvegardes et mises à jour.

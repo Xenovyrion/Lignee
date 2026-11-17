@@ -1,4 +1,4 @@
-// Bilan de l'étable : stock de chaque couleur comparé aux besoins du plan, et enclos.
+// Bilan de l'étable : stock de chaque couleur comparé aux besoins du plan, et nombre d'enclos.
 import { couleur } from "./donnees";
 import type { Etape, Plan } from "./planificateur";
 import type { Etat, Famille, Monture, Sauvegarde, Sexe } from "./types";
@@ -52,7 +52,6 @@ export function besoinsParCouleur(
   return r;
 }
 
-export const CAPACITE_ENCLOS = 10;
 /** Niveaux du métier Éleveur qui débloquent chacun un enclos. */
 export const PALIERS_ENCLOS = [1, 40, 80, 120, 160, 200];
 
@@ -117,7 +116,7 @@ export function rendreFecondes(s: Sauvegarde, famille: Famille, c: string, sexe:
       .slice(0, n)
       .map((m) => m.id),
   );
-  return { ...s, montures: s.montures.map((m) => (ids.has(m.id) ? { ...m, etat: "feconde" as const, enclos: undefined } : m)) };
+  return { ...s, montures: s.montures.map((m) => (ids.has(m.id) ? { ...m, etat: "feconde" as const } : m)) };
 }
 
 /** Mode simple : toutes les montures prennent le niveau unique réglé dans les Paramètres. */

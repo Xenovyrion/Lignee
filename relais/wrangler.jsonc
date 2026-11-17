@@ -1,0 +1,19 @@
+// Relais Discord de Lignée : Cloudflare Worker personnel (offre gratuite).
+// Mise en place : docs/RELAIS_DISCORD.md. Sécurité : docs/RELAIS_SECURITE.md.
+{
+  "name": "lignee-relais",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-01",
+  // Pas d'URL de prévisualisation par version : une seule adresse publique à protéger.
+  "preview_urls": false,
+  "durable_objects": {
+    "bindings": [{ "name": "PLANIFICATEUR", "class_name": "Planificateur" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Planificateur"] }],
+  "vars": {
+    // Origines autorisées à appeler le relais depuis l'appli (Lignée installée, puis développement).
+    "ORIGINES": "http://tauri.localhost,tauri://localhost,http://localhost:1420"
+  },
+  // Journaux sans le contenu des messages (voir src/index.js).
+  "observability": { "enabled": true }
+}

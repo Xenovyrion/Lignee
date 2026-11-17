@@ -17,3 +17,8 @@ desktop.ini
 # Fichiers personnels (sauvegardes d'étable, anciens tableurs)
 *.xlsx
 lignee-sauvegarde*.json
+
+# Relais Discord (Cloudflare Worker)
+relais/node_modules/
+relais/.wrangler/
+relais/.dev.vars*

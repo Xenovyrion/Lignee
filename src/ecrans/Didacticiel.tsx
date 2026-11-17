@@ -7,7 +7,7 @@ import { Logo } from "../Logo";
 import type { Sauvegarde } from "../moteur/types";
 import { Bouton } from "../ui";
 
-export type OngletTuto = "actions" | "etable" | "arbre" | "succes" | "guide" | "parametres";
+export type OngletTuto = "actions" | "etable" | "enclos" | "arbre" | "succes" | "guide" | "parametres";
 export type Chapitre = "decouverte" | "etable" | "tableau" | "quotidien";
 
 interface EtapeTuto {
@@ -79,6 +79,13 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
           "Ton plan du jour : les actions à faire en jeu, numérotées dans l'ordre, avec la makina à utiliser et la chance de réussite. Tu enregistres chaque résultat et le plan se recalcule. Le chapitre « Suivre le tableau de bord » le détaille.",
         cible: '[data-tuto="ecran"]',
         onglet: "actions",
+      },
+      {
+        titre: "Les enclos",
+        texte:
+          "Pour chaque enclos, active les deux jauges que tu as mises en jeu et règle leur remplissage : Lignée calcule l'heure où tes montures sont prêtes et te prévient (Windows, et Discord si tu l'as configuré dans les Paramètres).",
+        cible: '[data-tuto="ecran"]',
+        onglet: "enclos",
       },
       {
         titre: "L'arbre des couleurs",
@@ -178,7 +185,7 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
       {
         titre: "Les vues",
         texte:
-          "« Par couleur » : les cartes que tu viens d'utiliser. « Stériles » : les paires à cloner. En suivi détaillé (Paramètres → Étable), tu as aussi une liste monture par monture, avec niveau et fiche, et la vue des enclos.",
+          "« Par couleur » : les cartes que tu viens d'utiliser. « Stériles » : les paires à cloner. En suivi détaillé (Paramètres → Étable), tu as aussi une liste monture par monture, avec niveau et fiche.",
         cible: '[data-tuto="vues"]',
         onglet: "etable",
       },

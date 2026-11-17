@@ -4,7 +4,7 @@ import { useNotifier } from "../../notifications";
 import { cloner } from "../../moteur/actions";
 import { conseiller } from "../../moteur/conseils";
 import { couleur, nomCouleur } from "../../moteur/donnees";
-import { nombreEnclos, RESSOURCE_EXTRACTION, ressourcesExtraction, roleDansLePlan } from "../../moteur/etable";
+import { RESSOURCE_EXTRACTION, ressourcesExtraction, roleDansLePlan } from "../../moteur/etable";
 import type { Plan } from "../../moteur/planificateur";
 import { clonables } from "../../moteur/regles";
 import type { Capacite, Etat, Monture, Sauvegarde, Sexe } from "../../moteur/types";
@@ -43,7 +43,6 @@ export function FicheMonture({ monture: m, s, setS, plan, fermer }: Props) {
   const modifier = (champs: Partial<Monture>) => setS((s) => ({ ...s, montures: s.montures.map((x) => (x.id === m.id ? { ...x, ...champs } : x)) }));
   const roles = roleDansLePlan(plan, m.id);
   const ordre = conseiller(plan, { takeza: s.options.takeza, makina: s.options.makina }).ordre;
-  const nbEnclos = nombreEnclos(s.options.niveauEleveur);
   const ressources = ressourcesExtraction(m);
 
   // Clonage : partenaires stériles de même génération.
@@ -139,20 +138,10 @@ export function FicheMonture({ monture: m, s, setS, plan, fermer }: Props) {
             />
           </Champ>
           <Champ libelle="État">
-            <select className={champ} value={m.etat} onChange={(e) => modifier({ etat: e.target.value as Etat, enclos: e.target.value === "sterile" ? undefined : m.enclos })}>
+            <select className={champ} value={m.etat} onChange={(e) => modifier({ etat: e.target.value as Etat })}>
               {Object.entries(ETATS).map(([k, v]) => (
                 <option key={k} value={k}>
                   {v}
-                </option>
-              ))}
-            </select>
-          </Champ>
-          <Champ libelle="Enclos">
-            <select className={champ} value={m.enclos ?? ""} onChange={(e) => modifier({ enclos: e.target.value ? Number(e.target.value) : undefined })} disabled={m.etat === "sterile"}>
-              <option value="">Aucun</option>
-              {Array.from({ length: nbEnclos }, (_, i) => i + 1).map((k) => (
-                <option key={k} value={k}>
-                  Enclos {k}
                 </option>
               ))}
             </select>

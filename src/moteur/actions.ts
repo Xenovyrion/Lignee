@@ -6,6 +6,13 @@ import type { Capacite, Famille, Makina, Monture, Sauvegarde, Sexe } from "./typ
 export const nouvelId = () => Math.random().toString(36).slice(2, 10);
 const maintenant = () => new Date().toISOString();
 
+/** Montures lues d'une ancienne sauvegarde : retire le champ « enclos » (placement abandonné en 1.0.14). */
+export const nettoyerMontures = (l: unknown): Monture[] =>
+  Array.isArray(l) ? l.map((m: Monture & { enclos?: unknown }) => {
+    const { enclos: _, ...reste } = m;
+    return reste;
+  }) : [];
+
 export function sauvegardeVide(): Sauvegarde {
   return { version: 1, montures: [], journal: [], obtenues: { dragodinde: [], muldo: [], volkorne: [] }, options: { takeza: false, niveauParDefaut: 100, afficherNom: false, langue: "fr", naissancesAnterieures: 0, niveauEleveur: 1, modeSuivi: "simple", animations: true, particules: true, fondEcran: "", fondVisibilite: 35, fondFlou: 2, voile: 70, theme: "dore" } };
 }
@@ -48,7 +55,7 @@ export function enregistrerNaissance(s: Sauvegarde, pereId: string, mereId: stri
   for (const b of nes) obtenues = ajouterObtenue({ ...s, obtenues }, f, b.couleur);
   return {
     ...s,
-    montures: [...s.montures.map((m) => (m.id === pereId || m.id === mereId ? { ...m, etat: "sterile" as const, enclos: undefined } : m)), ...nes],
+    montures: [...s.montures.map((m) => (m.id === pereId || m.id === mereId ? { ...m, etat: "sterile" as const } : m)), ...nes],
     obtenues,
     journal: [...s.journal, { id: nouvelId(), date: maintenant(), famille: f, pereId, mereId, makina, bebeIds: nes.map((b) => b.id) }],
   };

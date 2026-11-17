@@ -389,7 +389,7 @@ export function Guide({ allerA, lancerVisite }: { allerA: (o: OngletGuide) => vo
             Une jauge se vide à la même vitesse avec 1 ou 10 montures : <B>remplis toujours l'enclos</B> avec 10 montures qui ont besoin de cette jauge.
           </Encadre>
           <Encadre ton="lignee">
-            Indique ton niveau d'éleveur dans les <Lien vers="parametres">Paramètres</Lien> : Lignée en déduit tes enclos et répartit les montures à préparer.
+            Indique ton niveau d'éleveur dans les <Lien vers="parametres">Paramètres</Lien> : Lignée en déduit le nombre d'enclos de l'onglet Enclos, où tu lances un minuteur pour savoir quand tes montures sont prêtes.
           </Encadre>
         </Section>
 

@@ -2,7 +2,7 @@
 // ou localStorage quand l'interface tourne dans un navigateur (développement, version web).
 import { journaliser } from "./diagnostic";
 import { useEffect, useRef, useState } from "react";
-import { sauvegardeVide } from "./moteur/actions";
+import { nettoyerMontures, sauvegardeVide } from "./moteur/actions";
 import type { Sauvegarde } from "./moteur/types";
 import { copieAutomatique } from "./sauvegardes";
 
@@ -19,7 +19,7 @@ async function lire(): Promise<Sauvegarde> {
     if (!texte) return sauvegardeVide();
     const vide = sauvegardeVide();
     const lue = JSON.parse(texte);
-    return { ...vide, ...lue, options: { ...vide.options, ...lue.options } };
+    return { ...vide, ...lue, montures: nettoyerMontures(lue.montures), options: { ...vide.options, ...lue.options } };
   } catch (e) {
     console.error("Lecture de la sauvegarde impossible", e);
     return sauvegardeVide();

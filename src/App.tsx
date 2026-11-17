@@ -7,12 +7,14 @@ import { Parametres } from "./ecrans/Parametres";
 import { Succes } from "./ecrans/succes/Succes";
 import { ImageMonture } from "./ecrans/arbre/commun";
 import { couleurs, FAMILLES, NOMS_FAMILLE, objectifs } from "./moteur/donnees";
-import { IconeActions, IconeArbre, IconeEtable, IconeGuide, IconeParametres, IconeSucces } from "./icones";
+import { IconeActions, IconeArbre, IconeEnclos, IconeEtable, IconeGuide, IconeParametres, IconeSucces } from "./icones";
 import { Guide } from "./ecrans/guide/Guide";
 import { Logo } from "./Logo";
 import { entrerCompagnon, epingler, quitterCompagnon } from "./compagnon";
 import { Compagnon } from "./ecrans/Compagnon";
 import { FournisseurNotifications, useAnnuler } from "./notifications";
+import { SurveillanceMinuteurs } from "./ecrans/SurveillanceMinuteurs";
+import { OngletEnclos } from "./ecrans/enclos/OngletEnclos";
 import { chercherMiseAJour, versionActuelle, versionNouvellementInstallee, type MiseAJour } from "./miseAJour";
 import { NotesDeVersion } from "./ecrans/NotesDeVersion";
 import { chapitreDeLOnglet, CHAPITRES, Didacticiel, ProposerDidacticiel, type Chapitre } from "./ecrans/Didacticiel";
@@ -25,9 +27,9 @@ import { appliquerPalette, themeParId } from "./themes";
 import type { Famille, Sauvegarde } from "./moteur/types";
 import { useSauvegarde } from "./stockage";
 
-const ONGLETS = { actions: "Tableau de bord", etable: "Étable", arbre: "Arbre", succes: "Succès", guide: "Guide", parametres: "Paramètres" } as const;
+const ONGLETS = { actions: "Tableau de bord", etable: "Étable", enclos: "Enclos", arbre: "Arbre", succes: "Succès", guide: "Guide", parametres: "Paramètres" } as const;
 type Onglet = keyof typeof ONGLETS;
-const ICONES_ONGLETS = { actions: IconeActions, etable: IconeEtable, arbre: IconeArbre, succes: IconeSucces, guide: IconeGuide, parametres: IconeParametres };
+const ICONES_ONGLETS = { actions: IconeActions, etable: IconeEtable, enclos: IconeEnclos, arbre: IconeArbre, succes: IconeSucces, guide: IconeGuide, parametres: IconeParametres };
 
 /** Image de fond choisie dans les Paramètres, assombrie pour garder le contenu lisible. */
 function FondEcran({ nom, visibilite, flou }: { nom: string; visibilite: number; flou: number }) {
@@ -214,6 +216,7 @@ export function App() {
   if (compagnon)
     return (
       <FournisseurNotifications historique={modifications} annuler={annuler}>
+        <SurveillanceMinuteurs s={s} setS={setS} />
         <div className={s.options.animations ? "" : "sans-animation"}>
           {fond}
           <Compagnon
@@ -235,6 +238,7 @@ export function App() {
 
   return (
     <FournisseurNotifications historique={modifications} annuler={annuler}>
+        <SurveillanceMinuteurs s={s} setS={setS} />
       <div className={`mx-auto flex max-w-[2200px] flex-col gap-4 p-6 ${s.options.animations ? "" : "sans-animation"}`}>
         {fond}
         {/* En-tête sans cadre : logo et titre flottent sur le fond, avec une ombre portée pour rester lisibles. */}
@@ -333,6 +337,7 @@ export function App() {
         <main data-tuto="ecran" className="surface rounded-2xl border border-border p-4">
           {onglet === "actions" && <TableauDeBord {...props} />}
           {onglet === "etable" && <Etable key={`${famille}-${demo ? "demo" : "reel"}`} {...props} />}
+          {onglet === "enclos" && <OngletEnclos s={s} setS={majReel} />}
           {onglet === "arbre" && <Arbre key={famille} famille={famille} s={sv} />}
           {onglet === "succes" && <Succes {...props} setFamille={setFamille} />}
           {onglet === "guide" && <Guide allerA={allerA} lancerVisite={lancerTuto} />}

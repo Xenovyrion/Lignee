@@ -5,14 +5,13 @@ import { ajusterStock, besoinsParCouleur, compterStock, rendreFecondes } from ".
 import { conseiller } from "../../moteur/conseils";
 import { planifier } from "../../moteur/planificateur";
 import type { Etat, Famille, Monture, Sauvegarde, Sexe } from "../../moteur/types";
-import { IconeEnclos, IconeGrille, IconeListe, IconeSterile } from "../../icones";
+import { IconeGrille, IconeListe, IconeSterile } from "../../icones";
 import { useNotifier } from "../../notifications";
 import { Bouton, champ, ETATS, Segments } from "../../ui";
 import { filtrer, filtreVide, trier, type Filtre, type Tri } from "./filtres";
 import { ListeMontures } from "./ListeMontures";
 import { PanneauFiltres } from "./PanneauFiltres";
 import { SaisieRapide } from "./SaisieRapide";
-import { Enclos } from "./Enclos";
 import { FicheMonture } from "./FicheMonture";
 import { Steriles } from "./Steriles";
 import { VueCouleurs } from "./VueCouleurs";
@@ -42,9 +41,9 @@ export function Etable({ famille, s, setS }: Props) {
   const [tri, setTri] = useState<Tri>({ cle: "generation", sens: 1 });
   const simple = s.options.modeSuivi === "simple";
   const notifier = useNotifier();
-  const [vueChoisie, setVue] = useState<"couleurs" | "liste" | "enclos" | "steriles">("couleurs");
-  // En mode simple, pas de liste ni d'enclos : on revient à la vue par couleur.
-  const vue = simple && (vueChoisie === "liste" || vueChoisie === "enclos") ? "couleurs" : vueChoisie;
+  const [vueChoisie, setVue] = useState<"couleurs" | "liste" | "steriles">("couleurs");
+  // En mode simple, pas de liste : on revient à la vue par couleur.
+  const vue = simple && vueChoisie === "liste" ? "couleurs" : vueChoisie;
   const [ficheId, setFicheId] = useState<string | null>(null);
   const fiche = s.montures.find((m) => m.id === ficheId);
   const [selection, setSelection] = useState<Set<string>>(new Set());
@@ -113,7 +112,7 @@ export function Etable({ famille, s, setS }: Props) {
   return (
     <div className="flex items-start gap-4">
       {fiche && <FicheMonture monture={fiche} s={s} setS={setS} plan={plan} fermer={() => setFicheId(null)} />}
-      {vue !== "enclos" && vue !== "steriles" && <PanneauFiltres famille={famille} montures={deLaFamille} reservees={reservees} filtre={filtre} setFiltre={setFiltre} sansNiveau={simple} />}
+      {vue !== "steriles" && <PanneauFiltres famille={famille} montures={deLaFamille} reservees={reservees} filtre={filtre} setFiltre={setFiltre} sansNiveau={simple} />}
 
       <div className="flex min-w-0 flex-1 flex-col gap-3">
         <div className="flex flex-wrap items-center gap-3">
@@ -126,19 +125,13 @@ export function Etable({ famille, s, setS }: Props) {
                 { valeur: "couleurs", libelle: "Par couleur", icone: <IconeGrille taille={16} /> },
                 { valeur: "liste", libelle: "Liste", icone: <IconeListe taille={16} /> },
                 {
-                  valeur: "enclos",
-                  libelle: "Enclos",
-                  icone: <IconeEnclos taille={16} />,
-                  badge: s.montures.some((m) => m.enclos) ? <span className="text-xs opacity-80">{s.montures.filter((m) => m.enclos).length}</span> : undefined,
-                },
-                {
                   valeur: "steriles",
                   libelle: "Stériles",
                   icone: <IconeSterile taille={16} />,
                   badge: deLaFamille.some((m) => m.etat === "sterile") ? <span className="text-xs opacity-80">{deLaFamille.filter((m) => m.etat === "sterile").length}</span> : undefined,
                 },
               ] as { valeur: typeof vue; libelle: string; icone: ReactNode; badge?: ReactNode }[]
-            ).filter((o) => !simple || o.valeur === "couleurs" || o.valeur === "steriles")}
+            ).filter((o) => !simple || o.valeur !== "liste")}
           />
           </div>
           <span className="text-sm text-text-secondary">
@@ -172,7 +165,7 @@ export function Etable({ famille, s, setS }: Props) {
           {!saisie && <Bouton data-tuto="ajouter" onClick={() => setSaisie(true)}>+ Ajouter des montures</Bouton>}
         </div>
 
-        {vue !== "enclos" && vue !== "steriles" && (
+        {vue !== "steriles" && (
           <div data-tuto="raccourcis" className="flex flex-wrap gap-1.5">
             {RACCOURCIS.map((r) => {
               const f = { ...filtreVide(), ...r.filtre };
@@ -224,8 +217,6 @@ export function Etable({ famille, s, setS }: Props) {
         <div className="overflow-hidden rounded-xl border border-border bg-bg-card">
           {vue === "steriles" ? (
             <Steriles famille={famille} s={s} setS={setS} ouvrirFiche={setFicheId} />
-          ) : vue === "enclos" ? (
-            <Enclos famille={famille} s={s} setS={setS} plan={plan} ouvrirFiche={setFicheId} />
           ) : vue === "couleurs" ? (
             <VueCouleurs
               besoins={besoins}

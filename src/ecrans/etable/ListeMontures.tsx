@@ -67,7 +67,6 @@ export function ListeMontures({ famille, montures, reservees, afficherNom, tri, 
                 <ImageMonture famille={famille} id={m.couleur} taille={28} />
                 {nomCouleur(famille, m.couleur)}
               </button>
-              {m.enclos && <span className="ml-2 rounded-sm bg-bg-hover px-1.5 text-xs text-text-secondary">enclos {m.enclos}</span>}
               {reservees.has(m.id) && (
                 <span className="ml-2 text-xs text-accent" title="Utilisée par le plan d'élevage">
                   ● plan

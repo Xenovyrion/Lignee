@@ -6,6 +6,7 @@ import { Carte, champ } from "../ui";
 import { SectionSauvegardes } from "./SectionSauvegardes";
 import { SectionMiseAJour } from "./SectionMiseAJour";
 import { SectionDiagnostic } from "./SectionDiagnostic";
+import { SectionEnclos } from "./SectionEnclos";
 import { ChoixChapitres, type Chapitre } from "./Didacticiel";
 import { fondDuTheme, themeParId, THEMES, type Theme } from "../themes";
 import { useNotifier } from "../notifications";
@@ -16,7 +17,7 @@ interface Props {
   lancerDidacticiel?: (c: Chapitre) => void;
 }
 
-const Ligne = ({ titre, aide, children }: { titre: string; aide: string; children: ReactNode }) => (
+export const Ligne = ({ titre, aide, children }: { titre: string; aide: string; children: ReactNode }) => (
   <div className="flex items-center justify-between gap-6 border-t border-border py-3 first:border-t-0 first:pt-0">
     <div>
       <div className="text-sm font-medium">{titre}</div>
@@ -181,7 +182,7 @@ export function Parametres({ s, setS, lancerDidacticiel }: Props) {
           aide={
             o.modeSuivi === "simple"
               ? "Simple : tu saisis des nombres par couleur, sexe et état (fertile, féconde, stérile), avec un seul niveau pour toutes tes montures."
-              : "Détaillé : chaque monture a son niveau, son enclos et sa fiche ; vue Liste et suivi des enclos."
+              : "Détaillé : chaque monture a son niveau et sa fiche, avec une vue Liste."
           }
         >
           <div className="flex rounded-lg border border-border-light p-0.5 text-sm">
@@ -230,6 +231,7 @@ export function Parametres({ s, setS, lancerDidacticiel }: Props) {
           </Ligne>
         )}
       </Carte>
+      <SectionEnclos s={s} maj={maj} />
       {lancerDidacticiel && (
         <Carte titre="Visite guidée">
           <div className="flex flex-col gap-3">

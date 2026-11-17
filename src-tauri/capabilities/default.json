@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Permissions de Lignée : sauvegarde dans AppData, export et import vers un fichier choisi par l'utilisateur, mode compagnon (fenêtre compacte au premier plan)",
+  "description": "Permissions de Lignée : sauvegarde dans AppData, export et import vers un fichier choisi par l'utilisateur, mode compagnon (fenêtre compacte au premier plan), notifications Windows des minuteurs d'enclos",
   "windows": ["main"],
   "permissions": [
     "core:default",
@@ -24,6 +24,7 @@
     "core:window:allow-maximize",
     "core:window:allow-unmaximize",
     "updater:default",
-    "process:allow-restart"
+    "process:allow-restart",
+    "notification:default"
   ]
 }
