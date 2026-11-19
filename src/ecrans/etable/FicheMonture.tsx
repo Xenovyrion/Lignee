@@ -43,7 +43,7 @@ export function FicheMonture({ monture: m, s, setS, plan, fermer }: Props) {
   const notifier = useNotifier();
   const modifier = (champs: Partial<Monture>) => setS((s) => ({ ...s, montures: s.montures.map((x) => (x.id === m.id ? { ...x, ...champs } : x)) }));
   const roles = roleDansLePlan(plan, m.id);
-  const ordre = conseiller(plan, { takeza: s.options.takeza, makina: s.options.makina }).ordre;
+  const ordre = conseiller(plan, { takeza: s.options.takeza, makina: s.options.makina, seuilAnimakina: s.options.seuilAnimakina }).ordre;
   const ressources = ressourcesExtraction(m);
 
   // Clonage : partenaires stériles de même génération.

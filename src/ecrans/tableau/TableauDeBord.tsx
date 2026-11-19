@@ -9,6 +9,7 @@ import { Bandeau, Confettis, Nombre, useCompteur } from "../../effets";
 import { IconeBlocage, IconeCapture, IconeClonage, IconeNaissance, IconePreparer } from "../../icones";
 import { CarteCapture, CarteClonage, CarteNaissance, CartePreparer } from "./CartesActions";
 import { TYPES } from "./typesActions";
+import { LigneCompacte } from "./LignesCompactes";
 
 const LIMITE_FRISE = 6;
 
@@ -99,7 +100,7 @@ function AnneauTotal({ faites, total }: { faites: number; total: number }) {
 
 export function TableauDeBord({ famille, s, setS }: Props) {
   const plan = useMemo(() => planifier(famille, s.montures, s.obtenues[famille]), [famille, s.montures, s.obtenues]);
-  const c = useMemo(() => conseiller(plan, { takeza: s.options.takeza, makina: s.options.makina }), [plan, s.options.takeza, s.options.makina]);
+  const c = useMemo(() => conseiller(plan, { takeza: s.options.takeza, makina: s.options.makina, seuilAnimakina: s.options.seuilAnimakina }), [plan, s.options.takeza, s.options.makina, s.options.seuilAnimakina]);
   const objectif = useMemo(() => prochainObjectif(plan), [plan]);
   const clonages = useMemo(() => regrouperClonages(suggererClonages(s.montures.filter((m) => m.famille === famille))), [famille, s.montures]);
   const actions = useMemo(() => actionsMaintenant(c, clonages), [c, clonages]);
@@ -156,7 +157,7 @@ export function TableauDeBord({ famille, s, setS }: Props) {
       <Confettis declencheur={confettis} />
       <Bandeau message={bandeau} fermer={fermerBandeau} />
       {/* Progression */}
-      <div className={`rounded-xl border border-border bg-bg-card ${compacte ? "px-4 py-2.5" : "p-4"}`}>
+      <div data-tuto="progression" className={`rounded-xl border border-border bg-bg-card ${compacte ? "px-4 py-2.5" : "p-4"}`}>
         <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
           {!compacte && <AnneauTotal faites={obtenues.size} total={objectifs(famille).length} />}
           <div className="flex min-w-[320px] flex-1 gap-2">
@@ -194,22 +195,6 @@ export function TableauDeBord({ famille, s, setS }: Props) {
                 </div>
                 <div className="text-[10px] uppercase tracking-wide text-text-muted">{l}</div>
               </div>
-            ))}
-          </div>
-          <div data-tuto="vue-compacte" className="ml-auto flex rounded-lg border border-border-light p-0.5 text-xs" title="Vue compacte : seulement les actions, sans les explications">
-            {(
-              [
-                [false, "Détaillée"],
-                [true, "Compacte"],
-              ] as const
-            ).map(([v, l]) => (
-              <button
-                key={l}
-                onClick={() => setS((x) => ({ ...x, options: { ...x.options, vueCompacte: v } }))}
-                className={`rounded-md px-2.5 py-1 ${compacte === v ? "bg-accent-dim text-accent" : "text-text-secondary hover:text-text-primary"}`}
-              >
-                {l}
-              </button>
             ))}
           </div>
         </div>
@@ -315,10 +300,17 @@ export function TableauDeBord({ famille, s, setS }: Props) {
           .join(", ")}. Enregistre chaque résultat : le plan se recalcule.`}
       >
         {actions.length ? (
-          <ul className="flex flex-col gap-2">
+          <ul className={`flex flex-col ${compacte ? "gap-1.5" : "gap-2"}`}>
             {actions.map((x) => {
               const id = `action-${x.numero}`;
               const k = cleAction(x);
+              // Vue compacte : une ligne par action, comme le mode compagnon.
+              if (compacte)
+                return (
+                  <li key={k} id={id} data-type={x.type} className="scroll-mt-4">
+                    <LigneCompacte x={x} famille={famille} setS={setS} niveau={niveauNouvelles} etapePreparer={premier("preparer")} />
+                  </li>
+                );
               if (x.type === "naissance")
                 return <CarteNaissance key={k} id={id} numero={x.numero} famille={famille} a={x.a} prevues={prevues(x.a.e.couleur)} setS={setS} niveauBebes={niveauNouvelles} etapePreparer={premier("preparer")} />;
               if (x.type === "clonage") return <CarteClonage key={k} id={id} numero={x.numero} famille={famille} g={x.g} setS={setS} />;

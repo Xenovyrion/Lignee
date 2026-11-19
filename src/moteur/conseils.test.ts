@@ -22,7 +22,10 @@ describe("conseil de makina", () => {
   it("makina choisie dans les paramètres : toujours celle-là", () => {
     expect(conseillerMakina(100, 100, "F", false, "optimakina")).toMatchObject({ makina: "optimakina", chance: 0.8 });
     expect(conseillerMakina(100, 100, undefined, false, "animakina")).toMatchObject({ makina: "animakina", chance: 0.6 });
-    expect(conseillerMakina(100, 100, "F", false, "auto").makina).toBe("animakina");
+    // Auto : l'Animakina (60 % au niveau 100) est sous le seuil par défaut (80 %) : Optimakina, sexe au hasard.
+    expect(conseillerMakina(100, 100, "F", false, "auto")).toMatchObject({ makina: "optimakina", chance: 0.8, autre: { makina: "animakina", chance: 0.6 } });
+    expect(conseillerMakina(100, 100, "F", false, "auto", 0.6).makina).toBe("animakina");
+    expect(conseillerMakina(100, 100, undefined, false, "auto").autre).toBeUndefined();
   });
 });
 

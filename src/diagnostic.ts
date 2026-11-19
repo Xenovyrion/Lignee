@@ -147,7 +147,7 @@ export function resumerPlans(s: Sauvegarde) {
   return Object.fromEntries(
     FAMILLES.map((f) => {
       const plan = planifier(f, s.montures, s.obtenues[f]);
-      const c = conseiller(plan, { takeza: s.options.takeza, makina: s.options.makina });
+      const c = conseiller(plan, { takeza: s.options.takeza, makina: s.options.makina, seuilAnimakina: s.options.seuilAnimakina });
       return [
         f,
         {

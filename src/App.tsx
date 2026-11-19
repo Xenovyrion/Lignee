@@ -31,7 +31,7 @@ import { RechercheRapide, resultatsMontures, type Resultat } from "./ecrans/Rech
 
 /** Réglages trouvables par la recherche rapide : repère (data-tuto) dans Paramètres, titre et mots-clés. */
 const REGLAGES: [string, string, string][] = [
-  ["apparence", "Apparence", "thème fond d'écran image transparence animations lucioles"],
+  ["apparence", "Apparence", "thème fond d'écran image transparence animations lucioles vue compacte détaillée tableau de bord"],
   ["metier", "Métier d'Éleveur", "niveau enclos"],
   ["reglages-etable", "Réglages de l'étable", "suivi simple détaillé niveau par défaut nom"],
   ["minuteurs", "Minuteurs d'enclos et Discord", "notifications relais windows discord"],
@@ -178,7 +178,7 @@ export function App() {
       journaliser("info", `Visite guidée : chapitre « ${CHAPITRES[c].titre} » (étable de démonstration)`);
       if (!familleAvantDemo.current) familleAvantDemo.current = famille;
       setFamille("dragodinde");
-      setDemo(construireDemo(s.options));
+      setDemo(construireDemo({ ...s.options, vueCompacte: false }));
       setHistoriqueDemo([]);
     },
     [s, famille, quitterDemo],

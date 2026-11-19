@@ -87,6 +87,8 @@ export interface Options {
   didacticiel?: "vu" | "refuse";
   /** Makina conseillée : « auto » (meilleure chance globale), ou toujours la même (modifiable à chaque saisie). */
   makina?: "auto" | "optimakina" | "animakina";
+  /** Mode automatique : chance de génération cible minimale pour conseiller l'Animakina (0,5 à 0,9 ; 0,8 par défaut). */
+  seuilAnimakina?: number;
   /** Saisie des jauges d'enclos : simple (paliers et demi-paliers) ou avancée (valeur exacte). */
   saisieJauges?: "palier" | "exacte";
   /** Notifications Windows à la fin des minuteurs d'enclos. */

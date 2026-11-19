@@ -60,7 +60,7 @@ const Badge = ({ valide, commence }: { valide: boolean; commence: boolean }) =>
 export function Succes({ famille, setFamille, s, setS }: Props) {
   const bilans = useMemo(() => Object.fromEntries(FAMILLES.map((f) => [f, bilan(f, s)])) as Record<Famille, ReturnType<typeof bilan>>, [s]);
   const rangs = useMemo(() => {
-    const c = conseiller(planifier(famille, s.montures, s.obtenues[famille]), { takeza: s.options.takeza, makina: s.options.makina });
+    const c = conseiller(planifier(famille, s.montures, s.obtenues[famille]), { takeza: s.options.takeza, makina: s.options.makina, seuilAnimakina: s.options.seuilAnimakina });
     return new Map(c.ordre.map((a) => [a.e.couleur, { rang: a.rang, pret: !a.aPreparer.length }]));
   }, [famille, s.montures, s.obtenues, s.options.takeza, s.options.makina]);
   const [filtre, setFiltre] = useState<Filtre>("tous");

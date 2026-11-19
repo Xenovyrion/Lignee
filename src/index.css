@@ -210,8 +210,7 @@ body {
 .vue-compacte .aide-detaillee {
   display: none;
 }
-.vue-compacte section,
-.vue-compacte li[data-type] {
+.vue-compacte section {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
 }

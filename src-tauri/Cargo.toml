@@ -1,6 +1,6 @@
 [package]
 name = "lignee"
-version = "1.0.21"
+version = "1.0.22"
 description = "Lignée - pilotage de l'élevage pour Dofus 3.7"
 authors = ["Xenovyrion"]
 edition = "2021"
@@ -19,6 +19,7 @@ tauri-plugin-dialog = "2"
 tauri-plugin-updater = "2"
 tauri-plugin-process = "2"
 tauri-plugin-notification = "2"
+tauri-plugin-opener = "2"
 
 [profile.release]
 panic         = "abort"

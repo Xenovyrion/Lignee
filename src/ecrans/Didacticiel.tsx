@@ -38,14 +38,14 @@ const NAISSANCE = '#actions li[data-type="naissance"]';
 export const CHAPITRES: Record<Chapitre, DefChapitre> = {
   decouverte: {
     titre: "Découverte",
-    resume: "Les écrans de Lignée et à quoi ils servent.",
-    duree: "1 min",
+    resume: "Les écrans de Lignée et les boutons du haut, dans l'ordre.",
+    duree: "2 min",
     demo: false,
     etapes: [
       {
         titre: "Bienvenue dans Lignée",
         texte:
-          "Lignée calcule quoi accoupler, quoi capturer et quoi cloner, dans quel ordre, pour obtenir tous les succès de génération des Dragodindes, Muldos et Volkornes. Ce premier chapitre fait le tour des écrans ; les suivants t'apprennent à t'en servir.",
+          "Lignée calcule quoi accoupler, quoi capturer et quoi cloner, dans quel ordre, pour obtenir tous les succès de génération des Dragodindes, Muldos et Volkornes. Ce premier chapitre fait le tour de l'écran, de haut en bas ; les suivants t'apprennent à t'en servir.",
       },
       {
         titre: "Choisis ta famille",
@@ -54,31 +54,43 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
         onglet: "actions",
       },
       {
+        titre: "Annuler",
+        texte: "Chaque modification affiche une notification avec « Annuler ». Ce bouton défait aussi les dernières modifications de la session, une par une.",
+        cible: '[data-tuto="annuler"]',
+        onglet: "actions",
+      },
+      {
+        titre: "Mode compagnon",
+        texte: "Une petite fenêtre gardée au premier plan, à placer à côté du jeu : les mêmes actions en version compacte, pour enregistrer sans quitter Dofus des yeux.",
+        cible: '[data-tuto="compagnon"]',
+        onglet: "actions",
+      },
+      {
+        titre: "Les bandeaux",
+        texte:
+          "Juste en dessous peuvent apparaître des bandeaux : 🌙 le bonus d'Almanax d'élevage du jour ou du lendemain (appliqué automatiquement), et la mise à jour disponible. Chacun se ferme avec ✕.",
+        onglet: "actions",
+      },
+      {
         titre: "Les écrans",
         texte:
-          "Tableau de bord : ce qu'il faut faire maintenant. Étable : tes montures. Enclos : les minuteurs de tes enclos. Arbre : toutes les couleurs et leurs parents. Succès : les couleurs obtenues. Guide : les règles du jeu. Paramètres : réglages et sauvegardes.",
+          "Tableau de bord : ce qu'il faut faire maintenant. Étable : tes montures. Enclos : les minuteurs de tes enclos. Arbre : toutes les couleurs et leurs parents. Succès : les couleurs obtenues. Guide : les règles du jeu. Paramètres : réglages et sauvegardes. On les parcourt dans l'ordre.",
         cible: '[data-tuto="onglets"]',
+        onglet: "actions",
       },
       {
-        titre: "1. L'Étable",
-        texte:
-          "Tout part de là : pour chaque couleur, tu indiques combien de mâles et de femelles tu possèdes, et leur état. Plus l'étable est juste, plus le plan est juste. Le chapitre « Gérer l'étable » te montre comment.",
-        cible: '[data-tuto="ecran"]',
-        onglet: "etable",
-      },
-      {
-        titre: "2. Les succès",
-        texte:
-          "Coche ici les couleurs que tu as déjà fait naître avant d'utiliser Lignée : le plan ne les visera plus. Ensuite, elles se cochent toutes seules à chaque naissance enregistrée.",
-        cible: '[data-tuto="ecran"]',
-        onglet: "succes",
-      },
-      {
-        titre: "3. Le tableau de bord",
+        titre: "Le tableau de bord",
         texte:
           "Ton plan du jour : les actions à faire en jeu, numérotées dans l'ordre, avec la makina à utiliser et la chance de réussite. Tu enregistres chaque résultat et le plan se recalcule. Le chapitre « Suivre le tableau de bord » le détaille.",
         cible: '[data-tuto="ecran"]',
         onglet: "actions",
+      },
+      {
+        titre: "L'étable",
+        texte:
+          "Tout part de là : pour chaque couleur, tu indiques combien de mâles et de femelles tu possèdes, et leur état. Plus l'étable est juste, plus le plan est juste. Le chapitre « Gérer l'étable » te montre comment.",
+        cible: '[data-tuto="ecran"]',
+        onglet: "etable",
       },
       {
         titre: "Les enclos",
@@ -94,15 +106,35 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
         onglet: "arbre",
       },
       {
+        titre: "Les succès",
+        texte:
+          "Coche ici les couleurs que tu as déjà fait naître avant d'utiliser Lignée : le plan ne les visera plus. Ensuite, elles se cochent toutes seules à chaque naissance enregistrée.",
+        cible: '[data-tuto="ecran"]',
+        onglet: "succes",
+      },
+      {
         titre: "Le guide de l'éleveur",
         texte: "Nouveau dans l'élevage ? Le Guide explique les règles du jeu (capture, enclos, sérénité, génération cible, clonage, niveaux) et les conseils pour finir les succès.",
         cible: '[data-tuto="ecran"]',
         onglet: "guide",
       },
       {
+        titre: "Les paramètres",
+        texte: "Apparence, métier, étable, minuteurs, sauvegardes, mises à jour… Le chapitre « Les paramètres » les passe tous en revue.",
+        cible: '[data-tuto="ecran"]',
+        onglet: "parametres",
+      },
+      {
         titre: "Recherche rapide",
         texte: "Ctrl+K (ou « Rechercher ») trouve tout de suite une couleur, un onglet, un réglage ou une commande : tape quelques lettres, puis Entrée.",
         cible: '[data-tuto="recherche"]',
+        onglet: "actions",
+      },
+      {
+        titre: "Calendrier de l'Almanax",
+        texte:
+          "Quand un bonus d'élevage arrive dans les 45 prochains jours (+20 % de génération cible, jauge d'enclos doublée, capacité des bébés), le bouton « 🌙 Almanax » apparaît ici et les liste. Sinon, il reste caché.",
+        cible: '[data-tuto="almanax"]',
         onglet: "actions",
       },
       {
@@ -116,7 +148,7 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
 
   etable: {
     titre: "Gérer l'étable",
-    resume: "Saisir ses montures, les passer en féconde, lire les étiquettes et filtrer.",
+    resume: "Filtrer, choisir la vue, saisir ses montures, les passer en féconde et lire les étiquettes.",
     duree: "2 min",
     demo: true,
     etapes: [
@@ -124,6 +156,38 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
         titre: "Une étable d'exemple",
         texte:
           "Pour ce chapitre, Lignée affiche une petite étable de Dragodindes d'exemple : tu peux tout essayer sans risque. Ta vraie étable n'est pas touchée et revient à la fin de la visite.",
+        onglet: "etable",
+      },
+      {
+        titre: "Filtres détaillés",
+        texte: "Recherche par nom, et filtres par génération, sexe, état, usage dans le plan ou couleur. Ils se combinent avec les raccourcis.",
+        cible: '[data-tuto="filtres"]',
+        onglet: "etable",
+      },
+      {
+        titre: "Les vues",
+        texte:
+          "« Par couleur » : une carte par couleur (on y vient juste après). « Stériles » : les paires à cloner. En suivi détaillé (Paramètres → Étable), « Liste » montre chaque monture : clique-la pour ouvrir sa fiche (niveau, nom, capacités, clonage), ou coches-en plusieurs pour changer leur état ou leur niveau d'un coup.",
+        cible: '[data-tuto="vues"]',
+        onglet: "etable",
+      },
+      {
+        titre: "Remplissage de l'étable",
+        texte: "Combien de places sont prises sur les 500 de l'étable du jeu, par famille. Le texte passe en orange quand tu approches de la limite.",
+        cible: '[data-tuto="remplissage"]',
+        onglet: "etable",
+      },
+      {
+        titre: "Plusieurs montures d'un coup",
+        texte: "Après une grosse capture ou pour ta première saisie, « Ajouter des montures » permet d'entrer plusieurs couleurs, sexes et quantités en une fois.",
+        cible: '[data-tuto="ajouter"]',
+        onglet: "etable",
+      },
+      {
+        titre: "Filtres en un clic",
+        texte:
+          "« Utiles au plan » : ce que le plan va utiliser. « À préparer » : à mettre en enclos. « Libres » : ce qui reste, en réserve ou à recycler. « À vendre » : couleurs déjà obtenues qui ne servent plus à rien. Le chiffre indique combien de montures sont concernées.",
+        cible: '[data-tuto="raccourcis"]',
         onglet: "etable",
       },
       {
@@ -175,32 +239,6 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
         cible: `${ROUSSE} [data-tuto="grille"]`,
         onglet: "etable",
       },
-      {
-        titre: "Filtres en un clic",
-        texte:
-          "« Utiles au plan » : ce que le plan va utiliser. « À préparer » : à mettre en enclos. « Libres » : ce qui reste, en réserve ou à recycler. « À vendre » : couleurs déjà obtenues qui ne servent plus à rien. Le chiffre indique combien de montures sont concernées.",
-        cible: '[data-tuto="raccourcis"]',
-        onglet: "etable",
-      },
-      {
-        titre: "Filtres détaillés",
-        texte: "Recherche par nom, et filtres par génération, sexe, état, usage dans le plan ou couleur. Ils se combinent avec les raccourcis.",
-        cible: '[data-tuto="filtres"]',
-        onglet: "etable",
-      },
-      {
-        titre: "Les vues",
-        texte:
-          "« Par couleur » : les cartes que tu viens d'utiliser. « Stériles » : les paires à cloner. En suivi détaillé (Paramètres → Étable), tu as aussi une liste monture par monture, avec niveau et fiche.",
-        cible: '[data-tuto="vues"]',
-        onglet: "etable",
-      },
-      {
-        titre: "Plusieurs montures d'un coup",
-        texte: "Après une grosse capture ou pour ta première saisie, « Ajouter des montures » permet d'entrer plusieurs couleurs, sexes et quantités en une fois.",
-        cible: '[data-tuto="ajouter"]',
-        onglet: "etable",
-      },
     ],
   },
 
@@ -217,15 +255,16 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
         onglet: "actions",
       },
       {
-        titre: "Le prochain objectif",
-        texte: "La prochaine couleur à obtenir pour avancer dans les succès, et ce qu'il reste à faire naître pour compléter sa génération.",
-        cible: '[data-tuto="objectif"]',
+        titre: "Ta progression",
+        texte:
+          "En haut : le pourcentage de couleurs obtenues, l'avancement de chaque génération (G2 à G10, celle en cours en surbrillance) et ce qu'il reste dans le plan (naissances, clonages, captures, séances). Une vue compacte, une ligne par action, se choisit dans Paramètres → Apparence.",
+        cible: '[data-tuto="progression"]',
         onglet: "actions",
       },
       {
-        titre: "Détaillée ou compacte",
-        texte: "Une fois habitué, passe en vue compacte : seulement les actions, sans les explications ni les tuiles.",
-        cible: '[data-tuto="vue-compacte"]',
+        titre: "Le prochain objectif",
+        texte: "La prochaine couleur à obtenir pour avancer dans les succès, et ce qu'il reste à faire naître pour compléter sa génération.",
+        cible: '[data-tuto="objectif"]',
         onglet: "actions",
       },
       {
@@ -251,7 +290,7 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
       {
         titre: "La chance de réussite",
         texte:
-          "Probabilité d'obtenir la couleur visée, avec la makina conseillée (Optimakina : +20 % de chance, Animakina : sexe choisi). Survole l'anneau pour la raison du choix et les niveaux à atteindre pour 100 %.",
+          "Probabilité d'obtenir la couleur visée, avec la makina conseillée (Optimakina : +20 % de chance, Animakina : sexe choisi). Quand le sexe compte, la chance avec l'autre makina est indiquée dessous. Survole l'anneau pour la raison du choix et les niveaux à atteindre pour 100 %.",
         cible: `${NAISSANCE} [data-tuto="chance"]`,
         onglet: "actions",
       },
@@ -260,7 +299,7 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
         texte: "Une fois l'accouplement fait en jeu, enregistre-le ici, même s'il a raté : c'est ce qui fait avancer le plan.",
         cible: `${NAISSANCE} [data-tuto="enregistrer"]`,
         onglet: "actions",
-        action: { consigne: "Clique sur « Enregistrer ».", fait: existe('[data-tuto="form-naissance"]') },
+        action: { consigne: "Clique sur « Valider naissance ».", fait: existe('[data-tuto="form-naissance"]') },
       },
       {
         titre: "Le formulaire",
@@ -280,7 +319,7 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
       {
         titre: "Cloner les stériles",
         texte:
-          "Deux stériles de la même génération donnent une monture fertile au clonage, qui garde le sexe et l'arbre de la première. Fais-le en jeu, puis « Enregistrer » sur la carte.",
+          "Deux stériles de la même génération donnent une monture fertile au clonage, qui garde le sexe et l'arbre de la première. Fais-le en jeu, puis « Valider clonage » sur la carte.",
         cible: '#actions li[data-type="clonage"]',
         onglet: "actions",
       },
@@ -294,7 +333,7 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
       {
         titre: "Capturer",
         texte:
-          "Les montures sauvages à capturer, avec le nombre de mâles et de femelles conseillé. Après ta capture, « Capturé » les ajoute à l'étable (ajuste les nombres si besoin).",
+          "Les montures sauvages à capturer, avec le nombre de mâles et de femelles conseillé. Après ta capture, « Valider capture » les ajoute à l'étable en une fois (nombres pré-remplis, ajustables).",
         cible: '#actions li[data-type="capture"]',
         onglet: "actions",
       },
@@ -373,45 +412,62 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
   },
 
   quotidien: {
-    titre: "Au quotidien",
-    resume: "Mode compagnon, annulation, réglages utiles, sauvegardes et diagnostic.",
-    duree: "2 min",
+    titre: "Les paramètres",
+    resume: "Chaque réglage de Lignée, dans l'ordre de la page.",
+    duree: "3 min",
     demo: false,
     etapes: [
       {
-        titre: "Mode compagnon",
-        texte: "Une petite fenêtre gardée au premier plan, à placer à côté du jeu : les mêmes actions en version compacte, pour enregistrer sans quitter Dofus des yeux.",
-        cible: '[data-tuto="compagnon"]',
-      },
-      {
-        titre: "Annuler",
-        texte: "Chaque modification affiche une notification avec « Annuler ». Ce bouton défait aussi les dernières modifications de la session, une par une.",
-        cible: '[data-tuto="annuler"]',
-      },
-      {
-        titre: "Makina et Almanax",
-        texte:
-          "Choisis la makina conseillée par défaut (elle reste modifiable à chaque saisie). Les bonus d'Almanax liés à l'élevage (+20 % de génération cible, jauges doublées, capacité des bébés) sont appliqués automatiquement le jour venu, avec un bandeau pour te prévenir. Quand il y en a dans les 45 prochains jours, le bouton « 🌙 Almanax » en haut les liste.",
-        cible: '[data-tuto="accouplements"]',
+        titre: "Général",
+        texte: "La langue de Lignée : le français pour l'instant, d'autres langues viendront plus tard.",
+        cible: '[data-tuto="general"]',
         onglet: "parametres",
       },
       {
-        titre: "Ton métier d'Éleveur",
-        texte: "Indique ton niveau d'Éleveur : il donne le nombre d'enclos affichés dans l'onglet Enclos (un de plus aux paliers du jeu).",
+        titre: "Apparence",
+        texte:
+          "Thèmes (Doré, Iop, Sadida…) avec leur fond, image de fond (galerie officielle, ta propre image ou aucune), visibilité et flou de l'image, opacité des panneaux, animations (cartes, compteurs, confettis), lucioles en fond d'écran, et vue du tableau de bord : détaillée, ou compacte avec une ligne par action.",
+        cible: '[data-tuto="apparence"]',
+        onglet: "parametres",
+      },
+      {
+        titre: "Métier",
+        texte: "Ton niveau d'Éleveur : il donne le nombre d'enclos affichés dans l'onglet Enclos (un de plus aux paliers du jeu).",
         cible: '[data-tuto="metier"]',
         onglet: "parametres",
       },
       {
-        titre: "Suivi simple ou détaillé",
+        titre: "Étable",
         texte:
-          "Simple : tu comptes tes montures par couleur, toutes au niveau par défaut. Détaillé : chaque monture a sa fiche et son niveau, ce qui affine les chances. Tu peux changer quand tu veux.",
+          "Mode de suivi : Simple (des nombres par couleur, sexe et état, un seul niveau pour toutes) ou Détaillé (une fiche et un niveau par monture, qui affinent les chances). Niveau de tes montures, ou niveau par défaut des nouvelles. En détaillé, tu peux aussi afficher le nom des montures.",
         cible: '[data-tuto="reglages-etable"]',
         onglet: "parametres",
       },
       {
-        titre: "À ton goût",
-        texte: "Thèmes (Doré, Iop, Sadida…), fond d'écran (galerie officielle ou ta propre image), transparence, animations : tout se règle ici.",
-        cible: '[data-tuto="apparence"]',
+        titre: "Accouplements",
+        texte:
+          "La makina conseillée par défaut : Automatique, toujours Optimakina ou toujours Animakina (modifiable à chaque saisie). En Automatique, le seuil de l'Animakina fixe la chance de génération cible en dessous de laquelle on préfère l'Optimakina, même si le sexe compte. Les bonus d'Almanax d'élevage sont appliqués automatiquement le jour venu, rien à régler.",
+        cible: '[data-tuto="accouplements"]',
+        onglet: "parametres",
+      },
+      {
+        titre: "Minuteurs d'enclos",
+        texte:
+          "Saisie des jauges simple (par crans) ou avancée (valeur exacte), notifications Windows (Lignée ouverte), notifications Discord via le relais de ta guilde (même Lignée fermée, avec une mention pour toi seul) et rappel des bonus d'Almanax la veille à 20 h. Pas encore de relais ? « Copier ma demande » prépare le message pour celui qui le gère.",
+        cible: '[data-tuto="minuteurs"]',
+        onglet: "parametres",
+      },
+      {
+        titre: "Visite guidée",
+        texte: "Tous les chapitres de cette visite, à relancer quand tu veux, ensemble ou un par un.",
+        cible: '[data-tuto="visite"]',
+        onglet: "parametres",
+      },
+      {
+        titre: "Sauvegardes",
+        texte:
+          "Lignée enregistre toute seule. Exporter / Importer : ton élevage dans un fichier, pour un autre ordinateur. Copies automatiques : restaurables en un clic. Sauvegarde cloud : une copie dans OneDrive ou Google Drive (dossier « Lignée »), avec la liste des copies et « Restaurer ».",
+        cible: '[data-tuto="sauvegardes"]',
         onglet: "parametres",
       },
       {
@@ -421,13 +477,7 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
         onglet: "parametres",
       },
       {
-        titre: "Sauvegardes",
-        texte: "Lignée enregistre tout seul, et garde des copies automatiques. Tu peux aussi exporter ton élevage dans un fichier, et l'importer sur un autre ordinateur. Active la sauvegarde cloud (OneDrive ou Google Drive) pour avoir une copie à l'abri, restaurable en un clic.",
-        cible: '[data-tuto="sauvegardes"]',
-        onglet: "parametres",
-      },
-      {
-        titre: "Un souci ?",
+        titre: "Journal de diagnostic",
         texte: "Si quelque chose semble faux, « Exporter le diagnostic » crée un fichier (journal, sauvegarde, résumé du plan) à transmettre pour comprendre ce qui s'est passé.",
         cible: '[data-tuto="diagnostic"]',
         onglet: "parametres",
@@ -667,8 +717,8 @@ export function ProposerDidacticiel({ commencer, plusTard, refuser }: { commence
         <div>
           <h2 className="text-xl font-bold">Bienvenue dans Lignée !</h2>
           <p className="mt-2 text-sm text-text-secondary">
-            Veux-tu une visite guidée ? Cinq chapitres courts (≈ 9 minutes en tout) : le tour des écrans, comment gérer ton étable et suivre le tableau de bord en
-            t'exerçant sur une étable d'exemple, puis les minuteurs d'enclos et les réglages utiles.
+            Veux-tu une visite guidée ? Cinq chapitres courts (≈ 11 minutes en tout) : le tour des écrans, comment gérer ton étable et suivre le tableau de bord en
+            t'exerçant sur une étable d'exemple, puis les minuteurs d'enclos et tous les réglages.
           </p>
         </div>
         <div className="flex flex-wrap justify-center gap-2">

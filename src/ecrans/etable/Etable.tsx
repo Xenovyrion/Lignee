@@ -52,7 +52,7 @@ export function Etable({ famille, s, setS }: Props) {
   const plan = useMemo(() => planifier(famille, s.montures, s.obtenues[famille]), [famille, s.montures, s.obtenues]);
   const reservees = plan.reservees;
   const besoins = useMemo(
-    () => besoinsParCouleur(famille, s.montures, plan, conseiller(plan, { takeza: s.options.takeza, makina: s.options.makina }).captures),
+    () => besoinsParCouleur(famille, s.montures, plan, conseiller(plan, { takeza: s.options.takeza, makina: s.options.makina, seuilAnimakina: s.options.seuilAnimakina }).captures),
     [famille, s.montures, plan, s.options.takeza, s.options.makina],
   );
   const deLaFamille = useMemo(() => s.montures.filter((m) => m.famille === famille), [s.montures, famille]);
@@ -138,7 +138,7 @@ export function Etable({ famille, s, setS }: Props) {
             {affichees.length} / {deLaFamille.length} affichée(s)
           </span>
           {/* Remplissage de l'étable (500 places), par famille */}
-          <div className="flex min-w-[220px] flex-col gap-1" title={FAMILLES.map((f) => `${NOMS_FAMILLE[f]}s : ${s.montures.filter((m) => m.famille === f).length}`).join(" · ")}>
+          <div data-tuto="remplissage" className="flex min-w-[220px] flex-col gap-1" title={FAMILLES.map((f) => `${NOMS_FAMILLE[f]}s : ${s.montures.filter((m) => m.famille === f).length}`).join(" · ")}>
             <div className="flex h-2.5 overflow-hidden rounded-full bg-white/5 ring-1 ring-white/5">
               {FAMILLES.map((f) => (
                 <div

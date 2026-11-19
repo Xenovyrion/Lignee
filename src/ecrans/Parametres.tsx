@@ -53,7 +53,7 @@ export function Parametres({ s, setS, lancerDidacticiel }: Props) {
   };
   return (
     <div className="flex flex-col gap-4">
-      <Carte titre="Général">
+      <Carte tuto="general" titre="Général">
         <Ligne titre="Langue" aide="D'autres langues seront proposées plus tard.">
           <select className={champ} value={o.langue} onChange={(e) => maj({ langue: e.target.value as Options["langue"] })}>
             <option value="fr">Français</option>
@@ -160,6 +160,23 @@ export function Parametres({ s, setS, lancerDidacticiel }: Props) {
         <Ligne titre="Lucioles en fond d'écran" aide="Petites lueurs qui flottent lentement derrière le contenu.">
           <input type="checkbox" className="h-4 w-4 accent-accent" disabled={!o.animations} checked={o.particules && o.animations} onChange={(e) => maj({ particules: e.target.checked })} />
         </Ligne>
+        <Ligne
+          titre="Vue du tableau de bord"
+          aide="Détaillée : progression complète, tuiles, explications et grandes cartes d'action. Compacte : une ligne par action, comme le mode compagnon, sans les explications."
+        >
+          <div data-tuto="vue-compacte" className="flex rounded-lg border border-border-light p-0.5 text-sm">
+            {(
+              [
+                [false, "Détaillée"],
+                [true, "Compacte"],
+              ] as const
+            ).map(([v, l]) => (
+              <button key={l} onClick={() => maj({ vueCompacte: v })} className={`rounded-md px-3 py-1 ${!!o.vueCompacte === v ? "bg-accent-dim text-accent" : "text-text-secondary"}`}>
+                {l}
+              </button>
+            ))}
+          </div>
+        </Ligne>
       </Carte>
       <Carte tuto="metier" titre="Métier">
         <Ligne
@@ -231,21 +248,6 @@ export function Parametres({ s, setS, lancerDidacticiel }: Props) {
           </Ligne>
         )}
       </Carte>
-      <SectionEnclos s={s} maj={maj} />
-      {lancerDidacticiel && (
-        <Carte titre="Visite guidée">
-          <div className="flex flex-col gap-3">
-            <div className="text-sm text-text-secondary">
-              Cinq chapitres courts, à suivre dans l'ordre ou séparément. Les chapitres sur l'Étable et le tableau de bord utilisent une étable d'exemple : ta vraie
-              étable n'est pas touchée.
-            </div>
-            <ChoixChapitres lancer={lancerDidacticiel} />
-          </div>
-        </Carte>
-      )}
-      <SectionSauvegardes s={s} setS={setS} />
-      <SectionMiseAJour />
-      <SectionDiagnostic s={s} />
       <Carte tuto="accouplements" titre="Accouplements">
         <Ligne
           titre="Makina conseillée"
@@ -264,10 +266,43 @@ export function Parametres({ s, setS, lancerDidacticiel }: Props) {
             <option value="animakina">Toujours Animakina</option>
           </select>
         </Ligne>
+        <Ligne
+          titre="Seuil de l'Animakina"
+          aide={`En Automatique, quand le plan a besoin d'un sexe précis : Animakina (sexe garanti, sans bonus) seulement si elle garde au moins ${Math.round((o.seuilAnimakina ?? 0.8) * 100)} % de chance de génération cible, sinon Optimakina (+20 %, sexe au hasard). Parents niveau 100 : Animakina 60 %, Optimakina 80 %. Un bébé du mauvais sexe garde sa couleur, un échec de génération est à refaire.`}
+        >
+          <span className="flex items-center gap-2 text-sm">
+            <input
+              type="range"
+              min={50}
+              max={90}
+              step={5}
+              className="w-40 accent-accent"
+              disabled={(o.makina ?? "auto") !== "auto"}
+              value={Math.round((o.seuilAnimakina ?? 0.8) * 100)}
+              onChange={(e) => maj({ seuilAnimakina: Number(e.target.value) / 100 })}
+            />
+            <span className="w-10 text-right">{Math.round((o.seuilAnimakina ?? 0.8) * 100)} %</span>
+          </span>
+        </Ligne>
         <Ligne titre="Bonus Almanax" aide="Appliqués automatiquement le jour venu (+20 % de génération cible, jauges d'enclos doublées, capacité des bébés), avec un bandeau en haut de l'écran.">
           <span className="text-xs text-status-ok">Automatique</span>
         </Ligne>
       </Carte>
+      <SectionEnclos s={s} maj={maj} />
+      {lancerDidacticiel && (
+        <Carte tuto="visite" titre="Visite guidée">
+          <div className="flex flex-col gap-3">
+            <div className="text-sm text-text-secondary">
+              Cinq chapitres courts, à suivre dans l'ordre ou séparément. Les chapitres sur l'Étable et le tableau de bord utilisent une étable d'exemple : ta vraie
+              étable n'est pas touchée.
+            </div>
+            <ChoixChapitres lancer={lancerDidacticiel} />
+          </div>
+        </Carte>
+      )}
+      <SectionSauvegardes s={s} setS={setS} />
+      <SectionMiseAJour />
+      <SectionDiagnostic s={s} />
     </div>
   );
 }

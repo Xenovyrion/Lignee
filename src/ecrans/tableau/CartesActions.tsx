@@ -243,10 +243,15 @@ Pour 100 % avec Optimakina : niveaux cumulés ${a.niveauConseille} (actuellement
               de réussite
               <br />
               avec {NOM_MAKINA[a.makina.makina]}
+              {a.makina.autre && (
+                <span className="block text-text-muted">
+                  {NOM_MAKINA[a.makina.autre.makina]} : {pourcent(a.makina.autre.chance)}
+                </span>
+              )}
             </div>
           </div>
           <Bouton data-tuto="enregistrer" discret={!pret || ouvert} onClick={() => setOuvert(!ouvert)}>
-            {ouvert ? "Annuler" : "Enregistrer"}
+            {ouvert ? "Annuler" : "Valider naissance"}
           </Bouton>
         </>
       }
@@ -387,7 +392,7 @@ export function CarteClonage({ id, numero, famille, g, setS }: { id?: string; nu
       nombre={g.paires.length}
       droite={
         <Bouton discret={ouvert} onClick={() => setOuvert(!ouvert)}>
-          {ouvert ? "Annuler" : "Enregistrer"}
+          {ouvert ? "Annuler" : "Valider clonage"}
         </Bouton>
       }
       formulaire={ouvert && <FormClonages famille={famille} g={g} setS={setS} fermer={() => setOuvert(false)} />}
@@ -500,10 +505,9 @@ export function CartePreparer({ id, numero, famille, groupes, setS }: { id?: str
 
 // ---------------------------------------------------------------------------------------------
 
-export function CarteCapture({ id, numero, famille, capture, setS, niveau }: { id?: string; numero: number; famille: Famille; capture: ActionCapture; setS: SetS; niveau: number }) {
-  const [ouvert, setOuvert] = useState(false);
-  const prevues = (): Ligne[] => [{ couleur: capture.couleur, M: capture.M + Math.ceil(capture.libres / 2), F: capture.F + Math.floor(capture.libres / 2) }];
-  const [lignes, setLignes] = useState<Ligne[]>(prevues);
+/** Captures faites : nombres du plan pré-remplis (ajustables), ajoutées à l'étable en une fois. */
+export function FormCaptures({ famille, capture, setS, niveau, fermer }: { famille: Famille; capture: ActionCapture; setS: SetS; niveau: number; fermer: () => void }) {
+  const [lignes, setLignes] = useState<Ligne[]>([{ couleur: capture.couleur, M: capture.M + Math.ceil(capture.libres / 2), F: capture.F + Math.floor(capture.libres / 2) }]);
   const notifier = useNotifier();
   const valider = () => {
     notifier(`${total(lignes)} ${nomCouleur(famille, capture.couleur)} ajoutée${total(lignes) > 1 ? "s" : ""} à l'étable`, { annulable: true });
@@ -512,8 +516,23 @@ export function CarteCapture({ id, numero, famille, capture, setS, niveau }: { i
       r = ajusterStock(r, famille, capture.couleur, "F", "fertile", lignes[0].F, niveau);
       return r;
     });
-    setOuvert(false);
+    fermer();
   };
+  return (
+    <Formulaire>
+      <div className="text-text-secondary">Montures capturées</div>
+      <SaisieResultats famille={famille} lignes={lignes} setLignes={setLignes} couleursFixes />
+      <div>
+        <Bouton onClick={valider} disabled={total(lignes) < 1}>
+          Ajouter à l'étable
+        </Bouton>
+      </div>
+    </Formulaire>
+  );
+}
+
+export function CarteCapture({ id, numero, famille, capture, setS, niveau }: { id?: string; numero: number; famille: Famille; capture: ActionCapture; setS: SetS; niveau: number }) {
+  const [ouvert, setOuvert] = useState(false);
   return (
     <CadreAction
       id={id}
@@ -521,29 +540,12 @@ export function CarteCapture({ id, numero, famille, capture, setS, niveau }: { i
       type="capture"
       nombre={capture.nombre}
       droite={
-        <Bouton
-          discret={ouvert}
-          onClick={() => {
-            // À l'ouverture, repartir des nombres actuels du plan (ils changent après chaque saisie).
-            if (!ouvert) setLignes(prevues());
-            setOuvert(!ouvert);
-          }}
-        >
-          {ouvert ? "Annuler" : "Capturé"}
+        // Le formulaire est recréé à chaque ouverture : il repart des nombres actuels du plan.
+        <Bouton discret={ouvert} onClick={() => setOuvert(!ouvert)}>
+          {ouvert ? "Annuler" : "Valider capture"}
         </Bouton>
       }
-      formulaire={
-        ouvert && (
-          <Formulaire>
-            <SaisieResultats famille={famille} lignes={lignes} setLignes={setLignes} couleursFixes />
-            <div>
-              <Bouton onClick={valider} disabled={total(lignes) < 1}>
-                Ajouter à l'étable
-              </Bouton>
-            </div>
-          </Formulaire>
-        )
-      }
+      formulaire={ouvert && <FormCaptures famille={famille} capture={capture} setS={setS} niveau={niveau} fermer={() => setOuvert(false)} />}
     >
       <div className="flex flex-1 items-center gap-3">
         <ImageMonture famille={famille} id={capture.couleur} taille={52} />

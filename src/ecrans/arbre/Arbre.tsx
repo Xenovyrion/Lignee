@@ -24,7 +24,7 @@ export function Arbre({ famille, s, focus = null }: Props) {
   // Le plan d'élevage colore la carte : prochaines naissances (★) et couleurs à faire naître pour la suite.
   const { statut, prochaines, plan, dansPlan, seances } = useMemo(() => {
     const plan = planifier(famille, s.montures, s.obtenues[famille]);
-    const c = conseiller(plan, { takeza: s.options.takeza, makina: s.options.makina });
+    const c = conseiller(plan, { takeza: s.options.takeza, makina: s.options.makina, seuilAnimakina: s.options.seuilAnimakina });
     // Même numérotation que le tableau de bord (clonages compris).
     actionsMaintenant(c, regrouperClonages(suggererClonages(s.montures.filter((m) => m.famille === famille))));
     const roles = new Map<string, RolePlan>();

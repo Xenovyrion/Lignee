@@ -444,7 +444,7 @@ export function Guide({ allerA, lancerVisite }: { allerA: (o: OngletGuide) => vo
             certaines couleurs de génération impaire ont plusieurs recettes, et la chance se partage alors entre les couleurs possibles.
           </p>
           <Encadre ton="lignee">
-            Chaque carte <B>Naissance</B> donne la chance de réussite. Après l'accouplement en jeu, clique sur <B>Enregistrer</B> et indique ce qui est né (même un
+            Chaque carte <B>Naissance</B> donne la chance de réussite. Après l'accouplement en jeu, clique sur <B>Valider naissance</B> et indique ce qui est né (même un
             échec, avec <B>Croisement raté</B>) : le plan se recalcule.
           </Encadre>
         </Section>
