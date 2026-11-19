@@ -26,7 +26,7 @@ import { urlFond } from "./fond";
 import { appliquerPalette, themeParId } from "./themes";
 import type { Famille, Sauvegarde } from "./moteur/types";
 import { useSauvegarde } from "./stockage";
-import { BandeauAlmanax, useAlmanax } from "./ecrans/BandeauAlmanax";
+import { BandeauAlmanax, CalendrierAlmanax, useAlmanax } from "./ecrans/BandeauAlmanax";
 import { RechercheRapide, resultatsMontures, type Resultat } from "./ecrans/RechercheRapide";
 
 /** Réglages trouvables par la recherche rapide : repère (data-tuto) dans Paramètres, titre et mots-clés. */
@@ -109,6 +109,7 @@ export function App() {
   const [famille, setFamille] = useState<Famille>("dragodinde");
   const [onglet, setOnglet] = useState<Onglet>("actions");
   const [recherche, setRecherche] = useState(false);
+  const [calendrier, setCalendrier] = useState(false);
   const almanax = useAlmanax();
   const [focusArbre, setFocusArbre] = useState<{ f: Famille; id: string } | null>(null);
   useEffect(() => {
@@ -256,6 +257,9 @@ export function App() {
         montrer(repere);
       },
     })),
+    ...(almanax.prochains.length
+      ? [{ cle: "cmd-almanax", titre: "Calendrier de l'Almanax", detail: "Prochains bonus d'élevage", groupe: "Commandes" as const, icone: "🌙", aller: () => setCalendrier(true) }]
+      : []),
     { cle: "cmd-compagnon", titre: "Mode compagnon", detail: "Fenêtre compacte au premier plan, à côté du jeu", groupe: "Commandes", icone: "⤡", aller: () => basculerCompagnon(true) },
     { cle: "cmd-aide", titre: "Visite guidée de cet onglet", detail: CHAPITRES[chapitreDeLOnglet(onglet)].titre, groupe: "Commandes", icone: "?", mots: "aide didacticiel tutoriel", aller: () => lancerTuto(chapitreDeLOnglet(onglet)) },
     {
@@ -368,6 +372,7 @@ export function App() {
           </div>
         </header>
         <BandeauAlmanax jour={almanax.jour} aujourdhui={almanax.aujourdhui} demain={almanax.demain} />
+        {calendrier && almanax.prochains.length > 0 && <CalendrierAlmanax jour={almanax.jour} liste={almanax.prochains} fermer={() => setCalendrier(false)} />}
         {maj && <BandeauMiseAJour maj={maj} fermer={() => setMaj(null)} voirNouveautes={() => setNouveautes({ ouvert: true })} />}
       {nouveautes.ouvert && <NotesDeVersion miseEnAvant={nouveautes.version} fermer={fermerNouveautes} />}
         {!s.options.didacticiel && !tutoReporte && !tuto && !nouveautes.ouvert && (
@@ -401,6 +406,7 @@ export function App() {
           })}
           <span className="flex-1" />
           <button
+            data-tuto="recherche"
             onClick={() => setRecherche(true)}
             title="Recherche rapide : une couleur, un onglet, un réglage (Ctrl+K)"
             className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm text-text-secondary hover:bg-white/8 hover:text-text-primary"
@@ -408,6 +414,16 @@ export function App() {
             ⌕ Rechercher
             <kbd className="rounded border border-border-light px-1.5 text-[11px] text-text-muted">Ctrl K</kbd>
           </button>
+          {almanax.prochains.length > 0 && (
+            <button
+              data-tuto="almanax"
+              onClick={() => setCalendrier((x) => !x)}
+              title="Prochains bonus d'élevage de l'Almanax (45 jours)"
+              className={`flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm hover:bg-white/8 hover:text-text-primary ${calendrier ? "text-accent" : "text-text-secondary"}`}
+            >
+              🌙 Almanax
+            </button>
+          )}
           <button
             data-tuto="aide"
             onClick={() => lancerTuto(chapitreDeLOnglet(onglet))}

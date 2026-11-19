@@ -100,6 +100,12 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
         onglet: "guide",
       },
       {
+        titre: "Recherche rapide",
+        texte: "Ctrl+K (ou « Rechercher ») trouve tout de suite une couleur, un onglet, un réglage ou une commande : tape quelques lettres, puis Entrée.",
+        cible: '[data-tuto="recherche"]',
+        onglet: "actions",
+      },
+      {
         titre: "Besoin d'aide plus tard ?",
         texte: "Le bouton « ? Aide » relance le chapitre qui correspond à l'écran affiché. Tous les chapitres sont aussi dans les Paramètres.",
         cible: '[data-tuto="aide"]',
@@ -214,6 +220,12 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
         titre: "Le prochain objectif",
         texte: "La prochaine couleur à obtenir pour avancer dans les succès, et ce qu'il reste à faire naître pour compléter sa génération.",
         cible: '[data-tuto="objectif"]',
+        onglet: "actions",
+      },
+      {
+        titre: "Détaillée ou compacte",
+        texte: "Une fois habitué, passe en vue compacte : seulement les actions, sans les explications ni les tuiles.",
+        cible: '[data-tuto="vue-compacte"]',
         onglet: "actions",
       },
       {
@@ -339,7 +351,7 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
       {
         titre: "L'heure de fin et les alertes",
         texte:
-          "L'heure où l'enclos sera prêt, puis les alertes prévues : jauge vide avant la fin, sérénité qui sort de la zone, caractéristique qui ne progresse pas, chacune avec quoi faire. Avec une jauge de sérénité active, l'heure est une estimation.",
+          "L'heure où l'enclos sera prêt, puis les alertes prévues : jauge vide avant la fin, sérénité qui sort de la zone, caractéristique qui ne progresse pas, chacune avec quoi faire. Avec une jauge de sérénité active, l'heure est une estimation. Si l'Almanax double bientôt une de tes jauges, une ligne 🌙 te dit s'il vaut mieux attendre pour lancer.",
         cible: '[data-tuto="enclos-resultat"]',
         onglet: "enclos",
       },
@@ -353,7 +365,7 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
       {
         titre: "Être prévenu",
         texte:
-          "Dans les Paramètres : saisie simple ou avancée, notifications Windows (Lignée ouverte), et Discord via le relais de ta guilde, même Lignée fermée, avec une mention pour toi seul. Pas encore de relais ? « Copier ma demande » prépare le message à envoyer à celui qui le gère.",
+          "Dans les Paramètres : saisie simple ou avancée, notifications Windows (Lignée ouverte), et Discord via le relais de ta guilde, même Lignée fermée, avec une mention pour toi seul. Pas encore de relais ? « Copier ma demande » prépare le message à envoyer à celui qui le gère. Le relais peut aussi te rappeler la veille les bonus d'Almanax d'élevage.",
         cible: '[data-tuto="minuteurs"]',
         onglet: "parametres",
       },
@@ -379,7 +391,7 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
       {
         titre: "Makina et Almanax",
         texte:
-          "Choisis la makina conseillée par défaut (elle reste modifiable à chaque saisie). Les bonus d'Almanax liés à l'élevage (+20 % de génération cible, jauges doublées, capacité des bébés) sont appliqués automatiquement le jour venu, avec un bandeau pour te prévenir.",
+          "Choisis la makina conseillée par défaut (elle reste modifiable à chaque saisie). Les bonus d'Almanax liés à l'élevage (+20 % de génération cible, jauges doublées, capacité des bébés) sont appliqués automatiquement le jour venu, avec un bandeau pour te prévenir. Quand il y en a dans les 45 prochains jours, le bouton « 🌙 Almanax » en haut les liste.",
         cible: '[data-tuto="accouplements"]',
         onglet: "parametres",
       },
@@ -410,7 +422,7 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
       },
       {
         titre: "Sauvegardes",
-        texte: "Lignée enregistre tout seul, et garde des copies automatiques. Tu peux aussi exporter ton élevage dans un fichier, et l'importer sur un autre ordinateur.",
+        texte: "Lignée enregistre tout seul, et garde des copies automatiques. Tu peux aussi exporter ton élevage dans un fichier, et l'importer sur un autre ordinateur. Active la sauvegarde cloud (OneDrive ou Google Drive) pour avoir une copie à l'abri, restaurable en un clic.",
         cible: '[data-tuto="sauvegardes"]',
         onglet: "parametres",
       },

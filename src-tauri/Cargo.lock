@@ -2051,7 +2051,7 @@ dependencies = [
 
 [[package]]
 name = "lignee"
-version = "1.0.19"
+version = "1.0.20"
 dependencies = [
  "serde",
  "serde_json",

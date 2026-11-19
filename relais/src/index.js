@@ -35,6 +35,7 @@ const STYLES = {
   zone: { couleur: 0xf0a020, picto: "⚠️", appel: "a besoin de toi" },
   vide: { couleur: 0xe5534b, picto: "🪫", appel: "a besoin d'une recharge" },
   arret: { couleur: 0xe5534b, picto: "⛔", appel: "a besoin de toi" },
+  almanax: { couleur: 0x9b6cf0, picto: "🌙" },
   test: { couleur: 0x3fb6e3, picto: "🔔" },
 };
 /** Images du dépôt Lignée (logo et vignettes dessinées pour le projet, aucune image du jeu). */

@@ -24,7 +24,7 @@ import { nombreEnclos, prochainPalierEnclos } from "../../moteur/etable";
 import type { Sauvegarde } from "../../moteur/types";
 import { useNotifier } from "../../notifications";
 import { lireRelais } from "../../relais";
-import { simulerAlmanax } from "../../almanax";
+import { conseilLancement, simulerAlmanax } from "../../almanax";
 import { Bouton, champ } from "../../ui";
 
 type Charges = Record<TypeJauge, number>;
@@ -239,6 +239,8 @@ function CarteEnclos({ k, s, setS }: { k: number; s: Sauvegarde; setS: (f: (s: S
   };
   const apercu = useMemo(() => simulerAlmanax(aSimuler), [JSON.stringify(aSimuler)]); // eslint-disable-line react-hooks/exhaustive-deps
   const sim = useMemo(() => (m ? simulerAlmanax(m) : null), [m]);
+  // Jauge bientôt doublée par l'Almanax : vaut-il mieux attendre pour lancer ?
+  const conseil = useMemo(() => conseilLancement(aSimuler, Date.parse(aSimuler.debut)), [JSON.stringify(aSimuler)]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const basculer = (t: TypeJauge, charge?: number) =>
     setB((x) => {
@@ -412,6 +414,7 @@ function CarteEnclos({ k, s, setS }: { k: number; s: Sauvegarde; setS: (f: (s: S
                 <span className="text-sm font-medium text-status-err">Pas d'heure de fin : voir ci-dessous</span>
               )}
               {estimation && <span className="text-text-muted">Estimation : dépend de la sérénité réelle des montures.</span>}
+              {!enCours && conseil && <span className={conseil.attendre ? "font-medium text-accent" : "text-text-secondary"}>🌙 {conseil.texte}</span>}
               {evenements
                 .filter((e) => e.type !== "fin")
                 .map((e) => {

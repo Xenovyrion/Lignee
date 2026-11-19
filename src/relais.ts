@@ -4,7 +4,7 @@
 // L'adresse et la clé restent sur ce PC (localStorage) : elles ne sont ni dans la sauvegarde ni dans les exports.
 import { journaliser } from "./diagnostic";
 import { COURT, dependDeLaSerenite, type MinuteurEnclos } from "./moteur/enclos";
-import { simulerAlmanax } from "./almanax";
+import { rappelsAlmanax, simulerAlmanax } from "./almanax";
 
 const CLE_STOCKAGE = "lignee-relais";
 
@@ -14,6 +14,8 @@ export interface ConfigRelais {
   cle: string;
   /** Notifications Discord activées (la configuration est gardée quand on les coupe). */
   actif?: boolean;
+  /** Rappel la veille des bonus d'Almanax liés à l'élevage (activé par défaut). */
+  almanax?: boolean;
 }
 
 /** Configuration enregistrée, active ou non. */
@@ -102,5 +104,22 @@ export async function synchroniserRelais(enclos: number, m: MinuteurEnclos | und
     ? await appeler(`/planning/${groupe}`, { method: "PUT", body: JSON.stringify({ evenements: messagesMinuteur(m, `Enclos ${enclos}`) }) })
     : await appeler(`/planning/${groupe}`, { method: "DELETE" });
   if (!r.ok) journaliser("erreur", `Relais Discord (enclos ${enclos}) : ${r.erreur}`);
+  return r;
+}
+
+/**
+ * Programme les rappels Discord des prochains bonus d'Almanax (la veille à 20 h), ou les annule s'ils sont coupés.
+ * Un relais d'avant la 1.0.20 ne connaît pas le style « almanax » : on renvoie alors une version texte.
+ */
+export async function synchroniserAlmanaxRelais(c = lireRelais()) {
+  if (!c) return;
+  const chemin = "/planning/almanax";
+  const rappels = c.almanax === false ? [] : rappelsAlmanax();
+  let r = rappels.length
+    ? await appeler(chemin, { method: "PUT", body: JSON.stringify({ evenements: rappels }) }, c)
+    : await appeler(chemin, { method: "DELETE" }, c);
+  if (!r.ok && rappels.length)
+    r = await appeler(chemin, { method: "PUT", body: JSON.stringify({ evenements: rappels.map(({ at, message }) => ({ at, message: `🌙 ${message}` })) }) }, c);
+  if (!r.ok) journaliser("erreur", `Relais Discord (Almanax) : ${r.erreur}`);
   return r;
 }

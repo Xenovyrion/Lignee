@@ -4,7 +4,7 @@
 import { useState } from "react";
 import type { Options, Sauvegarde } from "../moteur/types";
 import { useNotifier } from "../notifications";
-import { ecrireRelais, lireConfigRelais, synchroniserRelais, testerRelais, urlRelaisValide } from "../relais";
+import { ecrireRelais, lireConfigRelais, lireRelais, synchroniserAlmanaxRelais, synchroniserRelais, testerRelais, urlRelaisValide } from "../relais";
 import { Bouton, Carte, champ } from "../ui";
 import { Ligne } from "./Parametres";
 
@@ -47,6 +47,8 @@ export function SectionEnclos({ s, maj }: { s: Sauvegarde; maj: (o: Partial<Opti
   /** Programme (actif) ou annule (inactif) les minuteurs en cours sur le relais. */
   const synchroniserTout = (programmer: boolean) => {
     for (let k = 1; k <= 6; k++) void synchroniserRelais(k, programmer ? s.minuteurs?.find((m) => m.enclos === k) : undefined);
+    const c = lireRelais();
+    if (c) void synchroniserAlmanaxRelais(programmer ? c : { ...c, almanax: false });
   };
   const tester = async () => {
     setOccupe(true);
@@ -102,6 +104,22 @@ export function SectionEnclos({ s, maj }: { s: Sauvegarde; maj: (o: Partial<Opti
       >
         <input type="checkbox" className="h-4 w-4 accent-accent" disabled={!enregistre} checked={actif} onChange={(e) => activer(e.target.checked)} />
       </Ligne>
+      {enregistre && (
+        <Ligne titre="Rappel Almanax sur Discord" aide="La veille à 20 h : bonus d'élevage du lendemain (+20 % de génération, jauge doublée, capacité des bébés).">
+          <input
+            type="checkbox"
+            className="h-4 w-4 accent-accent"
+            disabled={!actif}
+            checked={enregistre.almanax !== false}
+            onChange={(e) => {
+              const c = { ...enregistre, almanax: e.target.checked };
+              ecrireRelais(c);
+              setEnregistre(c);
+              void synchroniserAlmanaxRelais(c);
+            }}
+          />
+        </Ligne>
+      )}
       {!enregistre && (
         <div className="flex flex-col gap-2 rounded-lg border border-accent/30 bg-accent-dim/30 p-3 text-xs">
           <div className="font-semibold text-text-primary">Pas encore de relais ? Demande l'accès</div>

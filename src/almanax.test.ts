@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { concerneElevage, dateParis, effet, jourSuivant, minuitParis } from "./almanax";
+import { concerneElevage, conseilLancement, dateParis, effet, jourSuivant, minuitParis, rappelsAlmanax } from "./almanax";
 import { simuler } from "./moteur/enclos";
 
 const j = (description: string, id = "x") => ({ id, description });
@@ -32,5 +32,27 @@ describe("Almanax", () => {
     expect(double).toBe(10_000);
     // Une autre jauge doublée ne change rien.
     expect(simuler({ ...base, doubles: [{ type: "maturite", debut: 0, fin: Number.MAX_SAFE_INTEGER }] }).fin).toBe(normal);
+  });
+});
+
+describe("Conseils Almanax", () => {
+  const jours = [{ date: "2026-12-10", id: "x", nom: "Dragofesses", description: "Dans les enclos, l'effet des dragofesses est doublé." }];
+  const enclos = (charge: number) => ({ jauges: [{ type: "amour" as const, charge }], niveauDepart: 1, niveauCible: 1 });
+  const minuit = minuitParis("2026-12-10");
+
+  it("conseille d'attendre quand la charge ne suffit qu'avec le doublement", () => {
+    expect(conseilLancement(enclos(15_000), minuit - 10 * 3600_000, jours)?.attendre).toBe(true);
+  });
+  it("laisse lancer quand le bonus est déjà compté ou loin", () => {
+    expect(conseilLancement(enclos(80_000), minuit - 3600_000, jours)?.attendre).toBe(false);
+    expect(conseilLancement(enclos(80_000), minuit - 10 * 3600_000, jours)?.attendre).toBe(false);
+    expect(conseilLancement(enclos(80_000), minuit - 3 * 86400_000, jours)).toBeNull();
+    expect(conseilLancement(enclos(80_000), minuit + 3600_000, jours)).toBeNull();
+  });
+  it("programme le rappel la veille à 20 h (Paris)", () => {
+    const r = rappelsAlmanax(minuit - 2 * 86400_000, jours);
+    expect(r).toHaveLength(1);
+    expect(r[0].at).toBe(Date.UTC(2026, 11, 9, 19));
+    expect(rappelsAlmanax(minuit - 3600_000, jours)).toHaveLength(0);
   });
 });
