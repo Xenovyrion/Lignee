@@ -413,8 +413,15 @@ export function CarteClonage({ id, numero, famille, g, setS }: { id?: string; nu
 
 export function FormClonages({ famille, g, setS, fermer }: { famille: Famille; g: GroupeClonage; setS: SetS; fermer: () => void }) {
   const n0 = g.paires.length;
+  // Un clone garde le sexe de ses stériles : deux femelles donnent une femelle, deux mâles un mâle.
+  // Paire mixte : sexe au hasard, réparti moitié-moitié.
+  const memeSexe = (s: Sexe) => g.paires.filter((p) => p.a.sexe === s && p.b.sexe === s).length;
+  const mixtes = n0 - memeSexe("M") - memeSexe("F");
+  const sexes = { M: memeSexe("M") + Math.ceil(mixtes / 2), F: memeSexe("F") + Math.floor(mixtes / 2) };
   const [lignes, setLignes] = useState<Ligne[]>(
-    g.memeCouleur ? [{ couleur: g.couleurs[0], ...repartir(n0) }] : g.couleurs.map((c, i) => ({ couleur: c, ...repartir(i === 0 ? Math.ceil(n0 / 2) : Math.floor(n0 / 2)) })),
+    g.memeCouleur
+      ? [{ couleur: g.couleurs[0], ...sexes }]
+      : g.couleurs.map((c, i) => ({ couleur: c, ...(i === 0 ? { M: Math.ceil(sexes.M / 2), F: Math.ceil(sexes.F / 2) } : { M: Math.floor(sexes.M / 2), F: Math.floor(sexes.F / 2) }) })),
   );
   const n = total(lignes);
   const notifier = useNotifier();

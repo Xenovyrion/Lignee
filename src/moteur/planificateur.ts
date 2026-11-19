@@ -138,9 +138,14 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
     return { type: "naissance", etape: e };
   }
 
-  /** Sexe connu ou déjà décidé d'une source (un clone garde le sexe d'un de ses deux stériles). */
-  const sexeDe = (s: Source): Sexe | undefined =>
-    s.type === "monture" ? s.monture.sexe : s.type === "naissance" ? etapes[s.etape].sexeVoulu : s.type === "capture" ? s.sexe : undefined;
+  /** Sexe connu ou déjà décidé d'une source. Un clone garde le sexe de ses stériles : connu s'ils sont du même sexe. */
+  const sexeDe = (s: Source): Sexe | undefined => {
+    if (s.type === "monture") return s.monture.sexe;
+    if (s.type === "naissance") return etapes[s.etape].sexeVoulu;
+    if (s.type === "capture") return s.sexe;
+    const [x, y] = s.steriles;
+    return "monture" in x && "monture" in y && x.monture.sexe === y.monture.sexe ? x.monture.sexe : undefined;
+  };
   /** Décide le sexe d'une source encore libre (bébé à naître ou capture). */
   const fixerSexe = (s: Source, sexe: Sexe) => {
     if (s.type === "naissance" && !etapes[s.etape].sexeVoulu) etapes[s.etape].sexeVoulu = sexe;
@@ -156,11 +161,18 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
       if (k < meilleur) [meilleur, recette] = [k, r];
     }
     // Si les deux parents existent dans l'étable, choisir le sexe du premier pour que le second
-    // ait une monture du sexe opposé disponible.
-    const sexes = (c: string) => new Set((stock.get(c) ?? []).map((m) => m.sexe));
-    const sa = sexes(recette[0]);
-    const sb = sexes(recette[1]);
-    const sexeA: Sexe | undefined = sa.has("M") && sb.has("F") ? "M" : sa.has("F") && sb.has("M") ? "F" : undefined;
+    // ait une monture du sexe opposé disponible, en préférant le couple déjà fécond (prêt tout de suite)
+    // à un couple encore à préparer.
+    const a0 = stock.get(recette[0]) ?? [];
+    const b0 = stock.get(recette[1]) ?? [];
+    const couple = (sx: Sexe) => {
+      const pa = a0.filter((m) => m.sexe === sx);
+      const pb = b0.filter((m) => m.sexe === autreSexe(sx));
+      if (!pa.length || !pb.length) return -1;
+      return Number(pa.some((m) => m.etat === "feconde")) + Number(pb.some((m) => m.etat === "feconde"));
+    };
+    const [cm, cf] = [couple("M"), couple("F")];
+    const sexeA: Sexe | undefined = cm < 0 && cf < 0 ? undefined : cf > cm ? "F" : "M";
     const a = prendre(recette[0], sexeA);
     // Le second parent doit être de l'autre sexe : jamais deux mâles ou deux femelles.
     if (!sexeDe(a) && a.type !== "clone") fixerSexe(a, sexeA ?? "M");
@@ -236,8 +248,7 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
   // l'un d'eux avec une monture de même couleur et de sexe opposé réservée par une autre étape, si
   // l'autre parent de cette étape-là s'en accommode (monture de sexe opposé, clone, capture, ou
   // bébé dont le sexe n'est pas encore imposé).
-  const accepte = (src: Source, sexe: Sexe) =>
-    src.type === "monture" ? src.monture.sexe !== sexe : src.type === "naissance" ? etapes[src.etape].sexeVoulu !== sexe : true;
+  const accepte = (src: Source, sexe: Sexe) => sexeDe(src) !== sexe;
   etapes.forEach((e, i) => {
     if (!e.alerteSexe) return;
     const sexe = (e.parents[0] as { monture: Monture }).monture.sexe;
@@ -252,6 +263,7 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
           etapes[j].parents[coteJ] = { type: "monture", monture: x };
           e.parents[cote] = y;
           if (autre.type === "naissance") etapes[autre.etape].sexeVoulu = autreSexe(sexe);
+          if (autre.type === "capture") autre.sexe = autreSexe(sexe);
           e.alerteSexe = false;
           break;
         }

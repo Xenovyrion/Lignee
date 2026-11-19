@@ -115,6 +115,13 @@ describe("planificateur", () => {
     const clone = p.etapes.flatMap((e) => e.parents).find((s) => s.type === "clone" && s.couleur === "pourpre");
     expect(clone).toBeDefined();
   });
+  it("un clone de deux femelles est une femelle : l'autre parent sera un mâle", () => {
+    const p = planifier("dragodinde", [m("dragodinde", "amande", "F", { etat: "sterile" }), m("dragodinde", "amande", "F", { etat: "sterile" })], []);
+    const etape = p.etapes.find((e) => e.parents.some((s) => s.type === "clone" && s.couleur === "amande" && s.steriles.every((x) => "monture" in x)))!;
+    const autre = etape.parents.find((s) => s.type !== "clone")!;
+    const sexe = autre.type === "monture" ? autre.monture.sexe : autre.type === "naissance" ? p.etapes[autre.etape].sexeVoulu : autre.type === "capture" ? autre.sexe : undefined;
+    expect(sexe).toBe("M");
+  });
   it("choisit les sexes pour former un couple quand c'est possible", () => {
     const obtenues = couleurs("dragodinde").filter((c) => c.generation <= 4).map((c) => c.id);
     const etable = [m("dragodinde", "amande_rousse", "F"), m("dragodinde", "amande_rousse", "M"), m("dragodinde", "ebene_indigo", "M")];
