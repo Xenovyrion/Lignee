@@ -1,4 +1,5 @@
 import brut from "../donnees/arbres_croisements_3.7.json";
+import carac from "../donnees/caracteristiques_3.7.json";
 import type { Couleur, Famille } from "./types";
 
 export const FAMILLES: Famille[] = ["dragodinde", "muldo", "volkorne"];
@@ -24,6 +25,14 @@ export function couleur(f: Famille, id: string): Couleur {
 }
 
 export const nomCouleur = (f: Famille, id: string) => index[f].get(id)?.nom ?? id;
+
+/**
+ * Bonus de la monture au niveau maximum (source : dofuspourlesnoobs.com, plus à jour que DofusDB), ex. [["Vitalité", 400], ["Puissance", 90]].
+ * null si la couleur manque dans les données.
+ */
+export function caracteristiques(f: Famille, id: string): [string, number][] | null {
+  return (carac.familles as unknown as Record<Famille, Record<string, [string, number][] | undefined>>)[f][id] ?? null;
+}
 
 /** Couleurs comptant pour les succès de génération (G2 à G10). */
 export const objectifs = (f: Famille) => parFamille[f].filter((c) => c.generation > 1);

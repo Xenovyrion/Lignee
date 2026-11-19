@@ -293,7 +293,7 @@ export function Parametres({ s, setS, lancerDidacticiel }: Props) {
         <Carte tuto="visite" titre="Visite guidée">
           <div className="flex flex-col gap-3">
             <div className="text-sm text-text-secondary">
-              Cinq chapitres courts, à suivre dans l'ordre ou séparément. Les chapitres sur l'Étable et le tableau de bord utilisent une étable d'exemple : ta vraie
+              Six chapitres courts, à suivre dans l'ordre ou séparément. Les chapitres sur l'Étable, le tableau de bord et l'arbre utilisent une étable d'exemple : ta vraie
               étable n'est pas touchée.
             </div>
             <ChoixChapitres lancer={lancerDidacticiel} />

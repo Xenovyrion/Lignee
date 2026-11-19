@@ -1,7 +1,7 @@
 {
   "name": "lignee",
   "private": true,
-  "version": "1.0.22",
+  "version": "1.0.23",
   "type": "module",
   "description": "Outil de pilotage de l'élevage pour Dofus 3.7 (Dragodindes, Muldos, Volkornes)",
   "license": "SEE LICENSE IN LICENSE",

@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { actionsMaintenant, conseiller, seancesDesEtapes, type ActionAccouplement } from "../../moteur/conseils";
-import { couleur, nomCouleur } from "../../moteur/donnees";
+import { caracteristiques, couleur, couleurs, nomCouleur } from "../../moteur/donnees";
 import { enfantsDe, lignee } from "../../moteur/genealogie";
 import { planifier, regrouperClonages, suggererClonages, type Plan } from "../../moteur/planificateur";
 import type { Famille, Sauvegarde } from "../../moteur/types";
@@ -53,7 +53,9 @@ export function Arbre({ famille, s, focus = null }: Props) {
           <span className="font-semibold">Carte des lignées</span>
           <span className="text-xs text-text-muted">glisser pour déplacer · molette pour zoomer · survol : parents et enfants · clic : toute la lignée · Échap : désélectionner</span>
           <span className="flex-1" />
-          <Segments
+          <RechercheCarte famille={famille} choisir={setSelection} />
+          <span data-tuto="arbre-filtres">
+            <Segments
             petit
             valeur={filtre}
             onChange={setFiltre}
@@ -61,16 +63,19 @@ export function Arbre({ famille, s, focus = null }: Props) {
               { valeur: "tout", libelle: "Tout" },
               { valeur: "plan", libelle: "Mon plan", titre: "Seulement les couleurs à faire naître et leurs parents" },
               { valeur: "manquantes", libelle: "Manquantes", titre: "Seulement les couleurs jamais obtenues" },
-            ]}
-          />
+              ]}
+            />
+          </span>
         </div>
-        <div className="min-h-0 flex-1">
+        <div className="min-h-0 flex-1" data-tuto="arbre-carte">
           <CarteLignee famille={famille} statut={statut} selection={selection} setSelection={setSelection} survol={survol} setSurvol={setSurvol} filtre={filtre} dansPlan={dansPlan} />
         </div>
-        <Legende ouverte={legende} basculer={() => setLegende(!legende)} />
+        <div data-tuto="arbre-legende">
+          <Legende ouverte={legende} basculer={() => setLegende(!legende)} />
+        </div>
       </div>
 
-      <aside className="w-80 shrink-0 overflow-y-auto rounded-xl border border-border bg-bg-card p-4">
+      <aside data-tuto="arbre-detail" className="w-80 shrink-0 overflow-y-auto rounded-xl border border-border bg-bg-card p-4">
         {detail ? (
           <Detail famille={famille} id={detail} statut={statut} plan={plan} seances={seances} choisir={setSelection} selectionnee={detail === selection} />
         ) : (
@@ -116,6 +121,85 @@ function Legende({ ouverte, basculer }: { ouverte: boolean; basculer: () => void
           <span className="flex items-center gap-1.5">
             <span className="h-0.5 w-5 rounded bg-sky-400" /> Ce qu'elle débloque
           </span>
+        </>
+      )}
+    </div>
+  );
+}
+
+/** Recherche d'une couleur sur la carte : Entrée sélectionne la première trouvée et la centre. */
+function RechercheCarte({ famille, choisir }: { famille: Famille; choisir: (id: string) => void }) {
+  const [texte, setTexte] = useState("");
+  const norm = (x: string) => x.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const trouvees = texte.trim() ? couleurs(famille).filter((c) => norm(c.nom).includes(norm(texte.trim()))) : [];
+  const valider = (id: string) => {
+    choisir(id);
+    setTexte("");
+  };
+  return (
+    <div className="relative" data-tuto="arbre-recherche">
+      <input
+        value={texte}
+        onChange={(e) => setTexte(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && trouvees[0]) valider(trouvees[0].id);
+          if (e.key === "Escape") setTexte("");
+        }}
+        placeholder="⌕ Trouver une couleur…"
+        className="w-48 rounded-lg border border-border-light bg-bg-card px-2 py-1 text-xs outline-none focus:border-accent"
+      />
+      {trouvees.length > 0 && (
+        <div className="surface absolute left-0 top-full z-20 mt-1 flex max-h-72 w-60 flex-col overflow-y-auto rounded-lg border border-border-light p-1 shadow-xl">
+          {trouvees.slice(0, 12).map((c) => (
+            <button key={c.id} onClick={() => valider(c.id)} className="flex items-center gap-2 rounded px-1.5 py-1 text-left text-xs hover:bg-bg-hover">
+              <ImageMonture famille={famille} id={c.id} taille={20} />
+              <span className="flex-1 truncate">{c.nom}</span>
+              <span className="text-[10px] text-text-muted">G{c.generation}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Bloc repliable au-delà de `max` éléments. */
+function Repliable<T>({ items, max, rendu, quoi }: { items: T[]; max: number; rendu: (x: T) => ReactNode; quoi: string }) {
+  const [tout, setTout] = useState(false);
+  const visibles = tout || items.length <= max + 1 ? items : items.slice(0, max);
+  return (
+    <>
+      {visibles.map(rendu)}
+      {items.length > max + 1 && (
+        <button onClick={() => setTout(!tout)} className="self-start text-[11px] text-accent hover:underline">
+          {tout ? "▴ Réduire" : `▾ Voir ${items.length - max} ${quoi} de plus`}
+        </button>
+      )}
+    </>
+  );
+}
+
+/** Caractéristiques au niveau maximum, en pastilles sur deux colonnes. */
+function Caracteristiques({ famille, id }: { famille: Famille; id: string }) {
+  const liste = caracteristiques(famille, id);
+  return (
+    <div data-tuto="arbre-carac">
+      <TitreSection>Caractéristiques</TitreSection>
+      {liste === null ? (
+        <p className="text-xs text-text-muted">Pas encore connues.</p>
+      ) : liste.length === 0 ? (
+        <p className="text-xs text-text-muted">Aucune.</p>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 gap-1">
+            {liste.map(([nom, v]) => (
+              <span key={nom} className="flex items-baseline gap-1 truncate rounded-md border border-border-light bg-bg-secondary px-1.5 py-0.5 text-xs" title={`+${v} ${nom}`}>
+                <b className="text-status-ok">+{v}</b>
+                <span className="truncate text-text-secondary">{nom}</span>
+              </span>
+            ))}
+          </div>
+          <p className="mt-1 text-[10px] text-text-muted">Au niveau maximum de la monture.</p>
         </>
       )}
     </div>
@@ -174,37 +258,50 @@ function Detail(p: { famille: Famille; id: string; statut: (id: string) => Statu
         {!p.selectionnee && <div className="mt-1 text-[11px] text-text-muted">Clique pour la sélectionner et voir toute sa lignée.</div>}
       </div>
 
+      <Caracteristiques famille={famille} id={id} />
+
       {chemin.length > 0 && (
         <div>
-          <TitreSection>Comment l'obtenir</TitreSection>
+          <TitreSection>
+            Comment l'obtenir ({chemin.length} étape{chemin.length > 1 ? "s" : ""})
+          </TitreSection>
           <ol className="flex flex-col gap-1">
-            {chemin.map((i) => {
-              const e = p.plan.etapes[i];
-              const s = p.statut(e.couleur);
-              return (
-                <li key={i} className="flex items-center gap-2 rounded-lg border border-border-light bg-bg-secondary px-2 py-1">
-                  <ImageMonture famille={famille} id={e.recette[0]} taille={20} />
-                  <span className="text-text-muted">×</span>
-                  <ImageMonture famille={famille} id={e.recette[1]} taille={20} />
-                  <span className="text-accent">→</span>
-                  <button className="min-w-0 flex-1 truncate text-left text-xs hover:text-accent" onClick={() => p.choisir(e.couleur)}>
-                    {nomCouleur(famille, e.couleur)}
-                  </button>
-                  {s.rang && p.seances[i] === 1 ? (
-                    <Etoile rang={s.rang} pret={s.plan === "pret"} taille={18} />
-                  ) : (
-                    <span className="shrink-0 text-[10px] text-text-muted">{p.seances[i] === 1 ? "maintenant" : `séance ${p.seances[i]}`}</span>
-                  )}
-                </li>
-              );
-            })}
+            <Repliable
+              items={chemin}
+              max={6}
+              quoi="étapes"
+              rendu={(i) => {
+                const e = p.plan.etapes[i];
+                const s = p.statut(e.couleur);
+                return (
+                  <li key={i}>
+                    <button
+                      onClick={() => p.choisir(e.couleur)}
+                      title="Sélectionner sur la carte"
+                      className="flex w-full items-center gap-2 rounded-lg border border-border-light bg-bg-secondary px-2 py-1 text-left hover:border-accent/60 hover:bg-bg-hover"
+                    >
+                      <ImageMonture famille={famille} id={e.recette[0]} taille={20} />
+                      <span className="text-text-muted">×</span>
+                      <ImageMonture famille={famille} id={e.recette[1]} taille={20} />
+                      <span className="text-accent">→</span>
+                      <span className="min-w-0 flex-1 truncate text-xs">{nomCouleur(famille, e.couleur)}</span>
+                      {s.rang && p.seances[i] === 1 ? (
+                        <Etoile rang={s.rang} pret={s.plan === "pret"} taille={18} />
+                      ) : (
+                        <span className="shrink-0 text-[10px] text-text-muted">{p.seances[i] === 1 ? "maintenant" : `séance ${p.seances[i]}`}</span>
+                      )}
+                    </button>
+                  </li>
+                );
+              }}
+            />
           </ol>
         </div>
       )}
 
       {c.recettes.length > 0 && (
         <div>
-          <TitreSection>{c.recettes.length > 1 ? `${c.recettes.length} recettes` : "Recette"}</TitreSection>
+          <TitreSection>{c.recettes.length > 1 ? `Parents possibles (${c.recettes.length})` : "Parents possibles"}</TitreSection>
           <div className="flex flex-col gap-1">
             {c.recettes.map(([a, b], i) => (
               <div key={i} className="flex flex-wrap items-center gap-1">
@@ -219,9 +316,7 @@ function Detail(p: { famille: Famille; id: string; statut: (id: string) => Statu
         <div>
           <TitreSection>Ce qu'elle débloque ({enfants.length})</TitreSection>
           <div className="flex flex-wrap gap-1">
-            {enfants.map((x) => (
-              <Puce key={x} famille={famille} x={x} choisir={p.choisir} />
-            ))}
+            <Repliable items={enfants} max={8} quoi="couleurs" rendu={(x) => <Puce key={x} famille={famille} x={x} choisir={p.choisir} />} />
           </div>
         </div>
       )}

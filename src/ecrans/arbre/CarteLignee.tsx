@@ -262,10 +262,20 @@ export function CarteLignee({ famille, statut, selection, setSelection, survol, 
                     <Etoile rang={st.rang} pret={st.plan === "pret"} />
                   </span>
                 )}
+                {st.males + st.femelles > 0 && (
+                  <span
+                    className="absolute -bottom-1 -left-2 rounded-full border border-border-light bg-bg-card px-1 text-[9px] font-semibold leading-3.5"
+                    title={`En stock : ${st.males} ♂ · ${st.femelles} ♀`}
+                  >
+                    <span className="text-sky-400">{st.males}</span>
+                    <span className="text-text-muted">·</span>
+                    <span className="text-pink-400">{st.femelles}</span>
+                  </span>
+                )}
                 {st.plan === "produire" && !st.rang && <span className="absolute -inset-1.5 rounded-full border-2 border-dashed" style={{ borderColor: COULEURS.produire }} />}
               </div>
               {(avecNoms || allumes.has(id)) && (
-                <span className={`mt-1 max-w-full truncate rounded px-1 text-[11px] leading-4 ${choisi ? "bg-accent-dim font-semibold text-accent" : "text-text-secondary"}`}>{nom}</span>
+                <span className={`mt-1 line-clamp-2 max-w-full rounded px-1 text-center text-[10.5px] leading-3 ${choisi ? "bg-accent-dim font-semibold text-accent" : "text-text-secondary"}`}>{nom}</span>
               )}
             </div>
           );

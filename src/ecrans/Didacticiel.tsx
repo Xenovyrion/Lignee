@@ -8,7 +8,7 @@ import type { Sauvegarde } from "../moteur/types";
 import { Bouton } from "../ui";
 
 export type OngletTuto = "actions" | "etable" | "enclos" | "arbre" | "succes" | "guide" | "parametres";
-export type Chapitre = "decouverte" | "etable" | "tableau" | "enclos" | "quotidien";
+export type Chapitre = "decouverte" | "etable" | "tableau" | "enclos" | "arbre" | "quotidien";
 
 interface EtapeTuto {
   titre: string;
@@ -326,7 +326,7 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
       {
         titre: "Préparer les montures",
         texte:
-          "Les montures fertiles dont le plan a besoin : mets-les en enclos pour remplir leurs jauges. Quand elles sont fécondes en jeu, clique sur le sexe concerné ou « Toutes prêtes ».",
+          "Les montures fertiles dont le plan a besoin : mets-les en enclos pour remplir Endurance, Maturité et Amour (10 montures par enclos). Quand elles sont fécondes en jeu, clique sur le sexe concerné ou « Toutes prêtes ».",
         cible: '#actions li[data-type="preparer"]',
         onglet: "actions",
       },
@@ -411,6 +411,48 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
     ],
   },
 
+  arbre: {
+    titre: "L'arbre des couleurs",
+    resume: "Trouver une couleur, voir ses caractéristiques, ses parents et le chemin pour l'obtenir.",
+    duree: "1 min",
+    demo: true,
+    etapes: [
+      {
+        titre: "Trouver une couleur",
+        texte: "Tape une partie du nom : la liste propose les couleurs de la famille, Entrée sélectionne la première et centre la carte dessus.",
+        cible: '[data-tuto="arbre-recherche"]',
+        onglet: "arbre",
+      },
+      {
+        titre: "Filtrer la carte",
+        texte: "« Tout » montre chaque couleur ; « Mon plan » seulement celles à faire naître et leurs parents ; « Manquantes » celles jamais obtenues. Les autres sont estompées.",
+        cible: '[data-tuto="arbre-filtres"]',
+        onglet: "arbre",
+      },
+      {
+        titre: "La carte des lignées",
+        texte:
+          "Une colonne par génération. Glisse pour te déplacer, molette pour zoomer, boutons + − ⤢ en haut à gauche, mini-carte en bas à droite. Au survol : parents et enfants directs. La pastille sous une couleur donne ton stock (♂ · ♀).",
+        cible: '[data-tuto="arbre-carte"]',
+        onglet: "arbre",
+        action: { consigne: "Clique une couleur sur la carte.", fait: existe('[data-tuto="arbre-carac"]') },
+      },
+      {
+        titre: "La légende",
+        texte: "Obtenue (✓), prochaine étape avec son numéro du tableau de bord, à produire pour la suite (tirets orange), jamais obtenue (tirets gris). Liens dorés : d'où elle vient ; bleus : ce qu'elle débloque. Repliable.",
+        cible: '[data-tuto="arbre-legende"]',
+        onglet: "arbre",
+      },
+      {
+        titre: "Le détail d'une couleur",
+        texte:
+          "De haut en bas : génération, naissance obtenue ou non et stock ; ses caractéristiques au niveau maximum ; « Comment l'obtenir », les étapes de ton plan avec leur séance (clic : la sélectionner) ; les parents possibles ; ce qu'elle débloque. Les longues listes se déplient.",
+        cible: '[data-tuto="arbre-detail"]',
+        onglet: "arbre",
+      },
+    ],
+  },
+
   quotidien: {
     titre: "Les paramètres",
     resume: "Chaque réglage de Lignée, dans l'ordre de la page.",
@@ -486,11 +528,11 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
   },
 };
 
-const ORDRE: Chapitre[] = ["decouverte", "etable", "tableau", "enclos", "quotidien"];
+const ORDRE: Chapitre[] = ["decouverte", "etable", "tableau", "enclos", "arbre", "quotidien"];
 
 /** Chapitre qui correspond à l'écran affiché (bouton « ? Aide »). */
 export const chapitreDeLOnglet = (o: OngletTuto): Chapitre =>
-  o === "etable" ? "etable" : o === "actions" ? "tableau" : o === "enclos" ? "enclos" : o === "parametres" ? "quotidien" : "decouverte";
+  o === "etable" ? "etable" : o === "actions" ? "tableau" : o === "enclos" ? "enclos" : o === "arbre" ? "arbre" : o === "parametres" ? "quotidien" : "decouverte";
 
 /** Position de l'élément ciblé, suivie en continu (défilement, redimensionnement, contenu qui change). */
 function useRect(cible?: string) {
@@ -717,8 +759,8 @@ export function ProposerDidacticiel({ commencer, plusTard, refuser }: { commence
         <div>
           <h2 className="text-xl font-bold">Bienvenue dans Lignée !</h2>
           <p className="mt-2 text-sm text-text-secondary">
-            Veux-tu une visite guidée ? Cinq chapitres courts (≈ 11 minutes en tout) : le tour des écrans, comment gérer ton étable et suivre le tableau de bord en
-            t'exerçant sur une étable d'exemple, puis les minuteurs d'enclos et tous les réglages.
+            Veux-tu une visite guidée ? Six chapitres courts (≈ 12 minutes en tout) : le tour des écrans, comment gérer ton étable et suivre le tableau de bord en
+            t'exerçant sur une étable d'exemple, puis les minuteurs d'enclos, l'arbre des couleurs et tous les réglages.
           </p>
         </div>
         <div className="flex flex-wrap justify-center gap-2">

@@ -92,46 +92,46 @@ const B = ({ children }: { children: ReactNode }) => <b className="text-text-pri
 // ---------------------------------------------------------------------------------------------
 // Schémas
 
-/** Le cycle d'élevage : capturer, préparer, accoupler, cloner. */
+/** Le cycle d'élevage : capturer, préparer, accoupler, cloner, puis recommencer. */
 function SchemaCycle() {
+  const L = 176; // largeur d'une case
+  const H = 58;
   const etapes = [
-    { x: 90, y: 70, titre: "Capturer", texte: "montures G1 au filet" },
-    { x: 300, y: 70, titre: "Préparer", texte: "jauges en enclos → féconde" },
-    { x: 510, y: 70, titre: "Accoupler", texte: "1 bébé, parents stériles" },
-    { x: 405, y: 190, titre: "Cloner", texte: "2 stériles → 1 fertile" },
-    { x: 195, y: 190, titre: "Recommencer", texte: "avec bébés et clones" },
+    { x: 100, y: 60, titre: "Capturer", texte: "montures G1 au filet" },
+    { x: 320, y: 60, titre: "Préparer", texte: "jauges en enclos → féconde" },
+    { x: 540, y: 60, titre: "Accoupler", texte: "1 bébé, parents stériles" },
+    { x: 430, y: 180, titre: "Cloner", texte: "2 stériles → 1 fertile" },
+    { x: 210, y: 180, titre: "Recommencer", texte: "avec bébés et clones" },
   ];
+  // Flèches d'un bord de case à l'autre : droites sur une même rangée, courbes pour changer de rangée.
   const fleches = [
-    [0, 1],
-    [1, 2],
-    [2, 3],
-    [3, 4],
-    [4, 1],
+    "M190,60 H226",
+    "M410,60 H446",
+    "M540,91 C540,150 540,180 526,180",
+    "M340,180 H304",
+    "M210,149 C210,118 320,124 320,97",
   ];
   return (
-    <svg viewBox="0 0 600 250" className="w-full max-w-2xl self-center" role="img" aria-label="Cycle de l'élevage">
+    <svg viewBox="0 0 640 225" className="w-full max-w-2xl self-center" role="img" aria-label="Cycle de l'élevage">
       <defs>
-        <marker id="fleche-guide" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <marker id="fleche-guide" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
           <path d="M0 0 10 5 0 10z" fill="var(--color-accent)" />
         </marker>
       </defs>
-      {fleches.map(([a, b]) => {
-        const p = etapes[a];
-        const q = etapes[b];
-        const dx = q.x - p.x;
-        const dy = q.y - p.y;
-        const d = Math.hypot(dx, dy);
-        const k = 72 / d;
-        const k2 = 78 / d;
-        return <line key={`${a}-${b}`} x1={p.x + dx * k} y1={p.y + dy * k * 0.5} x2={q.x - dx * k2} y2={q.y - dy * k2 * 0.5} stroke="var(--color-accent)" strokeWidth="2" markerEnd="url(#fleche-guide)" opacity="0.8" />;
-      })}
-      {etapes.map((e) => (
+      {fleches.map((d, i) => (
+        <path key={i} d={d} fill="none" stroke="var(--color-accent)" strokeWidth="2" strokeLinecap="round" strokeDasharray={i === 4 ? "5 4" : undefined} markerEnd="url(#fleche-guide)" opacity="0.85" />
+      ))}
+      {etapes.map((e, i) => (
         <g key={e.titre}>
-          <rect x={e.x - 78} y={e.y - 30} width="156" height="60" rx="14" fill="var(--color-bg-secondary)" stroke="var(--color-border-light)" />
-          <text x={e.x} y={e.y - 5} textAnchor="middle" fontSize="15" fontWeight="700" fill="var(--color-text-primary)">
+          <rect x={e.x - L / 2} y={e.y - H / 2} width={L} height={H} rx="14" fill="var(--color-bg-secondary)" stroke="var(--color-border-light)" />
+          <circle cx={e.x - L / 2 + 16} cy={e.y - 9} r="9" fill="var(--color-accent)" />
+          <text x={e.x - L / 2 + 16} y={e.y - 5.5} textAnchor="middle" fontSize="10.5" fontWeight="700" fill="var(--color-accent-texte)">
+            {i + 1}
+          </text>
+          <text x={e.x + 8} y={e.y - 4} textAnchor="middle" fontSize="15" fontWeight="700" fill="var(--color-text-primary)">
             {e.titre}
           </text>
-          <text x={e.x} y={e.y + 15} textAnchor="middle" fontSize="11.5" fill="var(--color-text-muted)">
+          <text x={e.x} y={e.y + 17} textAnchor="middle" fontSize="11.5" fill="var(--color-text-muted)">
             {e.texte}
           </text>
         </g>
@@ -476,7 +476,8 @@ export function Guide({ allerA, lancerVisite }: { allerA: (o: OngletGuide) => vo
             L'<B>Optimakina</B> est la plus utile dès que tu avances dans les générations. L'Animakina sert quand il te manque un sexe précis.
           </Encadre>
           <Encadre ton="lignee">
-            Choisis ta makina préférée dans <Lien vers="parametres">Paramètres → Accouplements</Lien> : les chances affichées en tiennent compte.
+            Choisis ta makina préférée dans <Lien vers="parametres">Paramètres → Accouplements</Lien> : les chances affichées en tiennent compte. En Automatique, le
+            seuil de l'Animakina décide quand préférer le sexe garanti à la chance de génération.
           </Encadre>
         </Section>
 
@@ -542,7 +543,7 @@ export function Guide({ allerA, lancerVisite }: { allerA: (o: OngletGuide) => vo
               <B>Monte les niveaux</B> des parents des générations hautes, et utilise l'<B>Optimakina</B> dès que les générations deviennent chères.
             </li>
             <li>
-              Garde tes accouplements importants pour les jours d'<B>Almanax</B> à +20 % de chance de génération cible : Lignée te prévient la veille.
+              Garde tes accouplements importants pour les jours d'<B>Almanax</B> à +20 % de chance de génération cible : Lignée les affiche (bouton 🌙 Almanax) et peut te prévenir la veille sur Discord.
             </li>
             <li>
               Les accouplements qui dépassent la plus haute génération de l'arbre rapportent des <B>génétons</B>, à échanger au Village des Éleveurs.
@@ -584,7 +585,7 @@ export function Guide({ allerA, lancerVisite }: { allerA: (o: OngletGuide) => vo
           <a className="text-accent hover:underline" href="https://www.dofuspourlesnoobs.com/guide-de-l-eleveur.html" target="_blank" rel="noreferrer">
             guide de l'éleveur de Dofus pour les noobs
           </a>
-          , les données du jeu (DofusDB) et les patch notes. Images des montures © Ankama, chargées depuis DofusDB. En cas de doute, l'interface de génétique du jeu
+          , ses pages Dragodindes, Muldos et Volkornes (caractéristiques des montures), les données du jeu (DofusDB) et les patch notes. Images des montures © Ankama, chargées depuis DofusDB. En cas de doute, l'interface de génétique du jeu
           fait foi.
         </p>
       </div>

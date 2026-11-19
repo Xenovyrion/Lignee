@@ -472,7 +472,7 @@ export function CartePreparer({ id, numero, famille, groupes, setS }: { id?: str
         <Bouton onClick={() => toutesPretes(groupes)} title="Toutes les jauges sont remplies : tout passer en Féconde">
           ✓ Toutes prêtes ({nb})
         </Bouton>
-      } pied={<span>Remplis Endurance, Maturité et Amour en enclos (≈ {Math.ceil(nb / 10)} enclos de 10), puis clique « ✓ » quand elles sont prêtes.</span>}>
+      }>
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         {preparationParGeneration(famille, groupes).map(({ generation, couleurs }) => (
           <div key={generation} className="flex flex-wrap items-center gap-2">

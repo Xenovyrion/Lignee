@@ -112,21 +112,30 @@ export function SaisieRapide({ famille, niveauDefaut, sansNiveau, ajouter, ferme
           <option key={c.id} value={`${c.nom} (G${c.generation})`} />
         ))}
       </datalist>
-      <table className="w-full text-sm">
-        <thead className="text-left text-xs uppercase text-text-muted">
+      {/* Colonnes de largeur fixe : les champs restent groupés au lieu de s'étaler sur toute la largeur. */}
+      <table className="w-full max-w-3xl table-fixed text-sm">
+        <colgroup>
+          <col />
+          <col className="w-24" />
+          <col className="w-24" />
+          {!sansNiveau && <col className="w-24" />}
+          <col className="w-36" />
+          <col className="w-8" />
+        </colgroup>
+        <thead className="text-left text-xs font-semibold uppercase tracking-wide text-text-muted">
           <tr>
-            <th className="pb-1">Couleur</th>
-            <th className="text-sky-400">♂</th>
-            <th className="text-pink-400">♀</th>
-            {!sansNiveau && <th>Niveau</th>}
-            <th>État</th>
+            <th className="pb-1.5 font-semibold">Couleur</th>
+            <th className="pb-1.5 font-semibold text-sky-400">♂ Mâles</th>
+            <th className="pb-1.5 font-semibold text-pink-400">♀ Femelles</th>
+            {!sansNiveau && <th className="pb-1.5 font-semibold">Niveau</th>}
+            <th className="pb-1.5 font-semibold">État</th>
             <th />
           </tr>
         </thead>
         <tbody>
           {resolues.map((l, i) => (
             <tr key={l.cle}>
-              <td className="py-1 pr-2">
+              <td className="py-1 pr-3 align-top">
                 <input
                   ref={(el) => {
                     if (el) champsCouleur.current.set(l.cle, el);
@@ -151,12 +160,12 @@ export function SaisieRapide({ famille, niveauDefaut, sansNiveau, ajouter, ferme
                 </div>
               </td>
               {(["males", "femelles"] as const).map((k) => (
-                <td key={k} className="pr-2 align-top">
+                <td key={k} className="py-1 pr-2 align-top">
                   <input
                     type="number"
                     min={0}
                     max={99}
-                    className={`${champ} w-16`}
+                    className={`${champ} w-20`}
                     value={l[k] || ""}
                     placeholder="0"
                     onFocus={(e) => e.target.select()}
@@ -165,7 +174,7 @@ export function SaisieRapide({ famille, niveauDefaut, sansNiveau, ajouter, ferme
                   />
                 </td>
               ))}
-              {!sansNiveau && <td className="pr-2 align-top">
+              {!sansNiveau && <td className="py-1 pr-2 align-top">
                 <input
                   type="number"
                   min={1}
@@ -177,8 +186,8 @@ export function SaisieRapide({ famille, niveauDefaut, sansNiveau, ajouter, ferme
                   onKeyDown={(e) => clavier(e, l.cle)}
                 />
               </td>}
-              <td className="pr-2 align-top">
-                <select className={champ} value={l.etat} onChange={(e) => maj(l.cle, { etat: e.target.value as Etat })} onKeyDown={(e) => clavier(e, l.cle)}>
+              <td className="py-1 pr-2 align-top">
+                <select className={`${champ} w-full`} value={l.etat} onChange={(e) => maj(l.cle, { etat: e.target.value as Etat })} onKeyDown={(e) => clavier(e, l.cle)}>
                   {Object.entries(ETATS).map(([k, v]) => (
                     <option key={k} value={k}>
                       {v}
@@ -186,7 +195,7 @@ export function SaisieRapide({ famille, niveauDefaut, sansNiveau, ajouter, ferme
                   ))}
                 </select>
               </td>
-              <td className="align-top">
+              <td className="py-1 align-top">
                 {lignes.length > 1 && (
                   <button className="px-1 pt-1.5 text-text-muted hover:text-status-err" title="Retirer la ligne" onClick={() => setLignes((x) => x.filter((y) => y.cle !== l.cle))}>
                     ✕
