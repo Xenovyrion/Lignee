@@ -136,7 +136,19 @@ export interface Simulation {
   caracs: Partial<Record<TypeJauge, number>>;
 }
 
-type Simulable = Pick<MinuteurEnclos, "jauges" | "niveauDepart" | "niveauCible" | "sereniteDepart">;
+/** Période où l'Almanax double l'effet d'une jauge (ms). */
+export interface PeriodeDoublee {
+  type: TypeJauge;
+  debut: number;
+  fin: number;
+}
+
+type Simulable = Pick<MinuteurEnclos, "jauges" | "niveauDepart" | "niveauCible" | "sereniteDepart"> & {
+  /** Lancement (ISO) : nécessaire pour appliquer les périodes doublées. */
+  debut?: string;
+  /** Jours d'Almanax où l'effet d'une jauge est doublé (le gain double, la consommation de la jauge reste la même). */
+  doubles?: PeriodeDoublee[];
+};
 
 export function simuler(m: Simulable): Simulation {
   const jauges = m.jauges.slice(0, 2).map((j) => ({ ...j, charge: Math.max(0, Math.min(CHARGE_MAX, j.charge)) }));
@@ -161,6 +173,14 @@ export function simuler(m: Simulable): Simulation {
     const p = j.type === "mangeoire" ? (xpCible > xpDepart ? (c - xpDepart) / (xpCible - xpDepart) : 1) : c / CARAC_MAX;
     return Math.max(0, Math.min(100, Math.floor(p * 100)));
   };
+  const t0 = m.debut ? Date.parse(m.debut) : NaN;
+  const doubles = Number.isFinite(t0) ? (m.doubles ?? []) : [];
+  /** Multiplicateur de gain d'une jauge pour le tic qui commence à t secondes. */
+  const facteur = (type: TypeJauge, t: number) => {
+    if (!doubles.length) return 1;
+    const ms = t0 + t * 1000;
+    return doubles.some((p) => p.type === type && ms >= p.debut && ms < p.fin) ? 2 : 1;
+  };
   const ajouter = (e: Omit<Evenement, "progression" | "serenite">) =>
     evenements.push({
       ...e,
@@ -180,11 +200,12 @@ export function simuler(m: Simulable): Simulation {
     const gains = new Map<TypeJauge, number>();
     for (const j of jauges) {
       const d = debit(j.charge);
-      gains.set(j.type, d);
+      const g = d * facteur(j.type, t - TIC);
+      gains.set(j.type, g);
       if (!d) continue;
       j.charge = Math.max(0, j.charge - d);
       if (j.type === "baffeur" || j.type === "caresseur") {
-        ser = Math.max(-SERENITE_MAX, Math.min(SERENITE_MAX, ser + (j.type === "baffeur" ? -d : d)));
+        ser = Math.max(-SERENITE_MAX, Math.min(SERENITE_MAX, ser + (j.type === "baffeur" ? -g : g)));
         // Sans caractéristique à monter, la fin du minuteur le dit déjà.
         if (!j.charge && objectifs.length)
           ajouter({ cle: `vide-${j.type}`, t, type: "vide", titre: `Jauge ${COURT[j.type]} vide`, texte: `Sérénité à ${signe(ser)}. Recharge-la si une caractéristique en a encore besoin.` });

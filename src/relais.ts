@@ -3,7 +3,8 @@
 // et le relais ne mentionne que lui. Mise en place : docs/RELAIS_DISCORD.md.
 // L'adresse et la clé restent sur ce PC (localStorage) : elles ne sont ni dans la sauvegarde ni dans les exports.
 import { journaliser } from "./diagnostic";
-import { COURT, dependDeLaSerenite, simuler, type MinuteurEnclos } from "./moteur/enclos";
+import { COURT, dependDeLaSerenite, type MinuteurEnclos } from "./moteur/enclos";
+import { simulerAlmanax } from "./almanax";
 
 const CLE_STOCKAGE = "lignee-relais";
 
@@ -68,7 +69,7 @@ export function messagesMinuteur(m: MinuteurEnclos, nomEnclos: string) {
   const lancement = new Date(debut).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
   const jauges = m.jauges.map((j) => COURT[j.type]).join(" + ");
   const pied = `${jauges} · ${m.montures} monture${m.montures > 1 ? "s" : ""} · lancé à ${lancement}`;
-  const sim = simuler(m);
+  const sim = simulerAlmanax(m);
   const fin = sim.fin === undefined ? undefined : debut + sim.fin * 1000;
   return sim.evenements
     .map((e) => ({

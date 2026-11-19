@@ -1,5 +1,6 @@
 // Cartes de « À faire maintenant » : une par action (naissance, clonage, préparation, capture),
 // numérotées, avec une saisie groupée des résultats constatés en jeu.
+import { capaciteDuJour } from "../../almanax";
 import { useState, type ReactNode } from "react";
 import { clonerPlusieurs, enregistrerNaissances, type Bebe } from "../../moteur/actions";
 import type { ActionAccouplement, ActionCapture } from "../../moteur/conseils";
@@ -315,7 +316,7 @@ export function FormNaissances({ famille, a, setS, niveauBebes, fermer }: { fami
     try {
       const paires = a.paires.slice(0, n).map((p) => ({ pereId: p.pere.id, mereId: p.mere.id }));
       notifier(`${n > 1 ? `${n} naissances enregistrées` : "Naissance enregistrée"} : ${resumer(famille, lignes)}`, { annulable: true });
-      setS((s) => enregistrerNaissances(s, paires, versListe(lignes) as Bebe[], makina || undefined, niveauBebes));
+      setS((s) => enregistrerNaissances(s, paires, versListe(lignes) as Bebe[], makina || undefined, niveauBebes, capaciteDuJour()));
       fermer();
     } catch (err) {
       alert((err as Error).message);

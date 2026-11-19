@@ -379,7 +379,7 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
       {
         titre: "Makina et Almanax",
         texte:
-          "Choisis la makina conseillée par défaut (elle reste modifiable à chaque saisie). Les jours d'Almanax qui donnent +20 % (10 novembre, jour de Takeza), coche le bonus : les chances et les conseils en tiennent compte.",
+          "Choisis la makina conseillée par défaut (elle reste modifiable à chaque saisie). Les bonus d'Almanax liés à l'élevage (+20 % de génération cible, jauges doublées, capacité des bébés) sont appliqués automatiquement le jour venu, avec un bandeau pour te prévenir.",
         cible: '[data-tuto="accouplements"]',
         onglet: "parametres",
       },

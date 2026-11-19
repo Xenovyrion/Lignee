@@ -240,7 +240,7 @@ function Calculatrice() {
             <input type="checkbox" className="accent-accent" checked={opti} onChange={(e) => setOpti(e.target.checked)} /> Optimakina (+20 %)
           </label>
           <label className="flex items-center gap-2">
-            <input type="checkbox" className="accent-accent" checked={almanax} onChange={(e) => setAlmanax(e.target.checked)} /> Jour d'Almanax Takeza / Otoul (+20 %)
+            <input type="checkbox" className="accent-accent" checked={almanax} onChange={(e) => setAlmanax(e.target.checked)} /> Jour d'Almanax à +20 %
           </label>
         </div>
       </div>
@@ -435,7 +435,7 @@ export function Guide({ allerA, lancerVisite }: { allerA: (o: OngletGuide) => vo
               l'<B>Optimakina</B> : +20 % ;
             </li>
             <li>
-              les jours d'<B>Almanax Takeza et Otoul</B> (10 novembre) : +20 %.
+              certains jours d'<B>Almanax</B> (date variable, Lignée les détecte et te prévient) : +20 %.
             </li>
           </ul>
           <Calculatrice />
@@ -542,7 +542,7 @@ export function Guide({ allerA, lancerVisite }: { allerA: (o: OngletGuide) => vo
               <B>Monte les niveaux</B> des parents des générations hautes, et utilise l'<B>Optimakina</B> dès que les générations deviennent chères.
             </li>
             <li>
-              Garde tes accouplements importants pour les jours d'<B>Almanax Takeza et Otoul</B> (+20 % de chance de génération cible).
+              Garde tes accouplements importants pour les jours d'<B>Almanax</B> à +20 % de chance de génération cible : Lignée te prévient la veille.
             </li>
             <li>
               Les accouplements qui dépassent la plus haute génération de l'arbre rapportent des <B>génétons</B>, à échanger au Village des Éleveurs.

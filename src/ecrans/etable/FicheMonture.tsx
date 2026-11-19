@@ -17,6 +17,7 @@ const CAPACITES: Record<Capacite, string> = {
   sage: "Sage (XP ×2)",
   amoureuse: "Amoureuse (Amour ×2)",
   endurante: "Endurante (Endurance ×2)",
+  precoce: "Précoce (Maturité ×2)",
   cameleone: "Caméléone",
 };
 

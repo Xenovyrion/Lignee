@@ -16,7 +16,6 @@ import {
   SERENITE_MAX,
   SERENITES,
   sereniteParDefaut,
-  simuler,
   SYMBOLES_JAUGE,
   type MinuteurEnclos,
   type TypeJauge,
@@ -25,6 +24,7 @@ import { nombreEnclos, prochainPalierEnclos } from "../../moteur/etable";
 import type { Sauvegarde } from "../../moteur/types";
 import { useNotifier } from "../../notifications";
 import { lireRelais } from "../../relais";
+import { simulerAlmanax } from "../../almanax";
 import { Bouton, champ } from "../../ui";
 
 type Charges = Record<TypeJauge, number>;
@@ -229,9 +229,16 @@ function CarteEnclos({ k, s, setS }: { k: number; s: Sauvegarde; setS: (f: (s: S
   }, [m]);
 
   const serenite = b.serenite ?? sereniteParDefaut(b.actives);
-  const aSimuler = { jauges: b.actives.map((t) => ({ type: t, charge: b.charges[t] })), niveauDepart: b.niveauDepart, niveauCible: b.niveauCible, sereniteDepart: serenite };
-  const apercu = useMemo(() => simuler(aSimuler), [JSON.stringify(aSimuler)]); // eslint-disable-line react-hooks/exhaustive-deps
-  const sim = useMemo(() => (m ? simuler(m) : null), [m]);
+  // Aperçu : lancé maintenant (à la minute près), pour tenir compte des jauges doublées par l'Almanax.
+  const aSimuler = {
+    jauges: b.actives.map((t) => ({ type: t, charge: b.charges[t] })),
+    niveauDepart: b.niveauDepart,
+    niveauCible: b.niveauCible,
+    sereniteDepart: serenite,
+    debut: new Date(Math.floor(Date.now() / 60_000) * 60_000).toISOString(),
+  };
+  const apercu = useMemo(() => simulerAlmanax(aSimuler), [JSON.stringify(aSimuler)]); // eslint-disable-line react-hooks/exhaustive-deps
+  const sim = useMemo(() => (m ? simulerAlmanax(m) : null), [m]);
 
   const basculer = (t: TypeJauge, charge?: number) =>
     setB((x) => {

@@ -3,7 +3,7 @@ export type Famille = "dragodinde" | "muldo" | "volkorne";
 export type Sexe = "M" | "F";
 /** Fertile : jauges à remplir. Féconde : prête à s'accoupler. Stérile : déjà reproduite (clonable). */
 export type Etat = "fertile" | "feconde" | "sterile";
-export type Capacite = "reproducteur" | "sage" | "amoureuse" | "endurante" | "cameleone";
+export type Capacite = "reproducteur" | "sage" | "amoureuse" | "endurante" | "precoce" | "cameleone";
 export type Makina = "optimakina" | "animakina" | "kromakina";
 
 export interface Couleur {

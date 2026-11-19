@@ -29,7 +29,7 @@ export interface Bebe {
 }
 
 /** Enregistre un accouplement : parents stériles, bébé(s) créé(s), succès mis à jour, journal. */
-export function enregistrerNaissance(s: Sauvegarde, pereId: string, mereId: string, bebes: Bebe[], makina?: Makina, niveauBebes = 1): Sauvegarde {
+export function enregistrerNaissance(s: Sauvegarde, pereId: string, mereId: string, bebes: Bebe[], makina?: Makina, niveauBebes = 1, capaciteAlmanax?: Capacite): Sauvegarde {
   const pere = s.montures.find((m) => m.id === pereId);
   const mere = s.montures.find((m) => m.id === mereId);
   if (!pere || !mere) throw new Error("Parent introuvable");
@@ -46,7 +46,7 @@ export function enregistrerNaissance(s: Sauvegarde, pereId: string, mereId: stri
     sexe: b.sexe,
     niveau: niveauBebes,
     etat: "fertile",
-    capacite: b.capacite,
+    capacite: b.capacite ?? capaciteAlmanax,
     parents: [pere.couleur, mere.couleur],
     origine: "naissance",
     creeLe: maintenant(),
@@ -94,12 +94,13 @@ export function enregistrerNaissances(
   bebes: Bebe[],
   makina?: Makina,
   niveauBebes = 1,
+  capaciteAlmanax?: Capacite,
 ): Sauvegarde {
   const n = paires.length;
   if (n === 0) throw new Error("Aucun accouplement");
   if (bebes.length < n || bebes.length > 2 * n) throw new Error(`${n} accouplement(s) : entre ${n} et ${2 * n} bébés`);
   return paires.reduce(
-    (acc, p, i) => enregistrerNaissance(acc, p.pereId, p.mereId, [bebes[i], ...(n + i < bebes.length ? [bebes[n + i]] : [])], makina, niveauBebes),
+    (acc, p, i) => enregistrerNaissance(acc, p.pereId, p.mereId, [bebes[i], ...(n + i < bebes.length ? [bebes[n + i]] : [])], makina, niveauBebes, capaciteAlmanax),
     s,
   );
 }

@@ -26,6 +26,7 @@ import { urlFond } from "./fond";
 import { appliquerPalette, themeParId } from "./themes";
 import type { Famille, Sauvegarde } from "./moteur/types";
 import { useSauvegarde } from "./stockage";
+import { BandeauAlmanax, useAlmanax } from "./ecrans/BandeauAlmanax";
 import { RechercheRapide, resultatsMontures, type Resultat } from "./ecrans/RechercheRapide";
 
 /** Réglages trouvables par la recherche rapide : repère (data-tuto) dans Paramètres, titre et mots-clés. */
@@ -37,7 +38,7 @@ const REGLAGES: [string, string, string][] = [
   ["sauvegardes", "Sauvegardes", "export import copie restaurer cloud onedrive google drive"],
   ["mises-a-jour", "Mises à jour", "version nouveautés"],
   ["diagnostic", "Diagnostic", "journal problème bug"],
-  ["accouplements", "Accouplements", "makina optimakina animakina takeza almanax"],
+  ["accouplements", "Accouplements", "makina optimakina animakina"],
 ];
 
 /** Fait défiler jusqu'à un repère et le fait briller un instant. */
@@ -108,6 +109,7 @@ export function App() {
   const [famille, setFamille] = useState<Famille>("dragodinde");
   const [onglet, setOnglet] = useState<Onglet>("actions");
   const [recherche, setRecherche] = useState(false);
+  const almanax = useAlmanax();
   const [focusArbre, setFocusArbre] = useState<{ f: Famille; id: string } | null>(null);
   useEffect(() => {
     const touche = (e: KeyboardEvent) => {
@@ -200,7 +202,8 @@ export function App() {
     );
 
   // Pendant la démo, les écrans affichent et modifient l'étable d'exemple.
-  const sv = demo ?? s;
+  // Le bonus +20 % de l'Almanax s'applique tout seul le jour venu (plus de case à cocher).
+  const sv = { ...(demo ?? s), options: { ...(demo ?? s).options, takeza: almanax.generation } };
   const majReel = (f: (x: Sauvegarde) => Sauvegarde) => {
     setHistorique((h) => [...h.slice(-29), s]);
     setModifications((n) => n + 1);
@@ -364,6 +367,7 @@ export function App() {
             </button>
           </div>
         </header>
+        <BandeauAlmanax jour={almanax.jour} aujourdhui={almanax.aujourdhui} demain={almanax.demain} />
         {maj && <BandeauMiseAJour maj={maj} fermer={() => setMaj(null)} voirNouveautes={() => setNouveautes({ ouvert: true })} />}
       {nouveautes.ouvert && <NotesDeVersion miseEnAvant={nouveautes.version} fermer={fermerNouveautes} />}
         {!s.options.didacticiel && !tutoReporte && !tuto && !nouveautes.ouvert && (

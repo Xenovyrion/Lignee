@@ -3,7 +3,8 @@
 // s'est terminé pendant que l'appli était fermée. Les messages Discord, eux, partent du relais.
 import { useEffect, useRef } from "react";
 import { journaliser } from "../diagnostic";
-import { simuler, type MinuteurEnclos } from "../moteur/enclos";
+import type { MinuteurEnclos } from "../moteur/enclos";
+import { simulerAlmanax } from "../almanax";
 import type { Sauvegarde } from "../moteur/types";
 import { useNotifier } from "../notifications";
 import { lireRelais, synchroniserRelais } from "../relais";
@@ -25,7 +26,7 @@ async function notifierWindows(titre: string, texte: string) {
 /** Évènements arrivés à échéance et pas encore signalés. */
 export function aSignaler(m: MinuteurEnclos, maintenant: number) {
   const debut = Date.parse(m.debut);
-  return simuler(m).evenements.filter((e) => debut + e.t * 1000 <= maintenant && !m.signales.includes(e.cle));
+  return simulerAlmanax(m).evenements.filter((e) => debut + e.t * 1000 <= maintenant && !m.signales.includes(e.cle));
 }
 
 export function SurveillanceMinuteurs({ s, setS }: { s: Sauvegarde; setS: (f: (x: Sauvegarde | null) => Sauvegarde | null) => void }) {
