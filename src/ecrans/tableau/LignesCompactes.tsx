@@ -100,7 +100,7 @@ function Naissance({ numero, famille, a, setS, niveau, etapePreparer }: { numero
         </span>
       }
       actions={
-        <Bouton discret={!pret || ouvert} onClick={() => setOuvert(!ouvert)} className="w-full">
+        <Bouton data-principal discret={!pret || ouvert} onClick={() => setOuvert(!ouvert)} className="w-full">
           {ouvert ? "Annuler" : "Valider naissance"}
         </Bouton>
       }
@@ -135,7 +135,7 @@ function Clonage({ numero, famille, g, setS }: { numero: number; famille: Famill
       }
       detail={`un clone fertile par paire de stériles · ${g.memeCouleur ? "résultat certain" : "couleur à 50/50"}`}
       actions={
-        <Bouton discret={ouvert} onClick={() => setOuvert(!ouvert)} className="w-full">
+        <Bouton data-principal discret={ouvert} onClick={() => setOuvert(!ouvert)} className="w-full">
           {ouvert ? "Annuler" : "Valider clonage"}
         </Bouton>
       }
@@ -178,7 +178,7 @@ function Preparer({ numero, famille, groupes, setS }: { numero: number; famille:
         </span>
       }
       actions={
-        <Bouton onClick={() => toutesPretes(groupes)} className="w-full">
+        <Bouton data-principal onClick={() => toutesPretes(groupes)} className="w-full">
           ✓ Toutes prêtes
         </Bouton>
       }
@@ -210,7 +210,7 @@ function Capture({ numero, famille, capture, setS, niveau }: { numero: number; f
       }
       detail="génération 1 · à capturer au filet"
       actions={
-        <Bouton discret={ouvert} onClick={() => setOuvert(!ouvert)} className="w-full">
+        <Bouton data-principal discret={ouvert} onClick={() => setOuvert(!ouvert)} className="w-full">
           {ouvert ? "Annuler" : "Valider capture"}
         </Bouton>
       }

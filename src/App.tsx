@@ -437,10 +437,10 @@ export function App() {
         {erreur && <div className="rounded-md bg-status-err/15 p-2 text-sm text-status-err">Sauvegarde impossible : {erreur}</div>}
         {/* Voile commun derrière chaque écran : lisibilité uniforme quelle que soit l'image de fond. */}
         <main data-tuto="ecran" className="surface rounded-2xl border border-border p-4">
-          {onglet === "actions" && <TableauDeBord {...props} />}
+          {onglet === "actions" && <TableauDeBord {...props} allerArbre={() => setOnglet("arbre")} />}
           {onglet === "etable" && <Etable key={`${famille}-${demo ? "demo" : "reel"}`} {...props} />}
           {onglet === "enclos" && <OngletEnclos s={s} setS={majReel} />}
-          {onglet === "arbre" && <Arbre key={`${famille}-${focusArbre?.id}`} famille={famille} s={sv} focus={focusArbre?.f === famille ? focusArbre.id : null} />}
+          {onglet === "arbre" && <Arbre key={`${famille}-${focusArbre?.id}`} famille={famille} s={sv} setS={majS} focus={focusArbre?.f === famille ? focusArbre.id : null} />}
           {onglet === "succes" && <Succes {...props} setFamille={setFamille} />}
           {onglet === "guide" && <Guide allerA={allerA} lancerVisite={lancerTuto} />}
           {onglet === "parametres" && <Parametres s={s} setS={majReel} lancerDidacticiel={lancerTuto} />}

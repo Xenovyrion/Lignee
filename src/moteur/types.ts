@@ -40,6 +40,13 @@ export interface Accouplement {
   mereId: string;
   makina?: Makina;
   bebeIds: string[];
+  /** Couleur visée et chance de l'obtenir au moment de l'accouplement (bilan de chance). */
+  vise?: string;
+  chance?: number;
+  /** Niveaux du père et de la mère au moment de l'accouplement. */
+  niveaux?: [number, number];
+  /** Couleurs des bébés obtenus (les montures peuvent être supprimées ensuite). */
+  couleurs?: string[];
 }
 
 export interface Sauvegarde {
@@ -89,6 +96,8 @@ export interface Options {
   makina?: "auto" | "optimakina" | "animakina";
   /** Mode automatique : chance de génération cible minimale pour conseiller l'Animakina (0,5 à 0,9 ; 0,8 par défaut). */
   seuilAnimakina?: number;
+  /** Objectif prioritaire par famille : couleur à obtenir (et garder) avant le reste du plan. */
+  cibles?: Partial<Record<Famille, string>>;
   /** Saisie des jauges d'enclos : simple (paliers et demi-paliers) ou avancée (valeur exacte). */
   saisieJauges?: "palier" | "exacte";
   /** Notifications Windows à la fin des minuteurs d'enclos. */

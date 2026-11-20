@@ -256,7 +256,9 @@ export function conseiller(plan: Plan, options: Bonus & { takeza?: boolean; maki
   // Priorité : ce que l'accouplement fait avancer (son propre succès + les étapes qu'il débloque).
   // Ordre conseillé : terminer un succès de génération, puis obtenir une nouvelle couleur, puis
   // ce qui est prêt avant ce qui est à préparer, puis ce qui débloque le plus d'étapes.
+  const prio = (a: ActionAccouplement) => Number(plan.prioritaires.has(a.etape));
   const priorite = (x: ActionAccouplement, y: ActionAccouplement) =>
+    prio(y) - prio(x) ||
     Number(y.termineSucces) - Number(x.termineSucces) ||
     Number(y.e.pour === "succes") - Number(x.e.pour === "succes") ||
     Number(!y.aPreparer.length) - Number(!x.aPreparer.length) ||
@@ -274,7 +276,7 @@ export function conseiller(plan: Plan, options: Bonus & { takeza?: boolean; maki
     } else parCle.set(cle(a), a);
   }
   // Ce qui est prêt d'abord (tri stable : l'ordre de priorité est conservé).
-  const ordre = [...parCle.values()].sort((x, y) => Number(!!x.aPreparer.length) - Number(!!y.aPreparer.length));
+  const ordre = [...parCle.values()].sort((x, y) => prio(y) - prio(x) || Number(!!x.aPreparer.length) - Number(!!y.aPreparer.length));
   ordre.forEach((a, i) => (a.rang = i + 1));
   prets.sort(priorite);
   aPreparer.sort(priorite);

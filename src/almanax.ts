@@ -130,6 +130,8 @@ export function periodesDoublees(jours = joursConnus()) {
 export const simulerAlmanax = (m: Parameters<typeof simuler>[0]) => simuler({ ...m, doubles: periodesDoublees() });
 
 /** Capacité que l'Almanax donne aux bébés nés aujourd'hui, s'il y en a une. */
+/** Un bonus de génération cible est actif aujourd'hui (Almanax). */
+export const generationDuJour = () => bonusDu(dateParis()).some((j) => !!effet(j).generation);
 export const capaciteDuJour = () => bonusDu(dateParis()).map(effet).find((e) => e.capacite)?.capacite;
 
 /** Prochains bonus qui changent quelque chose dans Lignée, aujourd'hui compris, dans l'ordre. */

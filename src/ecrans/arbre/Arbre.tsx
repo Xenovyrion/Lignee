@@ -1,7 +1,8 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { actionsMaintenant, conseiller, seancesDesEtapes, type ActionAccouplement } from "../../moteur/conseils";
-import { caracteristiques, couleur, couleurs, nomCouleur } from "../../moteur/donnees";
+import { bonusDeFamille, caracteristiques, couleur, couleurs, nomCouleur } from "../../moteur/donnees";
 import { enfantsDe, lignee } from "../../moteur/genealogie";
+import { choisirCible } from "../../moteur/actions";
 import { planifier, regrouperClonages, suggererClonages, type Plan } from "../../moteur/planificateur";
 import type { Famille, Sauvegarde } from "../../moteur/types";
 import { Segments, TitreSection } from "../../ui";
@@ -11,19 +12,23 @@ import { COULEURS, Etoile, fabriquerStatut, ImageMonture, type RolePlan, type St
 interface Props {
   famille: Famille;
   s: Sauvegarde;
+  setS: (f: (s: Sauvegarde) => Sauvegarde) => void;
   /** Couleur à sélectionner à l'ouverture (recherche rapide). */
   focus?: string | null;
 }
 
-export function Arbre({ famille, s, focus = null }: Props) {
+export function Arbre({ famille, s, setS, focus = null }: Props) {
+  const cible = s.options.cibles?.[famille] ?? null;
+  const viser = (id: string | null) => setS((x) => choisirCible(x, famille, id));
   const [selection, setSelection] = useState<string | null>(focus);
   const [survol, setSurvol] = useState<string | null>(null);
   const [filtre, setFiltre] = useState<FiltreCarte>("tout");
+  const [bonus, setBonus] = useState("");
   const [legende, setLegende] = useState(true);
 
   // Le plan d'élevage colore la carte : prochaines naissances (★) et couleurs à faire naître pour la suite.
   const { statut, prochaines, plan, dansPlan, seances } = useMemo(() => {
-    const plan = planifier(famille, s.montures, s.obtenues[famille]);
+    const plan = planifier(famille, s.montures, s.obtenues[famille], s.options.cibles?.[famille]);
     const c = conseiller(plan, { takeza: s.options.takeza, makina: s.options.makina, seuilAnimakina: s.options.seuilAnimakina });
     // Même numérotation que le tableau de bord (clonages compris).
     actionsMaintenant(c, regrouperClonages(suggererClonages(s.montures.filter((m) => m.famille === famille))));
@@ -42,7 +47,7 @@ export function Arbre({ famille, s, focus = null }: Props) {
       e.recette.forEach((x) => dansPlan.add(x));
     }
     return { statut: fabriquerStatut(famille, s.montures, s.obtenues[famille], roles, rangs), prochaines: c.ordre, plan, dansPlan, seances: seancesDesEtapes(plan) };
-  }, [famille, s.montures, s.obtenues, s.options.takeza, s.options.makina]);
+  }, [famille, s.montures, s.obtenues, s.options.takeza, s.options.makina, s.options.seuilAnimakina, s.options.cibles]);
 
   const detail = selection ?? survol;
 
@@ -54,6 +59,20 @@ export function Arbre({ famille, s, focus = null }: Props) {
           <span className="text-xs text-text-muted">glisser pour déplacer · molette pour zoomer · survol : parents et enfants · clic : toute la lignée · Échap : désélectionner</span>
           <span className="flex-1" />
           <RechercheCarte famille={famille} choisir={setSelection} />
+          <select
+            data-tuto="arbre-bonus"
+            value={bonus}
+            onChange={(e) => setBonus(e.target.value)}
+            title="Mettre en avant les couleurs qui donnent ce bonus"
+            className={`rounded-lg border bg-bg-card px-2 py-1 text-xs outline-none ${bonus ? "border-accent text-accent" : "border-border-light text-text-secondary"}`}
+          >
+            <option value="">Bonus : tous</option>
+            {bonusDeFamille(famille).map((b) => (
+              <option key={b} value={b}>
+                {b}
+              </option>
+            ))}
+          </select>
           <span data-tuto="arbre-filtres">
             <Segments
             petit
@@ -68,7 +87,7 @@ export function Arbre({ famille, s, focus = null }: Props) {
           </span>
         </div>
         <div className="min-h-0 flex-1" data-tuto="arbre-carte">
-          <CarteLignee famille={famille} statut={statut} selection={selection} setSelection={setSelection} survol={survol} setSurvol={setSurvol} filtre={filtre} dansPlan={dansPlan} />
+          <CarteLignee famille={famille} cible={cible} bonus={bonus} statut={statut} selection={selection} setSelection={setSelection} survol={survol} setSurvol={setSurvol} filtre={filtre} dansPlan={dansPlan} />
         </div>
         <div data-tuto="arbre-legende">
           <Legende ouverte={legende} basculer={() => setLegende(!legende)} />
@@ -77,7 +96,7 @@ export function Arbre({ famille, s, focus = null }: Props) {
 
       <aside data-tuto="arbre-detail" className="w-80 shrink-0 overflow-y-auto rounded-xl border border-border bg-bg-card p-4">
         {detail ? (
-          <Detail famille={famille} id={detail} statut={statut} plan={plan} seances={seances} choisir={setSelection} selectionnee={detail === selection} />
+          <Detail famille={famille} id={detail} cible={cible} viser={viser} statut={statut} plan={plan} seances={seances} choisir={setSelection} selectionnee={detail === selection} />
         ) : (
           <div className="flex flex-col gap-5">
             <Prochaines famille={famille} liste={prochaines} choisir={setSelection} />
@@ -228,7 +247,7 @@ function cheminVers(plan: Plan, id: string): number[] {
   return [...chemin].sort((a, b) => a - b);
 }
 
-function Detail(p: { famille: Famille; id: string; statut: (id: string) => Statut; plan: Plan; seances: number[]; choisir: (id: string) => void; selectionnee: boolean }) {
+function Detail(p: { famille: Famille; id: string; cible: string | null; viser: (id: string | null) => void; statut: (id: string) => Statut; plan: Plan; seances: number[]; choisir: (id: string) => void; selectionnee: boolean }) {
   const { famille, id } = p;
   const c = couleur(famille, id);
   const st = p.statut(id);
@@ -256,6 +275,21 @@ function Detail(p: { famille: Famille; id: string; statut: (id: string) => Statu
           En stock : <span className="text-sky-400">{st.males} ♂</span> · <span className="text-pink-400">{st.femelles} ♀</span>
         </div>
         {!p.selectionnee && <div className="mt-1 text-[11px] text-text-muted">Clique pour la sélectionner et voir toute sa lignée.</div>}
+        {c.generation > 1 &&
+          (p.cible === id ? (
+            <button data-tuto="viser" onClick={() => p.viser(null)} className="mt-2 rounded-lg border border-sky-400/60 bg-sky-400/15 px-3 py-1 text-xs font-semibold text-sky-300 hover:bg-sky-400/25">
+              🎯 Objectif prioritaire · Retirer
+            </button>
+          ) : (
+            <button
+              data-tuto="viser"
+              onClick={() => p.viser(id)}
+              title="Le plan fait d'abord le chemin le plus court vers cette couleur, et garde une monture de cette couleur (jamais utilisée comme parent)."
+              className="mt-2 rounded-lg border border-border-light px-3 py-1 text-xs font-semibold text-text-secondary hover:border-sky-400/60 hover:text-sky-300"
+            >
+              🎯 Viser en priorité{p.cible ? ` (remplace ${nomCouleur(famille, p.cible)})` : ""}
+            </button>
+          ))}
       </div>
 
       <Caracteristiques famille={famille} id={id} />

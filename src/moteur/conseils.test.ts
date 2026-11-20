@@ -169,3 +169,25 @@ describe("clés des actions", () => {
     }
   });
 });
+
+describe("objectif prioritaire", () => {
+  // Étable G1 complète en mâles et femelles, rien d'obtenu.
+  const etable = () => ["amande", "doree", "rousse"].flatMap((c) => [m(c, "M"), m(c, "F"), m(c, "M"), m(c, "F")]);
+  it("son chemin passe en premier dans l'ordre conseillé", () => {
+    const plan = planifier("dragodinde", etable(), [], "amande_doree");
+    expect(plan.cible).toMatchObject({ couleur: "amande_doree" });
+    expect(plan.prioritaires.size).toBe(1);
+    const c = conseiller(plan, {});
+    expect(c.ordre[0].e.couleur).toBe("amande_doree");
+  });
+  it("une monture de cette couleur en étable est gardée, pas utilisée comme parent", () => {
+    const gardee = m("amande_doree", "M", { etat: "sterile" });
+    const plan = planifier("dragodinde", [...etable(), gardee, m("amande_doree", "F")], ["amande_doree"], "amande_doree");
+    expect(plan.cible).toMatchObject({ etape: null, gardee: { id: gardee.id } });
+    expect(plan.prioritaires.size).toBe(0);
+  });
+  it("une couleur déjà obtenue mais absente de l'étable est refaite", () => {
+    const plan = planifier("dragodinde", etable(), ["amande_doree"], "amande_doree");
+    expect(plan.etapes[plan.cible!.etape!]).toMatchObject({ couleur: "amande_doree", pour: "intermediaire" });
+  });
+});

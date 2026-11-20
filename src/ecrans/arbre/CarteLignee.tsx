@@ -1,7 +1,7 @@
 // Carte des lignées : une colonne par génération, déplaçable (glisser) et zoomable (molette).
 // Aucun lien par défaut ; au survol, parents et enfants directs ; au clic, toute la lignée.
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as PE } from "react";
-import { couleur, nomCouleur } from "../../moteur/donnees";
+import { caracteristiques, couleur, nomCouleur } from "../../moteur/donnees";
 import { dispositionCarte, enfantsDe, lignee } from "../../moteur/genealogie";
 import type { Famille } from "../../moteur/types";
 import { COULEURS, Etoile, ImageMonture, type Statut } from "./commun";
@@ -25,9 +25,14 @@ interface Props {
   filtre: FiltreCarte;
   /** Couleurs utilisées par le plan (filtre « Mon plan »). */
   dansPlan: Set<string>;
+  /** Objectif prioritaire (🎯 sur la carte). */
+  cible?: string | null;
+  /** Bonus mis en avant : les couleurs qui ne le donnent pas sont estompées, la valeur s'affiche. */
+  bonus?: string;
 }
 
-export function CarteLignee({ famille, statut, selection, setSelection, survol, setSurvol, filtre, dansPlan }: Props) {
+export function CarteLignee({ famille, statut, selection, setSelection, survol, setSurvol, filtre, dansPlan, cible, bonus }: Props) {
+  const valeurBonus = (id: string) => (bonus ? caracteristiques(famille, id)?.find(([n]) => n === bonus)?.[1] : undefined);
   // ---------- Disposition (coordonnées du « monde ») ----------
   const { pos, colonnes, centres, largeur, hauteur, etroites } = useMemo(() => {
     const colonnes = dispositionCarte(famille);
@@ -168,6 +173,7 @@ export function CarteLignee({ famille, statut, selection, setSelection, survol, 
   const focus = selection ?? survol;
   const filtreGarde = (id: string) => {
     const st = statut(id);
+    if (bonus && valeurBonus(id) === undefined) return false;
     if (filtre === "plan") return dansPlan.has(id);
     if (filtre === "manquantes") return !st.obtenue;
     return true;
@@ -262,6 +268,11 @@ export function CarteLignee({ famille, statut, selection, setSelection, survol, 
                     <Etoile rang={st.rang} pret={st.plan === "pret"} />
                   </span>
                 )}
+                {id === cible && (
+                  <span className="absolute -left-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-sky-400/90 text-[11px]" title="Objectif prioritaire">
+                    🎯
+                  </span>
+                )}
                 {st.males + st.femelles > 0 && (
                   <span
                     className="absolute -bottom-1 -left-2 rounded-full border border-border-light bg-bg-card px-1 text-[9px] font-semibold leading-3.5"
@@ -274,6 +285,11 @@ export function CarteLignee({ famille, statut, selection, setSelection, survol, 
                 )}
                 {st.plan === "produire" && !st.rang && <span className="absolute -inset-1.5 rounded-full border-2 border-dashed" style={{ borderColor: COULEURS.produire }} />}
               </div>
+              {valeurBonus(id) !== undefined && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-accent px-1.5 text-[10px] font-bold leading-4 text-accent-texte" title={`+${valeurBonus(id)} ${bonus}`}>
+                  +{valeurBonus(id)}
+                </span>
+              )}
               {(avecNoms || allumes.has(id)) && (
                 <span className={`mt-1 line-clamp-2 max-w-full rounded px-1 text-center text-[10.5px] leading-3 ${choisi ? "bg-accent-dim font-semibold text-accent" : "text-text-secondary"}`}>{nom}</span>
               )}

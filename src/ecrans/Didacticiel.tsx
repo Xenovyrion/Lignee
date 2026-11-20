@@ -108,7 +108,7 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
       {
         titre: "Les succès",
         texte:
-          "Coche ici les couleurs que tu as déjà fait naître avant d'utiliser Lignée : le plan ne les visera plus. Ensuite, elles se cochent toutes seules à chaque naissance enregistrée.",
+          "Coche ici les couleurs que tu as déjà fait naître avant d'utiliser Lignée : le plan ne les visera plus. Ensuite, elles se cochent toutes seules à chaque naissance enregistrée. En haut, le bilan de ta chance compare tes naissances réussies aux chances prévues, au total puis par makina et par niveau des parents.",
         cible: '[data-tuto="ecran"]',
         onglet: "succes",
       },
@@ -263,7 +263,8 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
       },
       {
         titre: "Le prochain objectif",
-        texte: "La prochaine couleur à obtenir pour avancer dans les succès, et ce qu'il reste à faire naître pour compléter sa génération.",
+        texte:
+          "La prochaine couleur à obtenir pour avancer dans les succès, et ce qu'il reste à faire naître pour compléter sa génération. Si tu as choisi un objectif prioritaire dans l'Arbre (🎯), il s'affiche juste au-dessus et ses naissances passent en tête des actions.",
         cible: '[data-tuto="objectif"]',
         onglet: "actions",
       },
@@ -335,6 +336,12 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
         texte:
           "Les montures sauvages à capturer, avec le nombre de mâles et de femelles conseillé. Après ta capture, « Valider capture » les ajoute à l'étable en une fois (nombres pré-remplis, ajustables).",
         cible: '#actions li[data-type="capture"]',
+        onglet: "actions",
+      },
+      {
+        titre: "Au clavier",
+        texte: "↑ et ↓ (ou J et K) choisissent une action, Entrée ouvre son formulaire, Ctrl + Entrée le valide, Échap le ferme. Après une validation, l'action suivante prend sa place : enchaîne sans la souris.",
+        cible: '[data-tuto="clavier"]',
         onglet: "actions",
       },
       {
@@ -413,14 +420,20 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
 
   arbre: {
     titre: "L'arbre des couleurs",
-    resume: "Trouver une couleur, voir ses caractéristiques, ses parents et le chemin pour l'obtenir.",
-    duree: "1 min",
+    resume: "Trouver une couleur ou un bonus, la viser en priorité, voir ses caractéristiques et le chemin pour l'obtenir.",
+    duree: "2 min",
     demo: true,
     etapes: [
       {
         titre: "Trouver une couleur",
         texte: "Tape une partie du nom : la liste propose les couleurs de la famille, Entrée sélectionne la première et centre la carte dessus.",
         cible: '[data-tuto="arbre-recherche"]',
+        onglet: "arbre",
+      },
+      {
+        titre: "Chercher par bonus",
+        texte: "Choisis un bonus (PM, Vitalité, Esquive PA…) : seules les couleurs qui le donnent restent visibles, avec leur valeur au-dessus. Pratique pour choisir une monture de combat.",
+        cible: '[data-tuto="arbre-bonus"]',
         onglet: "arbre",
       },
       {
@@ -441,6 +454,13 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
         titre: "La légende",
         texte: "Obtenue (✓), prochaine étape avec son numéro du tableau de bord, à produire pour la suite (tirets orange), jamais obtenue (tirets gris). Liens dorés : d'où elle vient ; bleus : ce qu'elle débloque. Repliable.",
         cible: '[data-tuto="arbre-legende"]',
+        onglet: "arbre",
+      },
+      {
+        titre: "Viser en priorité",
+        texte:
+          "« 🎯 Viser en priorité » fait passer cette couleur avant tout le reste : le plan prend le chemin le plus court vers elle, et une fois née, elle est gardée (jamais utilisée comme parent). Le tableau de bord l'affiche en tête ; une fois obtenue, il te félicite et propose d'en choisir une autre. « Retirer » rend la main aux succès.",
+        cible: '[data-tuto="viser"]',
         onglet: "arbre",
       },
       {
@@ -759,7 +779,7 @@ export function ProposerDidacticiel({ commencer, plusTard, refuser }: { commence
         <div>
           <h2 className="text-xl font-bold">Bienvenue dans Lignée !</h2>
           <p className="mt-2 text-sm text-text-secondary">
-            Veux-tu une visite guidée ? Six chapitres courts (≈ 12 minutes en tout) : le tour des écrans, comment gérer ton étable et suivre le tableau de bord en
+            Veux-tu une visite guidée ? Six chapitres courts (≈ 13 minutes en tout) : le tour des écrans, comment gérer ton étable et suivre le tableau de bord en
             t'exerçant sur une étable d'exemple, puis les minuteurs d'enclos, l'arbre des couleurs et tous les réglages.
           </p>
         </div>

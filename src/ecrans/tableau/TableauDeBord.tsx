@@ -1,6 +1,7 @@
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { actionsMaintenant, cleAction, conseiller, prochainObjectif, seancesDesEtapes, seancesSuivantes } from "../../moteur/conseils";
 import { couleur, NOMS_FAMILLE, nomCouleur, objectifs } from "../../moteur/donnees";
+import { choisirCible } from "../../moteur/actions";
 import { planifier, regrouperClonages, suggererClonages } from "../../moteur/planificateur";
 import { nomSuccesGeneration } from "../../moteur/succes";
 import type { Famille, Sauvegarde } from "../../moteur/types";
@@ -17,6 +18,8 @@ interface Props {
   famille: Famille;
   s: Sauvegarde;
   setS: (f: (s: Sauvegarde) => Sauvegarde) => void;
+  /** Ouvre l'Arbre (choisir un autre objectif prioritaire). */
+  allerArbre?: () => void;
 }
 
 const Cadre = ({ id, titre, sous, children, droite, ton }: { id?: string; titre: string; sous?: string; children: ReactNode; droite?: ReactNode; ton?: "alerte" }) => (
@@ -98,8 +101,8 @@ function AnneauTotal({ faites, total }: { faites: number; total: number }) {
   );
 }
 
-export function TableauDeBord({ famille, s, setS }: Props) {
-  const plan = useMemo(() => planifier(famille, s.montures, s.obtenues[famille]), [famille, s.montures, s.obtenues]);
+export function TableauDeBord({ famille, s, setS, allerArbre }: Props) {
+  const plan = useMemo(() => planifier(famille, s.montures, s.obtenues[famille], s.options.cibles?.[famille]), [famille, s.montures, s.obtenues, s.options.cibles]);
   const c = useMemo(() => conseiller(plan, { takeza: s.options.takeza, makina: s.options.makina, seuilAnimakina: s.options.seuilAnimakina }), [plan, s.options.takeza, s.options.makina, s.options.seuilAnimakina]);
   const objectif = useMemo(() => prochainObjectif(plan), [plan]);
   const clonages = useMemo(() => regrouperClonages(suggererClonages(s.montures.filter((m) => m.famille === famille))), [famille, s.montures]);
@@ -108,6 +111,50 @@ export function TableauDeBord({ famille, s, setS }: Props) {
   const suivantes = useMemo(() => seancesSuivantes(plan), [plan]);
   const totalSeances = Math.max(1, ...numSeance);
   const [toutesSeances, setToutesSeances] = useState(false);
+
+  // Raccourcis clavier : ↑ ↓ (ou J K) choisissent une action, Entrée l'ouvre, Ctrl + Entrée valide le formulaire, Échap le ferme.
+  const [actif, setActif] = useState<number | null>(null);
+  const element = (i: number | null) => (i === null || !actions[i] ? null : document.getElementById(`action-${actions[i].numero}`));
+  useEffect(() => {
+    const el = element(actif);
+    el?.classList.add("action-active");
+    return () => el?.classList.remove("action-active");
+  });
+  useEffect(() => {
+    const touche = (e: KeyboardEvent) => {
+      if (!actions.length || document.querySelector("[role=dialog]")) return;
+      const el = element(actif);
+      const bouton = (sel: string) => el?.querySelector<HTMLButtonElement>(sel) ?? null;
+      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+        const b = bouton("[data-valider]");
+        if (b && !b.disabled) {
+          e.preventDefault();
+          b.click();
+        }
+        return;
+      }
+      const cible = e.target instanceof HTMLElement ? e.target : document.body;
+      if (e.ctrlKey || e.altKey || e.metaKey || cible.closest("input, textarea, select, [contenteditable=true]")) return;
+      const bas = e.key === "ArrowDown" || e.key === "j";
+      const haut = e.key === "ArrowUp" || e.key === "k";
+      if (bas || haut) {
+        e.preventDefault();
+        const i = actif === null ? (bas ? 0 : actions.length - 1) : Math.min(actions.length - 1, Math.max(0, actif + (bas ? 1 : -1)));
+        setActif(i);
+        element(i)?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      } else if (e.key === "Enter" && el && cible.tagName !== "BUTTON") {
+        const b = bouton("[data-principal]");
+        if (b) {
+          e.preventDefault();
+          b.click();
+        }
+      } else if (e.key === "Escape" && bouton("[data-valider]")) {
+        bouton("[data-principal]")?.click();
+      }
+    };
+    window.addEventListener("keydown", touche);
+    return () => window.removeEventListener("keydown", touche);
+  });
   const compacte = !!s.options.vueCompacte;
 
   // Nouvelle couleur obtenue → confettis ; génération complétée → bandeau « Succès obtenu ».
@@ -128,6 +175,18 @@ export function TableauDeBord({ famille, s, setS }: Props) {
     setBandeau(succes.length ? `🏆 Succès obtenu : ${nomSuccesGeneration(famille, succes[0])}` : `✨ Nouvelle couleur : ${nouvelles.map((x) => nomCouleur(famille, x)).join(", ")}`);
   }, [famille, s.obtenues, s.options.animations]);
 
+  // Objectif prioritaire atteint → confettis et bandeau (le succès d'une génération reste prioritaire).
+  const cibleAvant = useRef<string | null>(null);
+  const etatCible = plan.cible ? `${famille}:${plan.cible.couleur}:${plan.cible.etape === null}` : null;
+  useEffect(() => {
+    const prec = cibleAvant.current;
+    cibleAvant.current = etatCible;
+    if (!etatCible || !prec || !s.options.animations || !etatCible.endsWith(":true") || prec !== etatCible.replace(/:true$/, ":false")) return;
+    setConfettis((n) => n + 1);
+    const message = `🎯 Objectif atteint : ${nomCouleur(famille, plan.cible!.couleur)}`;
+    setBandeau((b) => (b?.startsWith("🏆") ? b : message));
+  }, [etatCible, famille, plan.cible, s.options.animations]);
+
   const obtenues = new Set(s.obtenues[famille]);
   const gens = Array.from({ length: 9 }, (_, i) => i + 2).map((g) => {
     const l = objectifs(famille).filter((x) => x.generation === g);
@@ -144,6 +203,35 @@ export function TableauDeBord({ famille, s, setS }: Props) {
   const compte = (t: string) => actions.filter((x) => x.type === t).length;
   const premier = (t: string) => actions.find((x) => x.type === t)?.numero;
   const nbAPreparer = actions.reduce((n, x) => n + (x.type === "preparer" ? x.groupes.reduce((k, g) => k + g.montures.length, 0) : 0), 0);
+
+  /** Cartes d'un chemin d'étapes (la dernière est la couleur visée). */
+  const rendreChemin = (chemin: number[]) =>
+    chemin.map((i, k) => {
+      const e = plan.etapes[i];
+      const a = rangDe.get(e.couleur);
+      const estCible = k === chemin.length - 1;
+      return (
+        <Fragment key={i}>
+          {k > 0 && <span className="text-lg text-text-muted">→</span>}
+          <div
+            className={`relative flex w-28 flex-col items-center rounded-lg border px-1 pb-1.5 pt-1 text-center ${estCible ? "border-accent bg-bg-card" : "border-border-light bg-bg-secondary"}`}
+          >
+            {a && (
+              <span className="absolute -right-2 -top-2">
+                <Etoile rang={a.rang} pret={!a.aPreparer.length} />
+              </span>
+            )}
+            <ImageMonture famille={famille} id={e.couleur} taille={48} className={a || estCible ? "" : "opacity-60"} />
+            <span className="text-[11px] font-medium leading-tight">{nomCouleur(famille, e.couleur)}</span>
+            <span className={`text-[10px] ${a ? (a.aPreparer.length ? "text-accent" : "text-status-ok") : bloquees.has(e.couleur) ? "text-status-warn" : "text-text-muted"}`}>
+              {a ? (a.aPreparer.length ? "à préparer" : "maintenant") : bloquees.has(e.couleur) ? "bloquée" : `séance ${numSeance[i]}`}
+            </span>
+          </div>
+        </Fragment>
+      );
+    });
+  const cible = plan.cible;
+  const retirerCible = () => setS((x) => choisirCible(x, famille, null));
 
   if (plan.etapes.length === 0)
     return (
@@ -200,6 +288,41 @@ export function TableauDeBord({ famille, s, setS }: Props) {
         </div>
       </div>
 
+      {/* Objectif prioritaire choisi dans l'arbre */}
+      {cible && (
+        <section
+          data-tuto="cible"
+          className={`rounded-xl border p-4 ${cible.etape === null ? "border-status-ok/50 bg-linear-to-br from-status-ok/10 to-transparent" : "border-sky-400/50 bg-linear-to-br from-sky-400/10 to-transparent"}`}
+        >
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            {cible.etape === null ? (
+              <span className="rounded-md bg-status-ok/20 px-2 py-0.5 text-xs font-bold uppercase tracking-wide text-status-ok">🎯 Objectif atteint</span>
+            ) : (
+              <span className="rounded-md bg-sky-400/20 px-2 py-0.5 text-xs font-bold uppercase tracking-wide text-sky-300">🎯 Objectif prioritaire</span>
+            )}
+            <h2 className="flex items-center gap-2 text-xl font-bold">
+              <ImageMonture famille={famille} id={cible.couleur} taille={32} />
+              {nomCouleur(famille, cible.couleur)}
+            </h2>
+            <span className="text-sm text-text-secondary">
+              {cible.etape === null
+                ? `✓ en étable (${cible.gardee?.sexe === "M" ? "♂" : "♀"} niv. ${cible.gardee?.niveau}) : gardée, le plan ne l'utilise pas comme parent`
+                : `${plan.prioritaires.size} naissance${plan.prioritaires.size > 1 ? "s" : ""} pour l'obtenir, en tête des actions`}
+            </span>
+            <span className="flex-1" />
+            {cible.etape === null && allerArbre && (
+              <button onClick={allerArbre} className="rounded-lg border border-status-ok/60 bg-status-ok/10 px-2 py-1 text-xs font-medium text-status-ok hover:bg-status-ok/20">
+                🎯 Choisir un autre objectif
+              </button>
+            )}
+            <button onClick={retirerCible} className="rounded-lg border border-border-light px-2 py-1 text-xs text-text-secondary hover:text-text-primary">
+              Retirer l'objectif
+            </button>
+          </div>
+          {cible.etape !== null && !compacte && <div className="mt-3 flex flex-wrap items-center gap-2">{rendreChemin([...plan.prioritaires].sort((a, b) => a - b))}</div>}
+        </section>
+      )}
+
       {/* Prochain objectif et chemin */}
       {objectif && (
         <section data-tuto="objectif" className="rounded-xl border border-accent/40 bg-linear-to-br from-accent/10 to-transparent p-4">
@@ -217,30 +340,7 @@ export function TableauDeBord({ famille, s, setS }: Props) {
             Chemin pour obtenir <b className="text-text-primary">{nomCouleur(famille, objectif.cible)}</b> avec ton étable :
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            {objectif.chemin.map((i, k) => {
-              const e = plan.etapes[i];
-              const a = rangDe.get(e.couleur);
-              const estCible = k === objectif.chemin.length - 1;
-              return (
-                <Fragment key={i}>
-                  {k > 0 && <span className="text-lg text-text-muted">→</span>}
-                  <div
-                    className={`relative flex w-28 flex-col items-center rounded-lg border px-1 pb-1.5 pt-1 text-center ${estCible ? "border-accent bg-bg-card" : "border-border-light bg-bg-secondary"}`}
-                  >
-                    {a && (
-                      <span className="absolute -right-2 -top-2">
-                        <Etoile rang={a.rang} pret={!a.aPreparer.length} />
-                      </span>
-                    )}
-                    <ImageMonture famille={famille} id={e.couleur} taille={48} className={a || estCible ? "" : "opacity-60"} />
-                    <span className="text-[11px] font-medium leading-tight">{nomCouleur(famille, e.couleur)}</span>
-                    <span className={`text-[10px] ${a ? (a.aPreparer.length ? "text-accent" : "text-status-ok") : bloquees.has(e.couleur) ? "text-status-warn" : "text-text-muted"}`}>
-                      {a ? (a.aPreparer.length ? "à préparer" : "maintenant") : bloquees.has(e.couleur) ? "bloquée" : `séance ${numSeance[i]}`}
-                    </span>
-                  </div>
-                </Fragment>
-              );
-            })}
+            {rendreChemin(objectif.chemin)}
           </div>
           {objectif.manquantes.length > 1 && !compacte && (
             <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs text-text-muted">
@@ -320,6 +420,11 @@ export function TableauDeBord({ famille, s, setS }: Props) {
           </ul>
         ) : (
           <p className="text-sm text-text-muted">Rien à faire avec l'étable actuelle.</p>
+        )}
+        {actions.length > 0 && (
+          <p data-tuto="clavier" className="mt-2 text-[11px] text-text-muted">
+            ⌨ <kbd>↑</kbd> <kbd>↓</kbd> choisir une action · <kbd>Entrée</kbd> l'ouvrir · <kbd>Ctrl</kbd> + <kbd>Entrée</kbd> valider · <kbd>Échap</kbd> fermer
+          </p>
         )}
       </Cadre>
 

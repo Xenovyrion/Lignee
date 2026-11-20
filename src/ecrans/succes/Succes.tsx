@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
 import { useNotifier } from "../../notifications";
 import { conseiller } from "../../moteur/conseils";
-import { couleur, FAMILLES, NOMS_FAMILLE } from "../../moteur/donnees";
+import { couleur, FAMILLES, nomCouleur, NOMS_FAMILLE } from "../../moteur/donnees";
 import { planifier } from "../../moteur/planificateur";
-import { bilan, naissances, NOM_META_NAISSANCES, OBJECTIF_NAISSANCES, PALIERS_NAISSANCES, type SuccesGeneration } from "../../moteur/succes";
+import { bilan, bilanChance, bilanChanceDetail, naissances, NOM_META_NAISSANCES, OBJECTIF_NAISSANCES, PALIERS_NAISSANCES, type SuccesGeneration } from "../../moteur/succes";
 import type { Famille, Sauvegarde } from "../../moteur/types";
-import { champ, Segments } from "../../ui";
+import { champ, pourcent, Segments } from "../../ui";
 import { COULEURS, Etoile, ImageMonture, PointObtenue } from "../arbre/commun";
 
 interface Props {
@@ -60,9 +60,9 @@ const Badge = ({ valide, commence }: { valide: boolean; commence: boolean }) =>
 export function Succes({ famille, setFamille, s, setS }: Props) {
   const bilans = useMemo(() => Object.fromEntries(FAMILLES.map((f) => [f, bilan(f, s)])) as Record<Famille, ReturnType<typeof bilan>>, [s]);
   const rangs = useMemo(() => {
-    const c = conseiller(planifier(famille, s.montures, s.obtenues[famille]), { takeza: s.options.takeza, makina: s.options.makina, seuilAnimakina: s.options.seuilAnimakina });
+    const c = conseiller(planifier(famille, s.montures, s.obtenues[famille], s.options.cibles?.[famille]), { takeza: s.options.takeza, makina: s.options.makina, seuilAnimakina: s.options.seuilAnimakina });
     return new Map(c.ordre.map((a) => [a.e.couleur, { rang: a.rang, pret: !a.aPreparer.length }]));
-  }, [famille, s.montures, s.obtenues, s.options.takeza, s.options.makina]);
+  }, [famille, s.montures, s.obtenues, s.options.takeza, s.options.makina, s.options.seuilAnimakina, s.options.cibles]);
   const [filtre, setFiltre] = useState<Filtre>("tous");
   const [manquantesSeules, setManquantesSeules] = useState(false);
   const b = bilans[famille];
@@ -141,6 +141,8 @@ export function Succes({ famille, setFamille, s, setS }: Props) {
           </div>
         </div>
       </div>
+
+      <BilanDeChance famille={famille} s={s} />
 
       {/* Barre d'outils de la famille */}
       <div className="flex flex-wrap items-center gap-3">
@@ -292,5 +294,96 @@ function Grille(p: { famille: Famille; couleurs: string[]; obtenues: string[]; r
         );
       })}
     </div>
+  );
+}
+
+/** Bilan de chance : naissances réussies comparées aux chances prévues par Lignée. */
+function BilanDeChance({ famille, s }: { famille: Famille; s: Sauvegarde }) {
+  const [ouvert, setOuvert] = useState(false);
+  const b = useMemo(() => bilanChance(s.journal, famille), [s.journal, famille]);
+  const detail = useMemo(() => bilanChanceDetail(s.journal, famille), [s.journal, famille]);
+  const [voirDetail, setVoirDetail] = useState(false);
+  const VERDICTS = {
+    "trop-tot": ["text-text-muted", "Trop tôt pour conclure (moins de 10 accouplements suivis)."],
+    conforme: ["text-status-ok", "Conforme aux prévisions : le calcul colle à tes résultats."],
+    chanceux: ["text-status-ok", "Plus chanceux que prévu ! 🍀"],
+    malchanceux: ["text-status-warn", "Nettement moins de réussites que prévu : vérifie les niveaux des parents et la makina saisie."],
+  } as const;
+  const [ton, texte] = VERDICTS[b.verdict];
+  const ETIQUETTES = { "trop-tot": "trop tôt", conforme: "✓ conforme", chanceux: "🍀 chanceux", malchanceux: "⚠ en dessous" } as const;
+  return (
+    <section data-tuto="bilan-chance" className="rounded-xl border border-border bg-bg-card p-4">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+        <span className="font-semibold">🎲 Bilan de ta chance · {NOMS_FAMILLE[famille]}s</span>
+        {b.suivis === 0 ? (
+          <span className="text-sm text-text-muted">Aucune naissance suivie pour l'instant : le bilan se remplit à chaque « Valider naissance ».</span>
+        ) : (
+          <>
+            <span className="text-sm">
+              <b>{b.reussis}</b>/{b.suivis} réussies <span className="text-text-muted">({pourcent(b.reussis / b.suivis)})</span>
+            </span>
+            <span className="text-sm text-text-secondary">
+              prévu : {pourcent(b.attendus / b.suivis)} <span className="text-text-muted">(≈ {b.attendus.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} réussite{b.attendus >= 2 ? "s" : ""})</span>
+            </span>
+            <span className={`text-sm ${ton}`}>{texte}</span>
+            <span className="flex-1" />
+            <button onClick={() => setVoirDetail(!voirDetail)} className="text-xs text-accent hover:underline">
+              {voirDetail ? "▴ Masquer le détail" : "▾ Par makina et niveau"}
+            </button>
+            <button onClick={() => setOuvert(!ouvert)} className="text-xs text-accent hover:underline">
+              {ouvert ? "▴ Masquer" : `▾ Dernières naissances (${b.derniers.length})`}
+            </button>
+          </>
+        )}
+      </div>
+      {voirDetail && b.suivis > 0 && (
+        <>
+          <table className="mt-3 w-full max-w-2xl text-xs">
+            <thead className="text-left text-text-muted">
+              <tr>
+                <th className="py-1 font-medium">Conditions</th>
+                <th className="py-1 text-right font-medium">Suivis</th>
+                <th className="py-1 text-right font-medium">Réussis</th>
+                <th className="py-1 text-right font-medium">Prévu</th>
+                <th className="py-1 pl-4 font-medium">Verdict</th>
+              </tr>
+            </thead>
+            <tbody>
+              {detail.map(({ libelle, groupe, bilan: x }, i) => (
+                <tr key={libelle} className={`border-t ${i > 0 && groupe !== detail[i - 1].groupe ? "border-border" : "border-border-light"}`}>
+                  <td className="py-1">{libelle}</td>
+                  <td className="py-1 text-right">{x.suivis}</td>
+                  <td className="py-1 text-right">
+                    {x.reussis} <span className="text-text-muted">({pourcent(x.reussis / x.suivis)})</span>
+                  </td>
+                  <td className="py-1 text-right text-text-secondary">{pourcent(x.attendus / x.suivis)}</td>
+                  <td className={`py-1 pl-4 ${VERDICTS[x.verdict][0]}`}>{ETIQUETTES[x.verdict]}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="mt-1 text-[11px] text-text-muted">Chaque ligne conclut à partir de 10 accouplements. Le niveau des parents est suivi depuis la version 1.0.24.</p>
+        </>
+      )}
+      {ouvert && b.suivis > 0 && (
+        <ul className="mt-3 grid gap-1.5 sm:grid-cols-2">
+          {b.derniers.map((d, i) => (
+            <li key={i} className="flex items-center gap-2 rounded-lg border border-border-light bg-bg-secondary px-2 py-1 text-xs">
+              <span className={d.reussi ? "text-status-ok" : "text-status-warn"}>{d.reussi ? "✓" : "✗"}</span>
+              <ImageMonture famille={famille} id={d.vise} taille={22} />
+              <span className="min-w-0 flex-1 truncate">
+                {nomCouleur(famille, d.vise)}
+                {!d.reussi && <span className="text-text-muted"> → {d.couleurs.map((c) => nomCouleur(famille, c)).join(", ")}</span>}
+              </span>
+              <span className="text-text-muted">{pourcent(d.chance)}</span>
+              <span className="w-20 text-right text-text-muted">{d.date ? new Date(d.date).toLocaleDateString("fr-FR", { day: "numeric", month: "short" }) : ""}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="mt-2 text-[11px] text-text-muted">
+        Une naissance est réussie quand le bébé a la couleur visée. Seules les naissances validées depuis la version 1.0.24 sont suivies (la chance prévue est enregistrée à ce moment-là).
+      </p>
+    </section>
   );
 }

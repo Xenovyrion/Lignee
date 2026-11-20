@@ -34,5 +34,12 @@ export function caracteristiques(f: Famille, id: string): [string, number][] | n
   return (carac.familles as unknown as Record<Famille, Record<string, [string, number][] | undefined>>)[f][id] ?? null;
 }
 
+/** Noms des bonus possibles d'une famille, triés. */
+export function bonusDeFamille(f: Famille): string[] {
+  const noms = new Set<string>();
+  for (const c of parFamille[f]) for (const [n] of caracteristiques(f, c.id) ?? []) noms.add(n);
+  return [...noms].sort((a, b) => a.replace("% ", "").localeCompare(b.replace("% ", "")));
+}
+
 /** Couleurs comptant pour les succès de génération (G2 à G10). */
 export const objectifs = (f: Famille) => parFamille[f].filter((c) => c.generation > 1);

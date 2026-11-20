@@ -1,6 +1,7 @@
 // Cartes de « À faire maintenant » : une par action (naissance, clonage, préparation, capture),
 // numérotées, avec une saisie groupée des résultats constatés en jeu.
-import { capaciteDuJour } from "../../almanax";
+import { capaciteDuJour, generationDuJour } from "../../almanax";
+import { probaCible } from "../../moteur/regles";
 import { useState, type ReactNode } from "react";
 import { clonerPlusieurs, enregistrerNaissances, type Bebe } from "../../moteur/actions";
 import type { ActionAccouplement, ActionCapture } from "../../moteur/conseils";
@@ -250,7 +251,7 @@ Pour 100 % avec Optimakina : niveaux cumulés ${a.niveauConseille} (actuellement
               )}
             </div>
           </div>
-          <Bouton data-tuto="enregistrer" discret={!pret || ouvert} onClick={() => setOuvert(!ouvert)}>
+          <Bouton data-principal data-tuto="enregistrer" discret={!pret || ouvert} onClick={() => setOuvert(!ouvert)}>
             {ouvert ? "Annuler" : "Valider naissance"}
           </Bouton>
         </>
@@ -321,7 +322,14 @@ export function FormNaissances({ famille, a, setS, niveauBebes, fermer }: { fami
     try {
       const paires = a.paires.slice(0, n).map((p) => ({ pereId: p.pere.id, mereId: p.mere.id }));
       notifier(`${n > 1 ? `${n} naissances enregistrées` : "Naissance enregistrée"} : ${resumer(famille, lignes)}`, { annulable: true });
-      setS((s) => enregistrerNaissances(s, paires, versListe(lignes) as Bebe[], makina || undefined, niveauBebes, capaciteDuJour()));
+      // Chance de la couleur visée pour chaque accouplement, avec la makina réellement utilisée (bilan de chance).
+      const takeza = generationDuJour();
+      const previsions = a.paires.slice(0, n).map((p) => ({
+        vise: a.e.couleur,
+        chance: probaCible(p.pere.niveau, p.mere.niveau, { optimakina: makina === "optimakina", takeza }),
+        niveaux: [p.pere.niveau, p.mere.niveau] as [number, number],
+      }));
+      setS((s) => enregistrerNaissances(s, paires, versListe(lignes) as Bebe[], makina || undefined, niveauBebes, capaciteDuJour(), previsions));
       fermer();
     } catch (err) {
       alert((err as Error).message);
@@ -361,7 +369,7 @@ export function FormNaissances({ famille, a, setS, niveauBebes, fermer }: { fami
         </label>
       </div>
       <div className="flex flex-wrap items-center gap-3">
-        <Bouton onClick={valider} disabled={!ok}>
+        <Bouton data-valider onClick={valider} disabled={!ok}>
           Valider
         </Bouton>
         <span className={`text-xs ${ok ? "text-text-muted" : "text-status-warn"}`}>
@@ -391,7 +399,7 @@ export function CarteClonage({ id, numero, famille, g, setS }: { id?: string; nu
       type="clonage"
       nombre={g.paires.length}
       droite={
-        <Bouton discret={ouvert} onClick={() => setOuvert(!ouvert)}>
+        <Bouton data-principal discret={ouvert} onClick={() => setOuvert(!ouvert)}>
           {ouvert ? "Annuler" : "Valider clonage"}
         </Bouton>
       }
@@ -445,7 +453,7 @@ export function FormClonages({ famille, g, setS, fermer }: { famille: Famille; g
       <div className="text-text-secondary">Clones obtenus (un par paire de stériles)</div>
       <SaisieResultats famille={famille} lignes={lignes} setLignes={setLignes} couleursFixes />
       <div className="flex flex-wrap items-center gap-3">
-        <Bouton onClick={valider} disabled={n < 1 || n > n0}>
+        <Bouton data-valider onClick={valider} disabled={n < 1 || n > n0}>
           Valider
         </Bouton>
         <span className={`text-xs ${n >= 1 && n <= n0 ? "text-text-muted" : "text-status-warn"}`}>
@@ -469,7 +477,7 @@ export function CartePreparer({ id, numero, famille, groupes, setS }: { id?: str
       type="preparer"
       nombre={nb}
       droite={
-        <Bouton onClick={() => toutesPretes(groupes)} title="Toutes les jauges sont remplies : tout passer en Féconde">
+        <Bouton data-principal onClick={() => toutesPretes(groupes)} title="Toutes les jauges sont remplies : tout passer en Féconde">
           ✓ Toutes prêtes ({nb})
         </Bouton>
       }>
@@ -523,7 +531,7 @@ export function FormCaptures({ famille, capture, setS, niveau, fermer }: { famil
       <div className="text-text-secondary">Montures capturées</div>
       <SaisieResultats famille={famille} lignes={lignes} setLignes={setLignes} couleursFixes />
       <div>
-        <Bouton onClick={valider} disabled={total(lignes) < 1}>
+        <Bouton data-valider onClick={valider} disabled={total(lignes) < 1}>
           Ajouter à l'étable
         </Bouton>
       </div>
@@ -541,7 +549,7 @@ export function CarteCapture({ id, numero, famille, capture, setS, niveau }: { i
       nombre={capture.nombre}
       droite={
         // Le formulaire est recréé à chaque ouverture : il repart des nombres actuels du plan.
-        <Bouton discret={ouvert} onClick={() => setOuvert(!ouvert)}>
+        <Bouton data-principal discret={ouvert} onClick={() => setOuvert(!ouvert)}>
           {ouvert ? "Annuler" : "Valider capture"}
         </Bouton>
       }

@@ -28,8 +28,32 @@ export interface Bebe {
   capacite?: Capacite;
 }
 
+/** Fixe (ou retire, avec null) l'objectif prioritaire d'une famille. */
+export function choisirCible(s: Sauvegarde, f: Famille, id: string | null): Sauvegarde {
+  const cibles = { ...s.options.cibles };
+  if (id) cibles[f] = id;
+  else delete cibles[f];
+  return { ...s, options: { ...s.options, cibles } };
+}
+
 /** Enregistre un accouplement : parents stériles, bébé(s) créé(s), succès mis à jour, journal. */
-export function enregistrerNaissance(s: Sauvegarde, pereId: string, mereId: string, bebes: Bebe[], makina?: Makina, niveauBebes = 1, capaciteAlmanax?: Capacite): Sauvegarde {
+/** Prévision d'un accouplement : couleur visée et chance de l'obtenir. */
+export interface Prevision {
+  vise: string;
+  chance: number;
+  niveaux?: [number, number];
+}
+
+export function enregistrerNaissance(
+  s: Sauvegarde,
+  pereId: string,
+  mereId: string,
+  bebes: Bebe[],
+  makina?: Makina,
+  niveauBebes = 1,
+  capaciteAlmanax?: Capacite,
+  prevision?: Prevision,
+): Sauvegarde {
   const pere = s.montures.find((m) => m.id === pereId);
   const mere = s.montures.find((m) => m.id === mereId);
   if (!pere || !mere) throw new Error("Parent introuvable");
@@ -57,7 +81,7 @@ export function enregistrerNaissance(s: Sauvegarde, pereId: string, mereId: stri
     ...s,
     montures: [...s.montures.map((m) => (m.id === pereId || m.id === mereId ? { ...m, etat: "sterile" as const } : m)), ...nes],
     obtenues,
-    journal: [...s.journal, { id: nouvelId(), date: maintenant(), famille: f, pereId, mereId, makina, bebeIds: nes.map((b) => b.id) }],
+    journal: [...s.journal, { id: nouvelId(), date: maintenant(), famille: f, pereId, mereId, makina, bebeIds: nes.map((b) => b.id), couleurs: nes.map((b) => b.couleur), ...prevision }],
   };
 }
 
@@ -95,12 +119,13 @@ export function enregistrerNaissances(
   makina?: Makina,
   niveauBebes = 1,
   capaciteAlmanax?: Capacite,
+  previsions?: Prevision[],
 ): Sauvegarde {
   const n = paires.length;
   if (n === 0) throw new Error("Aucun accouplement");
   if (bebes.length < n || bebes.length > 2 * n) throw new Error(`${n} accouplement(s) : entre ${n} et ${2 * n} bébés`);
   return paires.reduce(
-    (acc, p, i) => enregistrerNaissance(acc, p.pereId, p.mereId, [bebes[i], ...(n + i < bebes.length ? [bebes[n + i]] : [])], makina, niveauBebes, capaciteAlmanax),
+    (acc, p, i) => enregistrerNaissance(acc, p.pereId, p.mereId, [bebes[i], ...(n + i < bebes.length ? [bebes[n + i]] : [])], makina, niveauBebes, capaciteAlmanax, previsions?.[i]),
     s,
   );
 }

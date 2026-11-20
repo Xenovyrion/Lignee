@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { sauvegardeVide } from "./actions";
 import { couleurs } from "./donnees";
-import { bilan, naissances, nomSuccesGeneration } from "./succes";
-import type { Monture } from "./types";
+import { bilan, bilanChance, bilanChanceDetail, naissances, nomSuccesGeneration } from "./succes";
+import type { Accouplement, Famille, Monture } from "./types";
 
 describe("succès", () => {
   it("noms officiels des succès de génération", () => {
@@ -28,5 +28,37 @@ describe("succès", () => {
     s.options.naissancesAnterieures = 120;
     s.journal = [{ id: "j", date: "", famille: "dragodinde", pereId: "a", mereId: "b", bebeIds: ["x", "y"] }];
     expect(naissances(s)).toBe(122);
+  });
+});
+
+describe("bilan de chance", () => {
+  const j = (vise: string, chance: number, couleur: string, famille: Famille = "dragodinde"): Accouplement => ({
+    id: Math.random().toString(), date: "", famille, pereId: "a", mereId: "b", bebeIds: ["x"], vise, chance, couleurs: [couleur],
+  });
+  it("compte les réussites et les attendus, ignore les entrées sans prévision", () => {
+    const journal = [j("ivoire", 0.8, "ivoire"), j("ivoire", 0.8, "ebene"), { id: "v", date: "", famille: "dragodinde" as const, pereId: "a", mereId: "b", bebeIds: ["y"] }];
+    const b = bilanChance(journal);
+    expect(b).toMatchObject({ suivis: 2, reussis: 1, verdict: "trop-tot" });
+    expect(b.attendus).toBeCloseTo(1.6);
+    expect(b.derniers[0].reussi).toBe(false);
+  });
+  it("verdict après 10 accouplements et filtre par famille", () => {
+    const journal = [...Array.from({ length: 20 }, () => j("ivoire", 0.8, "ebene")), j("prune", 0.5, "prune", "muldo")];
+    expect(bilanChance(journal, "dragodinde").verdict).toBe("malchanceux");
+    expect(bilanChance(journal, "muldo").suivis).toBe(1);
+    expect(bilanChance(Array.from({ length: 20 }, (_, i) => j("ivoire", 0.8, i < 16 ? "ivoire" : "ebene"))).verdict).toBe("conforme");
+  });
+  it("détail par makina et par niveau des parents", () => {
+    const journal: Accouplement[] = [
+      { ...j("ivoire", 0.8, "ivoire"), makina: "optimakina", niveaux: [200, 200] },
+      { ...j("ivoire", 0.6, "ebene"), makina: "animakina", niveaux: [200, 150] },
+      { ...j("ivoire", 0.6, "ivoire"), makina: "animakina" },
+    ];
+    expect(bilanChanceDetail(journal).map((x) => [x.libelle, x.bilan.suivis, x.bilan.reussis])).toEqual([
+      ["Optimakina", 1, 1],
+      ["Animakina", 2, 1],
+      ["Parents tous deux niv. 200", 1, 1],
+      ["Parents niv. 100 à 199", 1, 0],
+    ]);
   });
 });

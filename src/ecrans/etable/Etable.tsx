@@ -49,11 +49,11 @@ export function Etable({ famille, s, setS }: Props) {
   const [selection, setSelection] = useState<Set<string>>(new Set());
   const [saisie, setSaisie] = useState(false);
 
-  const plan = useMemo(() => planifier(famille, s.montures, s.obtenues[famille]), [famille, s.montures, s.obtenues]);
+  const plan = useMemo(() => planifier(famille, s.montures, s.obtenues[famille], s.options.cibles?.[famille]), [famille, s.montures, s.obtenues, s.options.cibles]);
   const reservees = plan.reservees;
   const besoins = useMemo(
     () => besoinsParCouleur(famille, s.montures, plan, conseiller(plan, { takeza: s.options.takeza, makina: s.options.makina, seuilAnimakina: s.options.seuilAnimakina }).captures),
-    [famille, s.montures, plan, s.options.takeza, s.options.makina],
+    [famille, s.montures, plan, s.options.takeza, s.options.makina, s.options.seuilAnimakina],
   );
   const deLaFamille = useMemo(() => s.montures.filter((m) => m.famille === famille), [s.montures, famille]);
   const obtenues = useMemo(() => new Set(s.obtenues[famille]), [s.obtenues, famille]);

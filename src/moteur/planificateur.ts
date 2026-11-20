@@ -49,12 +49,25 @@ export interface Plan {
    * (naissances et captures en amont) + nombre d'étapes qui en dépendent.
    */
   importance: number[];
+  /** Objectif prioritaire : la couleur visée, l'étape qui la fait naître (null si déjà en étable) et son chemin. */
+  cible?: { couleur: string; etape: number | null; gardee?: Monture };
+  /** Étapes du chemin vers l'objectif prioritaire (passent avant le reste). */
+  prioritaires: Set<number>;
 }
 
 const autreSexe = (s: Sexe): Sexe => (s === "M" ? "F" : "M");
 
-export function planifier(famille: Famille, montures: Monture[], obtenues: Iterable<string>): Plan {
+export function planifier(famille: Famille, montures: Monture[], obtenues: Iterable<string>, cible?: string | null): Plan {
   const dejaObtenues = new Set(obtenues);
+  // Objectif prioritaire : une monture de cette couleur est gardée (jamais utilisée comme parent),
+  // de préférence une stérile (inutile à l'élevage), sinon la plus haut niveau.
+  const valide = !!cible && couleur(famille, cible).generation > 1;
+  const gardee = valide
+    ? montures
+        .filter((m) => m.famille === famille && m.couleur === cible)
+        .sort((a, b) => Number(b.etat === "sterile") - Number(a.etat === "sterile") || b.niveau - a.niveau)[0]
+    : undefined;
+  if (gardee) montures = montures.filter((m) => m !== gardee);
   const stock = new Map<string, Monture[]>();
   for (const m of montures) {
     if (m.famille !== famille || !peutSAccoupler(m)) continue;
@@ -194,6 +207,14 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
   // un succès reste disponible comme parent des générations suivantes) et, dans une génération,
   // la moins coûteuse d'abord pour ne pas lui prendre les montures existantes qu'elle utilise.
   const restants = objectifs(famille).filter((c) => !dejaObtenues.has(c.id));
+  // L'objectif prioritaire passe avant tout : il prend les montures existantes en premier, et son bébé
+  // est gardé (pas remis comme parent disponible pour la suite).
+  let etapeCible: number | null = null;
+  if (valide && !gardee) {
+    const k = restants.findIndex((c) => c.id === cible);
+    if (k >= 0) restants.splice(k, 1);
+    etapeCible = produire(cible!, k >= 0 ? "succes" : "intermediaire");
+  }
   while (restants.length) {
     const gen = restants[0].generation;
     let iMin = 0;
@@ -277,7 +298,16 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
     .filter(({ e }) => e.parents.every((p) => p.type === "monture") && !e.alerteSexe)
     .map(({ i }) => i);
 
-  return { famille, etapes, captures, immediates, reservees, clonages, importance };
+  // Chemin vers l'objectif : son étape et toutes les naissances en amont.
+  const prioritaires = new Set<number>();
+  const remonter = (i: number) => {
+    if (prioritaires.has(i)) return;
+    prioritaires.add(i);
+    for (const p of etapes[i].parents) if (p.type === "naissance") remonter(p.etape);
+  };
+  if (etapeCible !== null) remonter(etapeCible);
+
+  return { famille, etapes, captures, immediates, reservees, clonages, importance, prioritaires, ...(valide && { cible: { couleur: cible!, etape: etapeCible, gardee } }) };
 }
 
 /** Importance de chaque étape : coût en amont (naissances + captures) + étapes en aval. */
