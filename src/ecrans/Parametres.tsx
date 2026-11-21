@@ -7,6 +7,7 @@ import { SectionSauvegardes } from "./SectionSauvegardes";
 import { SectionMiseAJour } from "./SectionMiseAJour";
 import { SectionDiagnostic } from "./SectionDiagnostic";
 import { SectionEnclos } from "./SectionEnclos";
+import { Mentions } from "./Mentions";
 import { ChoixChapitres, type Chapitre } from "./Didacticiel";
 import { fondDuTheme, themeParId, THEMES, type Theme } from "../themes";
 import { useNotifier } from "../notifications";
@@ -303,44 +304,7 @@ export function Parametres({ s, setS, lancerDidacticiel }: Props) {
       <SectionSauvegardes s={s} setS={setS} />
       <SectionMiseAJour />
       <SectionDiagnostic s={s} />
-      <Carte tuto="a-propos" titre="À propos">
-        <div className="flex flex-col gap-2 text-sm text-text-secondary">
-          <p>
-            Dofus est un MMORPG édité par{" "}
-            <a href="https://www.ankama.com" target="_blank" rel="noreferrer" className="text-accent hover:underline">
-              Ankama
-            </a>
-            . Lignée est un outil de fan <b>gratuit et non officiel, sans lien avec Ankama</b>.
-          </p>
-          <p>
-            Certaines illustrations sont la propriété d'Ankama Studio et de Dofus, tous droits réservés. Les images des montures et les fonds d'écran ne sont pas inclus dans
-            l'application : elle les affiche depuis leur site d'origine,{" "}
-            <a href="https://dofusdb.fr" target="_blank" rel="noreferrer" className="text-accent hover:underline">
-              DofusDB
-            </a>{" "}
-            et{" "}
-            <a href={SOURCE_FONDS} target="_blank" rel="noreferrer" className="text-accent hover:underline">
-              dofus.com
-            </a>
-            .
-          </p>
-          <p>
-            Merci à{" "}
-            <a href="https://www.dofuspourlesnoobs.com" target="_blank" rel="noreferrer" className="text-accent hover:underline">
-              Dofus pour les Noobs
-            </a>{" "}
-            pour les caractéristiques des montures et le guide de l'éleveur, et à DofusDB pour les données du jeu.
-          </p>
-          <p>
-            © 2026 Lignée. Le code est public (licence PolyForm Strict : usage personnel libre, pas de redistribution ni d'usage commercial) et chaque installeur est
-            compilé automatiquement par GitHub à partir de ce code :{" "}
-            <a href="https://github.com/Xenovyrion/Lignee" target="_blank" rel="noreferrer" className="text-accent hover:underline">
-              github.com/Xenovyrion/Lignee
-            </a>
-            .
-          </p>
-        </div>
-      </Carte>
+      <Mentions complet />
     </div>
   );
 }

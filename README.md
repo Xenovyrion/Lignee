@@ -12,6 +12,7 @@ Dragodindes, Muldos et Volkornes : Lignée te dit quoi accoupler, capturer et cl
 [![Téléchargements](https://img.shields.io/github/downloads/Xenovyrion/Lignee/total?label=t%C3%A9l%C3%A9chargements&color=3fb6e3)](../../releases)
 [![Windows](https://img.shields.io/badge/Windows-10%20%7C%2011-0078d4)](../../releases/latest)
 [![Licence](https://img.shields.io/badge/licence-PolyForm%20Strict-d35bdc)](LICENSE)
+[![VirusTotal](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FXenovyrion%2FLignee%2Fbadges%2Fvirustotal.json)](../../releases/latest)
 
 ### [⬇ Télécharger pour Windows](../../releases/latest)
 
@@ -28,10 +29,12 @@ Finir les succès de génération, c'est **294 couleurs** à faire naître sur t
 | | |
 |---|---|
 | 🧬 **Plan automatique** | Naissances, clonages, captures et préparations, numérotés dans l'ordre. Le plan se recalcule après chaque résultat. |
+| 🎯 **Objectif prioritaire** | Vise une couleur précise : le plan prend le chemin le plus court vers elle et la garde une fois née. |
 | ♻️ **Recyclage des stériles** | Deux stériles de même génération sont clonés en une monture fertile : plus de dix fois moins de naissances. |
 | ⏱️ **Minuteurs d'enclos** | Jauges comme en jeu, heure de fin calculée, alertes de sérénité. Notification Windows et, en option, Discord. |
-| 🌳 **Arbre des lignées** | Toutes les couleurs par génération, leurs parents et ce qu'elles débloquent. |
-| 🏆 **Succès** | Cochés automatiquement à chaque naissance enregistrée. |
+| 🌙 **Almanax** | Bonus d'élevage du jour appliqués automatiquement, calendrier et rappel Discord la veille. |
+| 🌳 **Arbre des lignées** | Toutes les couleurs, leurs parents, leurs caractéristiques et le chemin pour les obtenir ; recherche par nom ou par bonus. |
+| 🏆 **Succès et bilan de chance** | Succès cochés à chaque naissance ; tes réussites comparées aux chances prévues. |
 | 🪟 **Mode compagnon** | Une petite fenêtre toujours au premier plan, à garder à côté du jeu. |
 
 ## Aperçu
@@ -49,14 +52,16 @@ Finir les succès de génération, c'est **294 couleurs** à faire naître sur t
 
 ## Installation
 
-1. Télécharge l'installateur Windows (`Lignee_x.y.z_x64-setup.exe`) dans la [dernière version](../../releases/latest).
+1. Télécharge l'installateur Windows **`Lignee_x.y.z_x64_en-US.msi`** dans la [dernière version](../../releases/latest).
 2. Lance-le. L'application n'est pas signée par un éditeur reconnu, donc Windows SmartScreen peut afficher un avertissement : *Informations complémentaires → Exécuter quand même*.
+
+**Peut-on lui faire confiance ?** Le code est public, et chaque installeur est compilé automatiquement par GitHub à partir de ce code : le lien vers le journal de compilation et les analyses [VirusTotal](https://www.virustotal.com) de chaque fichier sont dans les notes de chaque version.
 
 **Mises à jour automatiques** : au démarrage, Lignée vérifie si une nouvelle version existe et propose *Installer et redémarrer*. Les nouveautés s'affichent ensuite dans l'application. Tes données sont conservées.
 
 ## Prise en main
 
-À la première ouverture, une **visite guidée** en cinq chapitres te présente l'outil : Découverte, Gérer l'étable, Suivre le tableau de bord, Enclos et notifications, Au quotidien. Les chapitres pratiques se font sur une **étable d'exemple**, sans toucher à la tienne. On les relance avec le bouton **? Aide** ou depuis *Paramètres → Visite guidée*.
+À la première ouverture, une **visite guidée** en six chapitres (≈ 13 minutes) te présente l'outil : Découverte, Gérer l'étable, Suivre le tableau de bord, Enclos et notifications, L'arbre des couleurs, Les paramètres. Les chapitres pratiques se font sur une **étable d'exemple**, sans toucher à la tienne. On les relance avec le bouton **? Aide** (qui ouvre le chapitre de l'écran affiché) ou depuis *Paramètres → Visite guidée*.
 
 1. **Choisis la famille** (Dragodindes, Muldos, Volkornes) en haut de l'écran.
 2. **Saisis ton étable** (onglet *Étable*) : pour chaque couleur, le nombre de mâles et de femelles, et leur état (fertile, féconde, stérile). Coche dans *Succès* les couleurs déjà obtenues.
@@ -64,17 +69,19 @@ Finir les succès de génération, c'est **294 couleurs** à faire naître sur t
 
 ## Les écrans
 
-- **Tableau de bord** : la progression vers le prochain succès, puis les prochaines étapes regroupées par type.
-  - **Naissances** : couples à accoupler, combien de fois, quelle makina utiliser et la chance d'obtenir la couleur visée. Les échecs et les jumeaux sont gérés.
-  - **Clonages** : les paires de stériles à cloner.
+- **Tableau de bord** : la progression vers le prochain succès, l'objectif prioritaire 🎯 s'il y en a un, puis les prochaines étapes regroupées par type. En vue détaillée ou compacte (une ligne par action), et au clavier : ↑ ↓ pour choisir, Entrée pour ouvrir, Ctrl + Entrée pour valider.
+  - **Naissances** : couples à accoupler, combien de fois, quelle makina utiliser (Optimakina ou Animakina selon ton seuil) et la chance d'obtenir la couleur visée. Les croisements ratés et les jumeaux sont gérés.
+  - **Clonages** : les paires de stériles à cloner, avec la couleur possible du clone.
   - **Préparer** : les jauges à remplir en enclos ; *✓ Toutes prêtes* passe tout en Féconde d'un coup.
-  - **Captures** : combien de mâles et de femelles capturer, par couleur.
-- **Étable** : tes montures par couleur, avec des filtres (à préparer, fécondes, stériles, utiles au plan, à vendre…).
+  - **Captures** : combien de mâles et de femelles capturer, par couleur, validées en un clic.
+- **Étable** : tes montures par couleur, avec des filtres (à préparer, fécondes, stériles, utiles au plan, à vendre…) et une saisie rapide.
 - **Enclos** : les jauges de chaque enclos comme en jeu, en mode simple (paliers) ou avancé (valeur exacte). Lignée calcule l'heure où les montures sont prêtes, prévient quand la sérénité sort de sa zone ou qu'une jauge se vide, et envoie une notification Windows. Avec un relais gratuit partageable dans une guilde, la notification arrive aussi sur Discord, même Lignée fermée : voir [le guide du relais](docs/RELAIS_DISCORD.md) et [sa sécurité](docs/RELAIS_SECURITE.md).
-- **Arbre** : toutes les couleurs par génération, avec les liens de parenté et le chemin pour obtenir une couleur.
-- **Succès** : les couleurs par génération et les paliers de naissances.
+- **Arbre** : la carte de toutes les couleurs, recherche par nom ou par bonus (PM, Vitalité…), caractéristiques au niveau maximum, parents possibles et chemin pour obtenir une couleur. *🎯 Viser en priorité* en fait l'objectif du plan.
+- **Succès** : les couleurs par génération, les paliers de naissances et le **bilan de chance** (au total, par makina et par niveau des parents).
 - **Guide** : les règles d'élevage expliquées simplement.
-- **Paramètres** : thèmes, fond d'écran, animations, minuteurs d'enclos, sauvegardes et mises à jour.
+- **Paramètres** : thèmes, fond d'écran, animations, makina et seuil d'Animakina, enclos, sauvegardes (dont une copie dans OneDrive ou Google Drive), mises à jour et journal de diagnostic.
+- **Almanax** (en haut) : les bonus d'élevage à venir ; ceux du jour s'appliquent tout seuls.
+- **Recherche rapide** (Ctrl + K) : une couleur, un onglet ou un réglage.
 
 Chaque modification affiche une notification discrète avec **Annuler**.
 
@@ -97,7 +104,8 @@ Un test joue un élevage complet de zéro pour les trois familles et vérifie qu
 
 - Sauvegarde : `%APPDATA%\io.github.xenovyrion.lignee\lignee-sauvegarde.json`.
 - Copies automatiques : une par jour dans le sous-dossier `sauvegardes` (les 15 dernières sont gardées).
-- *Paramètres → Sauvegardes* : exporter, importer ou restaurer une copie.
+- *Paramètres → Sauvegardes* : exporter, importer ou restaurer une copie, et en option une copie dans un dossier synchronisé (OneDrive, Google Drive).
+- Rien n'est envoyé ailleurs, sauf les notifications Discord si tu actives le relais.
 
 <details>
 <summary><b>Développement</b></summary>
@@ -120,7 +128,7 @@ npm run dev           # interface seule dans le navigateur (sauvegarde en localS
 | `relais` | relais Discord facultatif (Cloudflare Worker) |
 | `docs` | référence des règles d'élevage, guides du relais, captures |
 
-**Publier une version** : monter la version dans `package.json`, `src-tauri/tauri.conf.json` et `src-tauri/Cargo.toml`, commiter, attendre la CI, puis pousser une étiquette `vX.Y.Z`. Le workflow *Release* compile, signe et publie l'installateur et `latest.json`.
+**Publier une version** : monter la version dans `package.json`, `src-tauri/tauri.conf.json` et `src-tauri/Cargo.toml`, commiter, attendre la CI, puis pousser une étiquette `vX.Y.Z`. Le workflow *Release* compile, signe et publie les installeurs et `latest.json`, les fait analyser par VirusTotal (secret `VT_API_KEY`) et met à jour le badge (branche `badges`).
 
 </details>
 
@@ -138,4 +146,16 @@ Pour toute autre utilisation, demande l'autorisation dans une [issue](../../issu
 
 ---
 
-<sub>Dofus est un MMORPG édité par [Ankama](https://www.ankama.com). Lignée est un outil de fan gratuit et non officiel, sans lien avec Ankama. Certaines illustrations sont la propriété d'Ankama Studio et de Dofus, tous droits réservés : les images des montures (via [DofusDB](https://dofusdb.fr)) et les fonds d'écran ([wallpapers officiels](https://www.dofus.com/fr/mmorpg/medias/wallpapers)) ne sont pas inclus dans le code, l'application les affiche depuis leur site d'origine, et les captures d'écran de cette page en montrent certaines. Caractéristiques des montures : merci à [Dofus pour les Noobs](https://www.dofuspourlesnoobs.com).<br>© 2026 Lignée · [Licence PolyForm Strict](LICENSE)</sub>
+<div align="center">
+
+<img src="public/icone.svg" alt="" width="40" />
+
+**Outil de fan gratuit et non officiel, sans lien avec Ankama.**<br>
+Dofus est un MMORPG édité par [Ankama](https://www.ankama.com).
+
+<sub>Certaines illustrations sont la propriété d'Ankama Studio et de Dofus · Tous droits réservés.<br>
+Elles ne sont pas incluses dans le code : l'application les affiche depuis leur site d'origine, et les captures d'écran de cette page en montrent certaines.</sub>
+
+<sub>© 2026 Lignée · [Licence PolyForm Strict](LICENSE)</sub>
+
+</div>

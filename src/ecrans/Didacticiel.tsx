@@ -546,7 +546,7 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
       },
       {
         titre: "À propos",
-        texte: "Lignée est un projet de fan, non affilié à Ankama : les images et fonds d'écran restent leur propriété. Le lien vers le code public est ici.",
+        texte: "Lignée est un outil de fan, sans lien avec Ankama : certaines illustrations restent leur propriété. On y trouve aussi la licence et le lien vers le code public.",
         cible: '[data-tuto="a-propos"]',
         onglet: "parametres",
       },

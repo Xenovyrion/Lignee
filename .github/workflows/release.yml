@@ -52,7 +52,46 @@ jobs:
           TAG: ${{ github.ref_name }}
           ANALYSE: ${{ steps.vt.outputs.analysis }}
         run: |
-          $liens = $env:ANALYSE -split ',' | ForEach-Object { $f, $u = $_ -split '=', 2; "- [$(Split-Path $f -Leaf)]($u)" }
-          $corps = gh release view $env:TAG --json body -q .body
+          # Lien stable vers la fiche du fichier (empreinte SHA-256), plutôt que l'analyse ponctuelle.
+          $liens = $env:ANALYSE -split ',' | ForEach-Object {
+            $f = ($_ -split '=', 2)[0]
+            "- [$(Split-Path $f -Leaf)](https://www.virustotal.com/gui/file/$((Get-FileHash $f -Algorithm SHA256).Hash.ToLower()))"
+          }
+          $corps = (gh release view $env:TAG --json body -q .body) -join "`n"
           "$corps`n`n🛡️ Analyse VirusTotal :`n$($liens -join "`n")" | Set-Content notes-vt.md -Encoding utf8
           gh release edit $env:TAG --notes-file notes-vt.md
+      # Badge VirusTotal du README : résultat de l'installeur .msi, publié en fichier virustotal.json (format « endpoint » de shields.io).
+      - if: steps.vt.outputs.analysis != ''
+        continue-on-error: true
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          $msi = Get-ChildItem src-tauri/target/release/bundle/msi/*.msi | Select-Object -First 1
+          $sha = (Get-FileHash $msi -Algorithm SHA256).Hash.ToLower()
+          $stats = $null
+          for ($i = 0; $i -lt 20 -and -not $stats; $i++) {
+            Start-Sleep 30
+            try {
+              $r = Invoke-RestMethod "https://www.virustotal.com/api/v3/files/$sha" -Headers @{ 'x-apikey' = $env:VT_API_KEY }
+              if (@($r.data.attributes.last_analysis_results.PSObject.Properties).Count -gt 0) { $stats = $r.data.attributes.last_analysis_stats }
+            } catch {}
+          }
+          if (-not $stats) { Write-Host "Analyse VirusTotal pas encore terminée : badge non mis à jour."; exit 0 }
+          $alertes = $stats.malicious + $stats.suspicious
+          @{
+            schemaVersion = 1
+            label = 'VirusTotal'
+            message = if ($alertes) { "$alertes alerte(s)" } else { 'aucune alerte' }
+            color = if ($alertes) { 'orange' } else { 'brightgreen' }
+          } | ConvertTo-Json | Set-Content virustotal.json -Encoding utf8
+          # shields.io refuse les liens github.com : le fichier va sur la branche « badges », lue via raw.githubusercontent.com.
+          $dir = Join-Path $env:RUNNER_TEMP 'badges'
+          $url = "https://x-access-token:$($env:GH_TOKEN)@github.com/$($env:GITHUB_REPOSITORY).git"
+          git clone --quiet --depth 1 --branch badges $url $dir
+          if ($LASTEXITCODE -ne 0) { git init --quiet -b badges $dir; git -C $dir remote add origin $url }
+          Copy-Item virustotal.json $dir
+          git -C $dir add virustotal.json
+          git -C $dir -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit --quiet -m "Badge VirusTotal $env:TAG"
+          git -C $dir push --quiet origin badges

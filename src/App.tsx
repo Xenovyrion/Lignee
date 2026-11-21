@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { journaliser, resumerDifference } from "./diagnostic";
 import { TableauDeBord } from "./ecrans/tableau/TableauDeBord";
+import { Mentions } from "./ecrans/Mentions";
 import { Arbre } from "./ecrans/arbre/Arbre";
 import { Etable } from "./ecrans/etable/Etable";
 import { Parametres } from "./ecrans/Parametres";
@@ -445,11 +446,7 @@ export function App() {
           {onglet === "guide" && <Guide allerA={allerA} lancerVisite={lancerTuto} />}
           {onglet === "parametres" && <Parametres s={s} setS={majReel} lancerDidacticiel={lancerTuto} />}
         </main>
-        <p className="px-2 text-center text-[11px] leading-4 text-text-muted">
-          Dofus est un MMORPG édité par Ankama. Lignée est un outil de fan non officiel, sans lien avec Ankama.
-          <br />
-          Certaines illustrations sont la propriété d'Ankama Studio et de Dofus · Tous droits réservés · © 2026 Lignée
-        </p>
+        {onglet !== "parametres" && <Mentions />}
       </div>
     </FournisseurNotifications>
   );

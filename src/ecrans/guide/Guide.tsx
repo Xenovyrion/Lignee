@@ -581,12 +581,7 @@ export function Guide({ allerA, lancerVisite }: { allerA: (o: OngletGuide) => vo
         </Section>
 
         <p className="px-2 pb-2 text-xs text-text-muted">
-          Sources : règles de la version 3.7 vérifiées dans le{" "}
-          <a className="text-accent hover:underline" href="https://www.dofuspourlesnoobs.com/guide-de-l-eleveur.html" target="_blank" rel="noreferrer">
-            guide de l'éleveur de Dofus pour les noobs
-          </a>
-          , ses pages Dragodindes, Muldos et Volkornes (caractéristiques des montures), les données du jeu (DofusDB) et les patch notes. Images des montures © Ankama, chargées depuis DofusDB. En cas de doute, l'interface de génétique du jeu
-          fait foi.
+          Règles de la version 3.7, vérifiées en jeu et dans les notes de mise à jour. En cas de doute, l'interface de génétique du jeu fait foi.
         </p>
       </div>
     </div>
