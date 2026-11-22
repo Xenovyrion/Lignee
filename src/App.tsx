@@ -90,6 +90,31 @@ function FondEcran({ nom, visibilite, flou }: { nom: string; visibilite: number;
   );
 }
 
+/** Raccourcis globaux : Ctrl + 1 à 7 ouvrent les onglets, Ctrl + Z annule (hors champ de saisie, où il annule la frappe). */
+function Raccourcis({ allerA }: { allerA: (o: Onglet) => void }) {
+  const annuler = useAnnuler();
+  useEffect(() => {
+    const touche = (e: KeyboardEvent) => {
+      if (!(e.ctrlKey || e.metaKey) || e.altKey || e.shiftKey || document.querySelector("[role=dialog]")) return;
+      const onglets = Object.keys(ONGLETS) as Onglet[];
+      const n = Number(e.key);
+      if (n >= 1 && n <= onglets.length) {
+        e.preventDefault();
+        allerA(onglets[n - 1]);
+        return;
+      }
+      const cible = e.target instanceof HTMLElement ? e.target : document.body;
+      if (e.key.toLowerCase() === "z" && !cible.closest("input, textarea, select, [contenteditable=true]")) {
+        e.preventDefault();
+        annuler();
+      }
+    };
+    window.addEventListener("keydown", touche);
+    return () => window.removeEventListener("keydown", touche);
+  }, [allerA, annuler]);
+  return null;
+}
+
 /** « ↶ Annuler » de l'en-tête (passe par les notifications pour signaler l'annulation). */
 function BoutonAnnuler({ possibles }: { possibles: number }) {
   const annuler = useAnnuler();
@@ -97,7 +122,7 @@ function BoutonAnnuler({ possibles }: { possibles: number }) {
     <button
       onClick={annuler}
       disabled={!possibles}
-      title={possibles ? `Annuler la dernière modification (${possibles} possible${possibles > 1 ? "s" : ""})` : "Rien à annuler"}
+      title={possibles ? `Annuler la dernière modification (${possibles} possible${possibles > 1 ? "s" : ""}) · Ctrl + Z` : "Rien à annuler"}
       className="ml-1 rounded-xl px-3 py-2.5 text-sm text-text-secondary hover:bg-bg-hover disabled:opacity-30"
     >
       ↶ Annuler
@@ -319,7 +344,8 @@ export function App() {
 
   return (
     <FournisseurNotifications historique={modifications} annuler={annuler}>
-        <SurveillanceMinuteurs s={s} setS={setS} />
+      <SurveillanceMinuteurs s={s} setS={setS} />
+      <Raccourcis allerA={allerA} />
       <div className={`mx-auto flex max-w-[2200px] flex-col gap-4 p-6 ${s.options.animations ? "" : "sans-animation"}`}>
         {fond}
         {/* En-tête sans cadre : logo et titre flottent sur le fond, avec une ombre portée pour rester lisibles. */}
@@ -387,13 +413,14 @@ export function App() {
           </div>
         )}
         <nav data-tuto="onglets" className="surface flex flex-wrap gap-1.5 rounded-2xl border border-border p-1.5">
-          {(Object.keys(ONGLETS) as Onglet[]).map((o) => {
+          {(Object.keys(ONGLETS) as Onglet[]).map((o, rang) => {
             const Icone = ICONES_ONGLETS[o];
             const actif = o === onglet;
             return (
               <button
                 key={o}
                 onClick={() => setOnglet(o)}
+                title={`${ONGLETS[o]} · Ctrl + ${rang + 1}`}
                 className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-[15px] font-medium transition ${
                   actif
                     ? "bg-linear-to-b from-accent-clair to-accent text-accent-texte shadow-[0_4px_18px_color-mix(in_srgb,var(--color-accent)_40%,transparent)]"

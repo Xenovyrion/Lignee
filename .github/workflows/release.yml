@@ -27,7 +27,7 @@ jobs:
           tagName: ${{ github.ref_name }}
           releaseName: Lignée ${{ github.ref_name }}
           releaseBody: |
-            Installeur Windows ci-dessous (.exe ou .msi).
+            ⬇ Nouvelle installation : prends le **.msi** ci-dessous. Le .exe sert aux mises à jour automatiques des installations existantes.
 
             🔒 Compilé automatiquement par GitHub Actions à partir du code public de ce dépôt ([journal de compilation](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})).
           releaseDraft: false

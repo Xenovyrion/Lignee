@@ -261,6 +261,14 @@ function CarteEnclos({ k, s, setS }: { k: number; s: Sauvegarde; setS: (f: (s: S
     setEdition(false);
     notifier(`Enclos ${k} : minuteur lancé`, { annulable: true });
   };
+  /** Recharge et relance l'enclos avec le réglage du minuteur en cours (ou fini), à partir de maintenant. */
+  const relancerPareil = () => {
+    if (!m) return;
+    const nouveau: MinuteurEnclos = { ...m, debut: new Date().toISOString(), signales: [] };
+    setS((x) => ({ ...x, minuteurs: [...(x.minuteurs ?? []).filter((y) => y.enclos !== k), nouveau] }));
+    setB(depuis(nouveau));
+    notifier(`Enclos ${k} : relancé avec le même réglage`, { annulable: true });
+  };
   const arreter = () => {
     setS((x) => ({ ...x, minuteurs: (x.minuteurs ?? []).filter((y) => y.enclos !== k) }));
     setB(depuis(m));
@@ -435,6 +443,9 @@ function CarteEnclos({ k, s, setS }: { k: number; s: Sauvegarde; setS: (f: (s: S
           <div className="flex flex-wrap items-center gap-2" data-tuto={k === 1 ? "enclos-actions" : undefined}>
             {enCours ? (
               <>
+                <Bouton discret={!termine} onClick={relancerPareil} title="Jauges rechargées comme au dernier lancement : relance à partir de maintenant">
+                  ↻ Même réglage
+                </Bouton>
                 <Bouton
                   discret
                   onClick={() => {
@@ -443,7 +454,7 @@ function CarteEnclos({ k, s, setS }: { k: number; s: Sauvegarde; setS: (f: (s: S
                   }}
                   title="Changer les jauges et relancer à partir de maintenant"
                 >
-                  Relancer
+                  Modifier
                 </Bouton>
                 <Bouton discret onClick={arreter}>
                   Arrêter

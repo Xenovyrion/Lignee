@@ -423,7 +423,7 @@ export function TableauDeBord({ famille, s, setS, allerArbre }: Props) {
         )}
         {actions.length > 0 && (
           <p data-tuto="clavier" className="mt-2 text-[11px] text-text-muted">
-            ⌨ <kbd>↑</kbd> <kbd>↓</kbd> choisir une action · <kbd>Entrée</kbd> l'ouvrir · <kbd>Ctrl</kbd> + <kbd>Entrée</kbd> valider · <kbd>Échap</kbd> fermer
+            ⌨ <kbd>↑</kbd> <kbd>↓</kbd> choisir une action · <kbd>Entrée</kbd> l'ouvrir · <kbd>Ctrl</kbd> + <kbd>Entrée</kbd> valider · <kbd>Échap</kbd> fermer · <kbd>Ctrl</kbd> + <kbd>1</kbd>…<kbd>7</kbd> onglets · <kbd>Ctrl</kbd> + <kbd>Z</kbd> annuler
           </p>
         )}
       </Cadre>

@@ -179,7 +179,6 @@ function SaisieResultats({
 
 const Formulaire = ({ children, tuto }: { children: ReactNode; tuto?: string }) => <div data-tuto={tuto} className="mt-3 flex flex-col gap-3 border-t border-border pt-3 text-sm">{children}</div>;
 
-const repartir = (n: number, sexe?: Sexe) => (sexe === "M" ? { M: n, F: 0 } : sexe === "F" ? { M: 0, F: n } : { M: Math.ceil(n / 2), F: Math.floor(n / 2) });
 
 // ---------------------------------------------------------------------------------------------
 
@@ -289,7 +288,8 @@ export function FormNaissances({ famille, a, setS, niveauBebes, fermer }: { fami
   // Seule la capacité Reproducteur permet 2 bébés pour un même accouplement.
   const [reproducteur, setReproducteur] = useState(false);
   const [n, setNombre] = useState(a.nombre);
-  const [lignes, setLignes] = useState<Ligne[]>([{ couleur: a.e.couleur, ...repartir(a.nombre, a.e.sexeVoulu) }]);
+  // Sexe des bébés jamais pré-rempli : c'est le jeu qui le décide, un sexe deviné passerait inaperçu.
+  const [lignes, setLignes] = useState<Ligne[]>([{ couleur: a.e.couleur, M: 0, F: 0 }]);
   const [makina, setMakina] = useState<Makina | "">(a.makina.makina);
   const bebes = total(lignes);
   const notifier = useNotifier();
@@ -300,7 +300,8 @@ export function FormNaissances({ famille, a, setS, niveauBebes, fermer }: { fami
     const autres = total(lignes.slice(1));
     const vise = Math.max(0, v - autres);
     setNombre(v);
-    setLignes([{ ...lignes[0], ...repartir(vise, a.e.sexeVoulu) }, ...lignes.slice(1)]);
+    // Moins de bébés visés qu'indiqué : on repart de zéro pour cette ligne plutôt que de deviner lequel retirer.
+    if (lignes[0].M + lignes[0].F > vise) setLignes([{ ...lignes[0], M: 0, F: 0 }, ...lignes.slice(1)]);
   };
   /** Croisement raté : un bébé passe de la couleur visée à une autre (à choisir), du même sexe. */
   // En cas d'échec, le bébé prend surtout une couleur de l'arbre : les parents, puis leurs propres parents.
@@ -313,9 +314,14 @@ export function FormNaissances({ famille, a, setS, niveauBebes, fermer }: { fami
       setLignes([...lignes, { couleur: candidate, M: 0, F: 1 }]);
       return;
     }
-    const sexe: Sexe = vise.M >= vise.F ? "M" : "F";
-    const retire = vise[sexe] > 0 ? { ...vise, [sexe]: vise[sexe] - 1 } : vise;
     const candidate = a.pere.couleur !== a.e.couleur ? a.pere.couleur : a.mere.couleur;
+    // Sexe déjà indiqué sur la ligne visée : le bébé raté le garde. Sinon, il reste à indiquer.
+    if (vise.M + vise.F === 0) {
+      setLignes([vise, ...autres, { couleur: candidate, M: 0, F: 0 }]);
+      return;
+    }
+    const sexe: Sexe = vise.M >= vise.F ? "M" : "F";
+    const retire = { ...vise, [sexe]: vise[sexe] - 1 };
     setLignes([retire, ...autres, { couleur: candidate, M: sexe === "M" ? 1 : 0, F: sexe === "F" ? 1 : 0 }]);
   };
   const valider = () => {
@@ -380,7 +386,9 @@ export function FormNaissances({ famille, a, setS, niveauBebes, fermer }: { fami
               ? ` : il en faut entre ${n} et ${2 * n}.`
               : bebes > n
                 ? ` : ${bebes - n} de trop. Un croisement raté remplace le bébé visé (retire-le de la première ligne), sauf Reproducteur.`
-                : ` : il manque ${n - bebes} bébé${n - bebes > 1 ? "s" : ""}.`}
+                : bebes === 0
+                  ? " : indique le sexe de chaque bébé obtenu (♂ ou ♀)."
+                  : ` : il manque ${n - bebes} bébé${n - bebes > 1 ? "s" : ""} (indique son sexe).`}
         </span>
       </div>
     </Formulaire>

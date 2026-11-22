@@ -305,10 +305,10 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
       {
         titre: "Le formulaire",
         texte:
-          "Indique combien d'accouplements tu as faits, la makina utilisée et les bébés obtenus par couleur et sexe. Raté ? « Croisement raté » remplace le bébé visé par la couleur obtenue. Coche « Reproducteur » si un parent a cette capacité : un accouplement peut alors donner 2 bébés.",
+          "Indique combien d'accouplements tu as faits, la makina utilisée et le sexe de chaque bébé obtenu : rien n'est pré-rempli, pour ne jamais enregistrer un sexe deviné. Raté ? « Croisement raté » remplace le bébé visé par la couleur obtenue. Coche « Reproducteur » si un parent a cette capacité : un accouplement peut alors donner 2 bébés.",
         cible: '[data-tuto="form-naissance"]',
         onglet: "actions",
-        action: { consigne: "Valide le formulaire tel quel (bouton en bas du formulaire).", fait: (d, s) => s.journal.length > d.journal.length },
+        action: { consigne: "Indique le sexe du bébé (+ sur ♂ ou ♀), puis clique « Valider ».", fait: (d, s) => s.journal.length > d.journal.length },
       },
       {
         titre: "Le plan s'est recalculé",
@@ -340,7 +340,7 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
       },
       {
         titre: "Au clavier",
-        texte: "↑ et ↓ (ou J et K) choisissent une action, Entrée ouvre son formulaire, Ctrl + Entrée le valide, Échap le ferme. Après une validation, l'action suivante prend sa place : enchaîne sans la souris.",
+        texte: "↑ et ↓ (ou J et K) choisissent une action, Entrée ouvre son formulaire, Ctrl + Entrée le valide, Échap le ferme. Après une validation, l'action suivante prend sa place : enchaîne sans la souris. Partout : Ctrl + 1 à 7 ouvrent les onglets, Ctrl + Z annule la dernière modification.",
         cible: '[data-tuto="clavier"]',
         onglet: "actions",
       },
@@ -404,7 +404,7 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
       {
         titre: "Lancer le minuteur",
         texte:
-          "Lance le minuteur au moment où tu remplis l'enclos en jeu : les barres se vident en direct. « Relancer » repart de maintenant avec de nouveaux réglages, « Arrêter » annule. Les alertes arrivent même si tu rouvres Lignée plus tard.",
+          "Lance le minuteur au moment où tu remplis l'enclos en jeu : les barres se vident en direct. « ↻ Même réglage » relance tout de suite avec les mêmes jauges (pratique quand un enclos est fini), « Modifier » repart de maintenant avec de nouveaux réglages, « Arrêter » annule. Les alertes arrivent même si tu rouvres Lignée plus tard.",
         cible: '[data-tuto="enclos-actions"]',
         onglet: "enclos",
       },
