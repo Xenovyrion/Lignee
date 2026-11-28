@@ -65,7 +65,70 @@ export type PrioritePlan = "rapide" | "equilibre" | "econome";
  */
 export const POIDS_EFFORT: Record<PrioritePlan, number> = { rapide: 1, equilibre: 4, econome: 1e6 };
 
+/**
+ * Plan d'élevage. Le planificateur choisit étape par étape : son résultat dépend de l'étable de départ,
+ * et une capture de plus peut lui faire trouver un chemin bien plus court. Il est donc relancé en
+ * faisant comme si ses propres captures étaient déjà faites (montures virtuelles, remises en captures
+ * à la fin), et la meilleure variante est gardée : moins de séances et d'actions, selon la priorité.
+ * Effet voulu : faire les captures demandées ne bouleverse plus le plan.
+ */
 export function planifier(famille: Famille, montures: Monture[], obtenues: Iterable<string>, cible?: string | null, priorite: PrioritePlan = "equilibre"): Plan {
+  const obtenuesListe = [...obtenues];
+  const poids = POIDS_EFFORT[priorite];
+  const note = (p: Plan) => Math.max(0, ...seancesPlan(p)) + Math.min(poids, 1e3) * (p.etapes.length + Object.values(p.captures).reduce((a, b) => a + b, 0));
+  let courant = planifierUneFois(famille, montures, obtenuesListe, cible, priorite);
+  for (let essai = 0; essai < 3; essai++) {
+    const virtuelles: Monture[] = [];
+    let alterne: Sexe = "M";
+    for (const e of courant.etapes)
+      for (const s of e.parents) {
+        if (s.type !== "capture") continue;
+        const sexe = s.sexe ?? (alterne = autreSexe(alterne));
+        virtuelles.push({ id: `${CAPTURE_VIRTUELLE}${virtuelles.length}`, famille, couleur: s.couleur, sexe, niveau: 1, etat: "fertile", origine: "capture", creeLe: "" });
+      }
+    if (!virtuelles.length) break;
+    const suivant = enCaptures(planifierUneFois(famille, [...montures, ...virtuelles], obtenuesListe, cible, priorite));
+    if (note(suivant) >= note(courant)) break;
+    courant = suivant;
+  }
+  return courant;
+}
+
+const CAPTURE_VIRTUELLE = "capture-virtuelle:";
+
+/** Séance de chaque étape (même calcul que seancesDesEtapes, sans dépendre des conseils). */
+function seancesPlan(plan: Plan): number[] {
+  const seance: number[] = [];
+  plan.etapes.forEach((e, i) => {
+    let s = 1;
+    for (const p of e.parents) {
+      if (p.type === "naissance") s = Math.max(s, seance[p.etape] + 1);
+      if (p.type === "clone") for (const st of p.steriles) if ("apresEtape" in st) s = Math.max(s, seance[st.apresEtape] + 1);
+    }
+    seance[i] = s;
+  });
+  return seance;
+}
+
+/** Remet les montures virtuelles utilisées en captures à faire ; celles qui ne servent pas disparaissent. */
+function enCaptures(plan: Plan): Plan {
+  const captures: Record<string, number> = { ...plan.captures };
+  for (const e of plan.etapes)
+    e.parents = e.parents.map((s) => {
+      if (s.type !== "monture" || !s.monture.id.startsWith(CAPTURE_VIRTUELLE)) return s;
+      captures[s.monture.couleur] = (captures[s.monture.couleur] ?? 0) + 1;
+      return { type: "capture", couleur: s.monture.couleur, sexe: s.monture.sexe };
+    }) as [Source, Source];
+  const reservees = new Set([...plan.reservees].filter((id) => !id.startsWith(CAPTURE_VIRTUELLE)));
+  const immediates = plan.etapes
+    .map((e, i) => ({ e, i }))
+    .filter(({ e }) => e.parents.every((p) => p.type === "monture") && !e.alerteSexe)
+    .map(({ i }) => i);
+  // Importance gardée telle quelle : c'est elle qui a réparti les montures par niveau.
+  return { ...plan, captures, reservees, immediates };
+}
+
+function planifierUneFois(famille: Famille, montures: Monture[], obtenues: Iterable<string>, cible?: string | null, priorite: PrioritePlan = "equilibre"): Plan {
   const poids = POIDS_EFFORT[priorite];
   const dejaObtenues = new Set(obtenues);
   // Objectif prioritaire : une monture de cette couleur est gardée (jamais utilisée comme parent),
@@ -84,7 +147,9 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
     stock.get(m.couleur)!.push(m);
   }
   // Priorité aux montures déjà fécondes, puis aux plus hauts niveaux.
-  for (const l of stock.values()) l.sort((a, b) => Number(b.etat === "feconde") - Number(a.etat === "feconde") || b.niveau - a.niveau);
+  // Les captures virtuelles (voir planifier) ne servent qu'en dernier.
+  const virtuelle = (m: Monture) => Number(m.id.startsWith(CAPTURE_VIRTUELLE));
+  for (const l of stock.values()) l.sort((a, b) => virtuelle(a) - virtuelle(b) || Number(b.etat === "feconde") - Number(a.etat === "feconde") || b.niveau - a.niveau);
 
   const virtuels = new Map<string, number[]>(); // couleur -> étapes dont le bébé est encore libre
   const steriles = new Map<string, Sterile[]>(); // couleur -> stériles disponibles pour un clonage
@@ -327,7 +392,7 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
   const emplacements = new Map<string, { etape: number; cote: 0 | 1 }[]>();
   etapes.forEach((e, i) =>
     e.parents.forEach((p, cote) => {
-      if (p.type !== "monture") return;
+      if (p.type !== "monture" || p.monture.id.startsWith(CAPTURE_VIRTUELLE)) return;
       const cle = `${p.monture.couleur}/${p.monture.sexe}`;
       if (!emplacements.has(cle)) emplacements.set(cle, []);
       emplacements.get(cle)!.push({ etape: i, cote: cote as 0 | 1 });
@@ -335,7 +400,7 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
   );
   for (const [cle, places] of emplacements) {
     const candidates = montures
-      .filter((m) => m.famille === famille && peutSAccoupler(m) && `${m.couleur}/${m.sexe}` === cle)
+      .filter((m) => m.famille === famille && peutSAccoupler(m) && !m.id.startsWith(CAPTURE_VIRTUELLE) && `${m.couleur}/${m.sexe}` === cle)
       .sort((a, b) => b.niveau - a.niveau || Number(b.etat === "feconde") - Number(a.etat === "feconde"));
     places.sort((x, y) => importance[y.etape] - importance[x.etape] || x.etape - y.etape);
     // À niveau égal, les montures déjà fécondes vont aux accouplements faisables tout de suite

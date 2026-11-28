@@ -220,3 +220,22 @@ describe("priorité du plan", () => {
     expect(equilibre.etapes.length).toBeLessThan(rapide.etapes.length);
   });
 });
+
+describe("stabilité du plan", () => {
+  it("faire les captures demandées ne bouleverse pas le plan", () => {
+    for (const f of ["dragodinde", "muldo", "volkorne"] as const) {
+      const avant = planifier(f, [], []);
+      let k = 0;
+      const capturees = avant.etapes
+        .flatMap((e) => e.parents)
+        .filter((x) => x.type === "capture")
+        .map((x) => m((x as { couleur: string }).couleur, (x as { sexe?: Sexe }).sexe ?? (k++ % 2 ? "M" : "F"), { famille: f, etat: "fertile" }));
+      const apres = planifier(f, capturees, []);
+      // Les captures restantes (s'il y en a) ne sont qu'une petite partie de celles déjà faites.
+      const n = (p: typeof avant) => Object.values(p.captures).reduce((a, b) => a + b, 0);
+      expect(n(apres), f).toBeLessThanOrEqual(n(avant) / 3);
+      expect(apres.etapes.length, f).toBeLessThanOrEqual(avant.etapes.length * 1.1);
+      expect(Math.max(...seancesDesEtapes(apres)), f).toBeLessThanOrEqual(Math.max(...seancesDesEtapes(avant)));
+    }
+  });
+});
