@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 1,
-  "message": "aucune alerte",
   "label": "VirusTotal",
+  "message": "aucune alerte",
+  "schemaVersion": 1,
   "color": "brightgreen"
 }
