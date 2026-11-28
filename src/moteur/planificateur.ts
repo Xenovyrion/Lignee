@@ -64,6 +64,14 @@ export type PrioritePlan = "rapide" | "equilibre" | "econome";
  * elle fait gagner plus de ce nombre de séances.
  */
 export const POIDS_EFFORT: Record<PrioritePlan, number> = { rapide: 1, equilibre: 4, econome: 1e6 };
+/**
+ * Poids essayés pour chaque priorité. Le choix étape par étape peut s'emballer avec un poids faible
+ * (des dizaines de captures pour finir plus tard) : plusieurs poids sont donc essayés et le meilleur
+ * plan selon la priorité est gardé (durée comptée en remplissages d'enclos, selon les places disponibles).
+ * Rapide ne fait ainsi jamais plus de séances qu'Équilibré, et Équilibré ne garde un autre plan que s'il est
+ * à la fois plus court (ou égal) et avec moins d'actions.
+ */
+const POIDS_ESSAYES: Record<PrioritePlan, number[]> = { rapide: [1, 1.5, 2, 3, 4, 1e6], equilibre: [4, 6, 1e6], econome: [1e6] };
 
 /**
  * Plan d'élevage. Le planificateur choisit étape par étape : son résultat dépend de l'étable de départ,
@@ -72,11 +80,31 @@ export const POIDS_EFFORT: Record<PrioritePlan, number> = { rapide: 1, equilibre
  * à la fin), et la meilleure variante est gardée : moins de séances et d'actions, selon la priorité.
  * Effet voulu : faire les captures demandées ne bouleverse plus le plan.
  */
-export function planifier(famille: Famille, montures: Monture[], obtenues: Iterable<string>, cible?: string | null, priorite: PrioritePlan = "equilibre"): Plan {
+export function planifier(
+  famille: Famille,
+  montures: Monture[],
+  obtenues: Iterable<string>,
+  cible?: string | null,
+  priorite: PrioritePlan = "equilibre",
+  places = Infinity,
+): Plan {
   const obtenuesListe = [...obtenues];
-  const poids = POIDS_EFFORT[priorite];
-  const note = (p: Plan) => Math.max(0, ...seancesPlan(p)) + Math.min(poids, 1e3) * (p.etapes.length + Object.values(p.captures).reduce((a, b) => a + b, 0));
-  let courant = planifierUneFois(famille, montures, obtenuesListe, cible, priorite);
+  const actions = (p: Plan) => p.etapes.length + Object.values(p.captures).reduce((a, b) => a + b, 0);
+  const duree = (p: Plan) => remplissagesPlan(p, places).total;
+  // Rapide : le moins de séances, puis le moins d'actions. Sinon : séances + poids × actions.
+  const note = (p: Plan) => (priorite === "rapide" ? duree(p) * 1e6 + actions(p) : duree(p) + Math.min(POIDS_EFFORT[priorite], 1e3) * actions(p));
+  let meilleur: Plan | null = null;
+  for (const poids of POIDS_ESSAYES[priorite]) {
+    const p = planifierAvecPoids(famille, montures, obtenuesListe, cible, poids, places);
+    if (!meilleur) meilleur = p;
+    else if (priorite === "rapide" ? note(p) < note(meilleur) : duree(p) <= duree(meilleur) && actions(p) <= actions(meilleur) && note(p) < note(meilleur)) meilleur = p;
+  }
+  return meilleur!;
+}
+
+function planifierAvecPoids(famille: Famille, montures: Monture[], obtenuesListe: string[], cible: string | null | undefined, poids: number, places: number): Plan {
+  const note = (p: Plan) => remplissagesPlan(p, places).total + Math.min(poids, 1e3) * (p.etapes.length + Object.values(p.captures).reduce((a, b) => a + b, 0));
+  let courant = planifierUneFois(famille, montures, obtenuesListe, cible, poids);
   for (let essai = 0; essai < 3; essai++) {
     const virtuelles: Monture[] = [];
     let alterne: Sexe = "M";
@@ -87,7 +115,7 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
         virtuelles.push({ id: `${CAPTURE_VIRTUELLE}${virtuelles.length}`, famille, couleur: s.couleur, sexe, niveau: 1, etat: "fertile", origine: "capture", creeLe: "" });
       }
     if (!virtuelles.length) break;
-    const suivant = enCaptures(planifierUneFois(famille, [...montures, ...virtuelles], obtenuesListe, cible, priorite));
+    const suivant = enCaptures(planifierUneFois(famille, [...montures, ...virtuelles], obtenuesListe, cible, poids));
     if (note(suivant) >= note(courant)) break;
     courant = suivant;
   }
@@ -95,6 +123,50 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
 }
 
 const CAPTURE_VIRTUELLE = "capture-virtuelle:";
+
+/** Places d'enclos : 10 par enclos. */
+export const PLACES_PAR_ENCLOS = 10;
+
+/**
+ * Nombre de remplissages d'enclos (tournées de jauges) que demande le plan, avec `places` montures
+ * à la fois. Chaque séance prépare ses parents pas encore féconds : ceux nés ou clonés à la séance
+ * précédente doivent attendre, ceux déjà dans l'étable (ou à capturer) peuvent être préparés en avance
+ * dans les places libres d'une tournée précédente. Une séance compte au moins une tournée.
+ * Places illimitées : autant de tournées que de séances.
+ */
+export function remplissagesPlan(plan: Plan, places: number): { total: number; parSeance: number[]; aPreparer: number[] } {
+  const seance = seancesPlan(plan);
+  const nb = Math.max(0, ...seance);
+  const tardifs = Array<number>(nb + 1).fill(0);
+  const precoces = Array<number>(nb + 1).fill(0);
+  plan.etapes.forEach((e, i) => {
+    for (const p of e.parents) {
+      if (p.type === "monture" && p.monture.etat === "feconde") continue;
+      if (p.type === "monture" || p.type === "capture") precoces[seance[i]]++;
+      else tardifs[seance[i]]++;
+    }
+  });
+  const parSeance: number[] = [];
+  const aPreparer: number[] = [];
+  const restants = [...precoces];
+  let total = 0;
+  for (let s = 1; s <= nb; s++) {
+    const besoin = tardifs[s] + restants[s];
+    aPreparer.push(tardifs[s] + precoces[s]);
+    restants[s] = 0;
+    const tours = Number.isFinite(places) ? Math.max(1, Math.ceil(besoin / places)) : 1;
+    parSeance.push(tours);
+    total += tours;
+    // Places libres : on avance la préparation des montures déjà disponibles des séances suivantes.
+    let libre = Number.isFinite(places) ? tours * places - besoin : 0;
+    for (let k = s + 1; k <= nb && libre > 0; k++) {
+      const pris = Math.min(libre, restants[k]);
+      restants[k] -= pris;
+      libre -= pris;
+    }
+  }
+  return { total, parSeance, aPreparer };
+}
 
 /** Séance de chaque étape (même calcul que seancesDesEtapes, sans dépendre des conseils). */
 function seancesPlan(plan: Plan): number[] {
@@ -128,8 +200,7 @@ function enCaptures(plan: Plan): Plan {
   return { ...plan, captures, reservees, immediates };
 }
 
-function planifierUneFois(famille: Famille, montures: Monture[], obtenues: Iterable<string>, cible?: string | null, priorite: PrioritePlan = "equilibre"): Plan {
-  const poids = POIDS_EFFORT[priorite];
+function planifierUneFois(famille: Famille, montures: Monture[], obtenues: Iterable<string>, cible: string | null | undefined, poids: number): Plan {
   const dejaObtenues = new Set(obtenues);
   // Objectif prioritaire : une monture de cette couleur est gardée (jamais utilisée comme parent),
   // de préférence une stérile (inutile à l'élevage), sinon la plus haut niveau.

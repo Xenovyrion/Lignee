@@ -1,7 +1,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { nouvelId } from "../../moteur/actions";
 import { couleur, FAMILLES, NOMS_FAMILLE } from "../../moteur/donnees";
-import { ajusterStock, besoinsParCouleur, compterStock, rendreFecondes } from "../../moteur/etable";
+import { ajusterStock, besoinsParCouleur, compterStock, rendreFecondes, placesEnclos } from "../../moteur/etable";
 import { conseiller } from "../../moteur/conseils";
 import { planifier } from "../../moteur/planificateur";
 import type { Etat, Famille, Monture, Sauvegarde, Sexe } from "../../moteur/types";
@@ -50,7 +50,7 @@ export function Etable({ famille, s, setS }: Props) {
   const [selection, setSelection] = useState<Set<string>>(new Set());
   const [saisie, setSaisie] = useState(false);
 
-  const plan = useMemo(() => planifier(famille, s.montures, s.obtenues[famille], s.options.cibles?.[famille], s.options.priorite), [famille, s.montures, s.obtenues, s.options.cibles, s.options.priorite]);
+  const plan = useMemo(() => planifier(famille, s.montures, s.obtenues[famille], s.options.cibles?.[famille], s.options.priorite, placesEnclos(s.options.niveauEleveur)), [famille, s.montures, s.obtenues, s.options.cibles, s.options.priorite, s.options.niveauEleveur]);
   const reservees = plan.reservees;
   const besoins = useMemo(
     () => besoinsParCouleur(famille, s.montures, plan, conseiller(plan, { takeza: s.options.takeza, makina: s.options.makina, seuilAnimakina: s.options.seuilAnimakina }).captures),

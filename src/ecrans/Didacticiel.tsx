@@ -327,7 +327,7 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
       {
         titre: "Préparer les montures",
         texte:
-          "Les montures fertiles dont le plan a besoin : mets-les en enclos pour remplir Endurance, Maturité et Amour (10 montures par enclos). Quand elles sont fécondes en jeu, clique sur le sexe concerné ou « Toutes prêtes ». Tu as monté toutes tes fertiles, même celles hors plan ? « Tout passer en Féconde ». En bas de la liste, les actions « ⏩ En avance » préparent les séances suivantes (jauges, captures déjà sûres) : fais-les en même temps pour gagner du temps. La « Priorité du plan » (Paramètres) règle l'équilibre entre vitesse et nombre d'actions.",
+          "Les montures fertiles dont le plan a besoin : mets-les en enclos pour remplir Endurance, Maturité et Amour (10 montures par enclos). Quand elles sont fécondes en jeu, clique sur le sexe concerné ou « Toutes prêtes ». Tu as monté toutes tes fertiles, même celles hors plan ? « Tout passer en Féconde ». En bas de la liste, les actions « ⏩ En avance » préparent les séances suivantes (jauges, captures déjà sûres) : fais-les en même temps pour gagner du temps. La « Priorité du plan » (Paramètres) règle l'équilibre entre vitesse et nombre d'actions. S'il y a plus de montures à préparer que de places, le haut de la liste indique combien de remplissages d'enclos il faudra.",
         cible: '#actions li[data-type="preparer"]',
         onglet: "actions",
       },
@@ -494,7 +494,7 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
       },
       {
         titre: "Métier",
-        texte: "Ton niveau d'Éleveur : il donne le nombre d'enclos affichés dans l'onglet Enclos (un de plus aux paliers du jeu).",
+        texte: "Ton niveau d'Éleveur : il donne le nombre d'enclos affichés dans l'onglet Enclos (un de plus aux paliers du jeu), et le plan en tient compte : avec peu de places, il évite de demander plus de montures à préparer que tes enclos n'en contiennent.",
         cible: '[data-tuto="metier"]',
         onglet: "parametres",
       },

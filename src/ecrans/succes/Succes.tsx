@@ -1,3 +1,4 @@
+import { placesEnclos } from "../../moteur/etable";
 import { useMemo, useState } from "react";
 import { useNotifier } from "../../notifications";
 import { conseiller } from "../../moteur/conseils";
@@ -60,9 +61,9 @@ const Badge = ({ valide, commence }: { valide: boolean; commence: boolean }) =>
 export function Succes({ famille, setFamille, s, setS }: Props) {
   const bilans = useMemo(() => Object.fromEntries(FAMILLES.map((f) => [f, bilan(f, s)])) as Record<Famille, ReturnType<typeof bilan>>, [s]);
   const rangs = useMemo(() => {
-    const c = conseiller(planifier(famille, s.montures, s.obtenues[famille], s.options.cibles?.[famille], s.options.priorite), { takeza: s.options.takeza, makina: s.options.makina, seuilAnimakina: s.options.seuilAnimakina });
+    const c = conseiller(planifier(famille, s.montures, s.obtenues[famille], s.options.cibles?.[famille], s.options.priorite, placesEnclos(s.options.niveauEleveur)), { takeza: s.options.takeza, makina: s.options.makina, seuilAnimakina: s.options.seuilAnimakina });
     return new Map(c.ordre.map((a) => [a.e.couleur, { rang: a.rang, pret: !a.aPreparer.length }]));
-  }, [famille, s.montures, s.obtenues, s.options.takeza, s.options.makina, s.options.seuilAnimakina, s.options.cibles]);
+  }, [famille, s.montures, s.obtenues, s.options.takeza, s.options.makina, s.options.seuilAnimakina, s.options.cibles, s.options.priorite, s.options.niveauEleveur]);
   const [filtre, setFiltre] = useState<Filtre>("tous");
   const [manquantesSeules, setManquantesSeules] = useState(false);
   const b = bilans[famille];

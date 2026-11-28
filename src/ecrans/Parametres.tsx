@@ -182,7 +182,7 @@ export function Parametres({ s, setS, lancerDidacticiel }: Props) {
       <Carte tuto="metier" titre="Métier">
         <Ligne
           titre="Niveau du métier Éleveur"
-          aide={`Détermine le nombre d'enclos : ${nombreEnclos(o.niveauEleveur)} actuellement${prochainPalierEnclos(o.niveauEleveur) ? `, un de plus au niveau ${prochainPalierEnclos(o.niveauEleveur)}` : " (maximum)"}.`}
+          aide={`Détermine le nombre d'enclos (10 places chacun), dont le plan tient compte : ${nombreEnclos(o.niveauEleveur)} actuellement${prochainPalierEnclos(o.niveauEleveur) ? `, un de plus au niveau ${prochainPalierEnclos(o.niveauEleveur)}` : " (maximum)"}.`}
         >
           <input
             type="number"
@@ -252,7 +252,7 @@ export function Parametres({ s, setS, lancerDidacticiel }: Props) {
       <Carte tuto="accouplements" titre="Accouplements">
         <Ligne
           titre="Priorité du plan"
-          aide="Rapide : finir les succès au plus tôt, quitte à capturer et faire naître davantage en parallèle. Économe : le moins d'actions possible, en attendant les clones des stériles (beaucoup plus de séances). Équilibré : une capture ou une naissance de plus seulement si elle fait gagner plusieurs séances."
+          aide="Rapide : finir les succès au plus tôt, quitte à capturer et faire naître davantage en parallèle. Économe : le moins d'actions possible, en attendant les clones des stériles (beaucoup plus de séances). Équilibré : une capture ou une naissance de plus seulement si elle fait gagner plusieurs séances. Le temps compte aussi les places d'enclos (niveau d'Éleveur) : préparer plus de montures qu'il n'y a de places demande plusieurs remplissages."
         >
           <select
             className={champ}

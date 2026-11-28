@@ -1,8 +1,9 @@
+import { placesEnclos } from "../../moteur/etable";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { actionsMaintenant, cleAction, conseiller, prochainObjectif, seancesDesEtapes, seancesSuivantes } from "../../moteur/conseils";
 import { couleur, NOMS_FAMILLE, nomCouleur, objectifs } from "../../moteur/donnees";
 import { choisirCible } from "../../moteur/actions";
-import { planifier, regrouperClonages, suggererClonages } from "../../moteur/planificateur";
+import { planifier, regrouperClonages, remplissagesPlan, suggererClonages } from "../../moteur/planificateur";
 import { nomSuccesGeneration } from "../../moteur/succes";
 import type { Famille, Sauvegarde } from "../../moteur/types";
 import { Etoile, ImageMonture } from "../arbre/commun";
@@ -102,7 +103,7 @@ function AnneauTotal({ faites, total }: { faites: number; total: number }) {
 }
 
 export function TableauDeBord({ famille, s, setS, allerArbre }: Props) {
-  const plan = useMemo(() => planifier(famille, s.montures, s.obtenues[famille], s.options.cibles?.[famille], s.options.priorite), [famille, s.montures, s.obtenues, s.options.cibles, s.options.priorite]);
+  const plan = useMemo(() => planifier(famille, s.montures, s.obtenues[famille], s.options.cibles?.[famille], s.options.priorite, placesEnclos(s.options.niveauEleveur)), [famille, s.montures, s.obtenues, s.options.cibles, s.options.priorite, s.options.niveauEleveur]);
   const c = useMemo(() => conseiller(plan, { takeza: s.options.takeza, makina: s.options.makina, seuilAnimakina: s.options.seuilAnimakina }), [plan, s.options.takeza, s.options.makina, s.options.seuilAnimakina]);
   const objectif = useMemo(() => prochainObjectif(plan), [plan]);
   const clonages = useMemo(() => regrouperClonages(suggererClonages(s.montures.filter((m) => m.famille === famille))), [famille, s.montures]);
@@ -110,6 +111,9 @@ export function TableauDeBord({ famille, s, setS, allerArbre }: Props) {
   const numSeance = useMemo(() => seancesDesEtapes(plan), [plan]);
   const suivantes = useMemo(() => seancesSuivantes(plan), [plan]);
   const totalSeances = Math.max(1, ...numSeance);
+  // Enclos : 10 places chacun. Plus de montures à préparer que de places = plusieurs remplissages par séance.
+  const places = placesEnclos(s.options.niveauEleveur);
+  const remplissages = useMemo(() => remplissagesPlan(plan, places), [plan, places]);
   const [toutesSeances, setToutesSeances] = useState(false);
 
   // Raccourcis clavier : ↑ ↓ (ou J K) choisissent une action, Entrée l'ouvre, Ctrl + Entrée valide le formulaire, Échap le ferme.
@@ -390,7 +394,9 @@ export function TableauDeBord({ famille, s, setS, allerArbre }: Props) {
       <Cadre
         id="actions"
         titre={`Prochaines étapes : ${actions.length} action${actions.length > 1 ? "s" : ""}`}
-        sous={`Séance 1 sur ≈ ${totalSeances}. Dans l'ordre : ${[
+        sous={`Séance 1 sur ≈ ${totalSeances}${
+          remplissages.total > totalSeances ? ` (≈ ${remplissages.total} remplissages d'enclos avec tes ${places} places${(remplissages.parSeance[0] ?? 1) > 1 ? `, dont ${remplissages.parSeance[0]} pour celle-ci` : ""})` : ""
+        }. Dans l'ordre : ${[
           compte("naissance") && "naissances",
           compte("clonage") && "clonages",
           compte("preparer") && "jauges à remplir",

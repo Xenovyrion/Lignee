@@ -1,3 +1,4 @@
+import { placesEnclos } from "../../moteur/etable";
 import { useMemo, useState, type ReactNode } from "react";
 import { actionsMaintenant, conseiller, seancesDesEtapes, type ActionAccouplement } from "../../moteur/conseils";
 import { bonusDeFamille, caracteristiques, couleur, couleurs, nomCouleur } from "../../moteur/donnees";
@@ -28,7 +29,7 @@ export function Arbre({ famille, s, setS, focus = null }: Props) {
 
   // Le plan d'élevage colore la carte : prochaines naissances (★) et couleurs à faire naître pour la suite.
   const { statut, prochaines, plan, dansPlan, seances } = useMemo(() => {
-    const plan = planifier(famille, s.montures, s.obtenues[famille], s.options.cibles?.[famille], s.options.priorite);
+    const plan = planifier(famille, s.montures, s.obtenues[famille], s.options.cibles?.[famille], s.options.priorite, placesEnclos(s.options.niveauEleveur));
     const c = conseiller(plan, { takeza: s.options.takeza, makina: s.options.makina, seuilAnimakina: s.options.seuilAnimakina });
     // Même numérotation que le tableau de bord (clonages compris).
     actionsMaintenant(c, regrouperClonages(suggererClonages(s.montures.filter((m) => m.famille === famille))));
@@ -47,7 +48,7 @@ export function Arbre({ famille, s, setS, focus = null }: Props) {
       e.recette.forEach((x) => dansPlan.add(x));
     }
     return { statut: fabriquerStatut(famille, s.montures, s.obtenues[famille], roles, rangs), prochaines: c.ordre, plan, dansPlan, seances: seancesDesEtapes(plan) };
-  }, [famille, s.montures, s.obtenues, s.options.takeza, s.options.makina, s.options.seuilAnimakina, s.options.cibles]);
+  }, [famille, s.montures, s.obtenues, s.options.takeza, s.options.makina, s.options.seuilAnimakina, s.options.cibles, s.options.priorite, s.options.niveauEleveur]);
 
   const detail = selection ?? survol;
 

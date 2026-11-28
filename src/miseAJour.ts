@@ -49,7 +49,7 @@ export interface NoteVersion {
 
 /** Notes de version publiées sur GitHub, de la plus récente à la plus ancienne. */
 export async function notesDesVersions(): Promise<NoteVersion[]> {
-  const r = await fetch("https://api.github.com/repos/Xenovyrion/Lignee/releases?per_page=30", { headers: { Accept: "application/vnd.github+json" } });
+  const r = await fetch("https://api.github.com/repos/Xenovyrion/Lignee/releases?per_page=30", { headers: { Accept: "application/vnd.github+json" }, cache: "no-store" });
   if (!r.ok) throw new Error(`GitHub a répondu ${r.status}`);
   const liste: { tag_name: string; published_at: string; body: string | null; html_url: string; draft: boolean }[] = await r.json();
   return liste.filter((x) => !x.draft).map((x) => ({ version: x.tag_name.replace(/^v/, ""), date: x.published_at, notes: x.body ?? "", url: x.html_url }));

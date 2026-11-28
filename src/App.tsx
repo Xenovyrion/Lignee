@@ -473,7 +473,7 @@ export function App() {
           {onglet === "guide" && <Guide allerA={allerA} lancerVisite={lancerTuto} />}
           {onglet === "parametres" && <Parametres s={s} setS={majReel} lancerDidacticiel={lancerTuto} />}
         </main>
-        {onglet !== "parametres" && <Mentions />}
+        <Mentions />
       </div>
     </FournisseurNotifications>
   );

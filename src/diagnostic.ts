@@ -2,6 +2,7 @@
 // erreurs), gardé dans AppData (lignee-journal.jsonl, une entrée par ligne, les 3000 dernières).
 // L'export « diagnostic » réunit ce journal, la sauvegarde et un résumé du plan dans un seul
 // fichier à transmettre en cas de problème.
+import { placesEnclos } from "./moteur/etable";
 import { conseiller } from "./moteur/conseils";
 import { FAMILLES, nomCouleur, objectifs } from "./moteur/donnees";
 import { planifier } from "./moteur/planificateur";
@@ -146,7 +147,7 @@ export function resumerDifference(avant: Sauvegarde, apres: Sauvegarde): string 
 export function resumerPlans(s: Sauvegarde) {
   return Object.fromEntries(
     FAMILLES.map((f) => {
-      const plan = planifier(f, s.montures, s.obtenues[f], s.options.cibles?.[f], s.options.priorite);
+      const plan = planifier(f, s.montures, s.obtenues[f], s.options.cibles?.[f], s.options.priorite, placesEnclos(s.options.niveauEleveur));
       const c = conseiller(plan, { takeza: s.options.takeza, makina: s.options.makina, seuilAnimakina: s.options.seuilAnimakina });
       return [
         f,

@@ -1,6 +1,6 @@
 {
   "productName": "Lignée",
-  "version": "1.0.30",
+  "version": "1.0.31",
   "identifier": "io.github.xenovyrion.lignee",
   "build": {
     "frontendDist": "../dist",

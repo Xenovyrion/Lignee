@@ -1,4 +1,5 @@
 // Mode compagnon : vue compacte des prochaines étapes, pour une petite fenêtre gardée à côté du jeu.
+import { placesEnclos } from "../moteur/etable";
 import { useMemo, useState, type ReactNode } from "react";
 import { actionsMaintenant, cleAction, conseiller, seancesDesEtapes, type ActionAccouplement, type ActionCapture, type ActionMaintenant } from "../moteur/conseils";
 import { couleurs, FAMILLES, NOMS_FAMILLE, nomCouleur, objectifs } from "../moteur/donnees";
@@ -26,7 +27,7 @@ interface Props {
 
 export function Compagnon({ famille, setFamille, s, setS, epingle, setEpingle, agrandir, peutAnnuler }: Props) {
   const annuler = useAnnuler();
-  const plan = useMemo(() => planifier(famille, s.montures, s.obtenues[famille], s.options.cibles?.[famille], s.options.priorite), [famille, s.montures, s.obtenues, s.options.cibles, s.options.priorite]);
+  const plan = useMemo(() => planifier(famille, s.montures, s.obtenues[famille], s.options.cibles?.[famille], s.options.priorite, placesEnclos(s.options.niveauEleveur)), [famille, s.montures, s.obtenues, s.options.cibles, s.options.priorite, s.options.niveauEleveur]);
   const c = useMemo(() => conseiller(plan, { takeza: s.options.takeza, makina: s.options.makina, seuilAnimakina: s.options.seuilAnimakina }), [plan, s.options.takeza, s.options.makina, s.options.seuilAnimakina]);
   const clonages = useMemo(() => regrouperClonages(suggererClonages(s.montures.filter((m) => m.famille === famille))), [famille, s.montures]);
   const actions = useMemo(() => actionsMaintenant(c, clonages), [c, clonages]);

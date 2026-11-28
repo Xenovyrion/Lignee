@@ -1,4 +1,4 @@
-// Mentions légales : pied de page de l'application (court) et bloc « À propos » des Paramètres (complet).
+// Mentions légales : pied de page identique sur tous les écrans, et bloc « À propos » des Paramètres (détails en plus).
 
 const Lien = ({ href, children }: { href: string; children: string }) => (
   <a href={href} target="_blank" rel="noreferrer" className="text-accent hover:underline">
@@ -14,7 +14,8 @@ export function Mentions({ complet = false }: { complet?: boolean }) {
       <footer className="px-2 text-center text-[11px] leading-5 text-text-muted">
         <b className="font-semibold text-text-secondary">Outil de fan non officiel, sans lien avec Ankama.</b> Dofus est un MMORPG édité par Ankama.
         <br />
-        Certaines illustrations sont la propriété d'Ankama Studio et de Dofus · Tous droits réservés · © 2026 Lignée
+        Certaines illustrations sont la propriété d'Ankama Studio et de Dofus · Tous droits réservés
+        <br />© 2026 Lignée · <Lien href={DEPOT}>Code source</Lien> · <Lien href={`${DEPOT}/blob/main/LICENSE`}>Licence PolyForm Strict</Lien>
       </footer>
     );
   return (
@@ -24,18 +25,12 @@ export function Mentions({ complet = false }: { complet?: boolean }) {
         Lignée
       </div>
       <p className="max-w-2xl text-sm text-text-secondary">
-        <b className="text-text-primary">Outil de fan gratuit et non officiel, sans lien avec Ankama.</b>
-        <br />
-        Dofus est un MMORPG édité par <Lien href="https://www.ankama.com">Ankama</Lien>.
+        Outil de fan gratuit. Dofus est un MMORPG édité par <Lien href="https://www.ankama.com">Ankama</Lien>.
       </p>
       <p className="max-w-2xl text-xs leading-5 text-text-muted">
-        Certaines illustrations sont la propriété d'Ankama Studio et de Dofus · Tous droits réservés.
+        Les illustrations d'Ankama ne sont pas incluses dans l'application, qui les affiche depuis leur site d'origine.
         <br />
-        Elles ne sont pas incluses dans l'application, qui les affiche depuis leur site d'origine.
-      </p>
-      <p className="max-w-2xl text-xs leading-5 text-text-muted">
         Code public : chaque installeur est <b className="text-text-secondary">compilé automatiquement par GitHub</b> à partir de ce code.
-        <br />© 2026 Lignée · <Lien href={DEPOT}>Code source</Lien> · <Lien href={`${DEPOT}/blob/main/LICENSE`}>Licence PolyForm Strict</Lien>
       </p>
     </section>
   );

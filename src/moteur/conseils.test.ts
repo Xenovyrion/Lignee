@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { clonerPlusieurs, enregistrerNaissances, sauvegardeVide } from "./actions";
 import { actionsMaintenant, cleAction, conseiller, conseillerMakina, prochainObjectif, seancesDesEtapes, seancesSuivantes } from "./conseils";
 import { couleurs } from "./donnees";
-import { planifier, regrouperClonages, suggererClonages } from "./planificateur";
+import { planifier, regrouperClonages, remplissagesPlan, suggererClonages } from "./planificateur";
 import type { Monture, Sexe } from "./types";
 
 let n = 0;
@@ -218,6 +218,22 @@ describe("priorité du plan", () => {
     expect(max(equilibre)).toBeLessThan(max(econome));
     expect(econome.etapes.length).toBeLessThan(equilibre.etapes.length);
     expect(equilibre.etapes.length).toBeLessThan(rapide.etapes.length);
+  });
+  it("tient compte des places d'enclos : peu de places, moins de montures à préparer en parallèle", () => {
+    for (const f of ["muldo", "volkorne"] as const) {
+      const sansLimite = planifier(f, [], [], null, "rapide");
+      const limite = planifier(f, [], [], null, "rapide", 10);
+      expect(remplissagesPlan(limite, 10).total, f).toBeLessThanOrEqual(remplissagesPlan(sansLimite, 10).total);
+      expect(remplissagesPlan(sansLimite, Infinity).total, f).toBe(Math.max(...seancesDesEtapes(sansLimite)));
+    }
+  });
+  it("Rapide ne fait jamais plus de séances qu'Équilibré, même avec une étable déjà avancée", () => {
+    const max = (p: ReturnType<typeof planifier>) => Math.max(0, ...seancesDesEtapes(p));
+    for (const f of ["dragodinde", "muldo", "volkorne"] as const) {
+      const debut = planifier(f, [], []);
+      const etable = debut.etapes.slice(0, 8).map((e, i) => m(e.couleur, i % 2 ? "M" : "F", { famille: f, etat: "fertile" }));
+      for (const montures of [[], etable]) expect(max(planifier(f, montures, [], null, "rapide")), f).toBeLessThanOrEqual(max(planifier(f, montures, [], null, "equilibre")));
+    }
   });
 });
 

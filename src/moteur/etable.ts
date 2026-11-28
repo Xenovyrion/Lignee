@@ -57,6 +57,9 @@ export const PALIERS_ENCLOS = [1, 40, 80, 120, 160, 200];
 
 export const nombreEnclos = (niveauEleveur: number) => PALIERS_ENCLOS.filter((p) => niveauEleveur >= p).length;
 
+/** Montures préparables en même temps : 10 places par enclos débloqué. */
+export const placesEnclos = (niveauEleveur: number) => nombreEnclos(niveauEleveur) * 10;
+
 /** Prochain palier qui débloquera un enclos, s'il en reste. */
 export const prochainPalierEnclos = (niveauEleveur: number) => PALIERS_ENCLOS.find((p) => p > niveauEleveur) ?? null;
 
