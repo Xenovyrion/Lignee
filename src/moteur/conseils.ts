@@ -136,9 +136,9 @@ export interface Conseils {
   ordre: ActionAccouplement[];
   aPreparer: ActionAccouplement[];
   captures: ActionCapture[];
-  /** Séance suivante : montures de l'étable à monter dès maintenant, en même temps que celles d'aujourd'hui. */
+  /** Séances suivantes : montures de l'étable à monter dès maintenant, en même temps que celles d'aujourd'hui. */
   aPreparerEnAvance: Monture[];
-  /** Séance suivante : captures au sexe déjà connu, faisables dès maintenant. */
+  /** Séances suivantes : captures au sexe déjà connu, faisables dès maintenant. */
   capturesEnAvance: ActionCapture[];
   /** Étapes qui attendent d'abord un clonage de deux stériles existants. */
   clonagesUtiles: number;
@@ -287,14 +287,14 @@ export function conseiller(plan: Plan, options: Bonus & { takeza?: boolean; maki
   prets.sort(priorite);
   aPreparer.sort(priorite);
 
-  // Séance suivante : ce qui peut déjà avancer en parallèle (jauges des parents déjà dans l'étable,
+  // Séances suivantes : tout ce qui est déjà sûr peut avancer en parallèle (jauges des parents déjà dans l'étable,
   // captures dont le sexe ne dépend pas d'un bébé à naître). Facultatif : les bébés d'aujourd'hui peuvent changer le plan.
   const numSeance = seancesDesEtapes(plan);
   const dejaPrevues = new Set(aPreparer.flatMap((a) => a.aPreparer.map((x) => x.id)));
   const enAvance = new Map<string, Monture>();
   const capturesEnAvance = new Map<string, ActionCapture>();
   plan.etapes.forEach((e, i) => {
-    if (numSeance[i] !== 2) return;
+    if (numSeance[i] < 2) return;
     const [a, b] = e.parents;
     for (const [p, autre] of [
       [a, b],

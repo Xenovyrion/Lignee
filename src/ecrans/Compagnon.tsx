@@ -26,7 +26,7 @@ interface Props {
 
 export function Compagnon({ famille, setFamille, s, setS, epingle, setEpingle, agrandir, peutAnnuler }: Props) {
   const annuler = useAnnuler();
-  const plan = useMemo(() => planifier(famille, s.montures, s.obtenues[famille], s.options.cibles?.[famille]), [famille, s.montures, s.obtenues, s.options.cibles]);
+  const plan = useMemo(() => planifier(famille, s.montures, s.obtenues[famille], s.options.cibles?.[famille], s.options.priorite), [famille, s.montures, s.obtenues, s.options.cibles, s.options.priorite]);
   const c = useMemo(() => conseiller(plan, { takeza: s.options.takeza, makina: s.options.makina, seuilAnimakina: s.options.seuilAnimakina }), [plan, s.options.takeza, s.options.makina, s.options.seuilAnimakina]);
   const clonages = useMemo(() => regrouperClonages(suggererClonages(s.montures.filter((m) => m.famille === famille))), [famille, s.montures]);
   const actions = useMemo(() => actionsMaintenant(c, clonages), [c, clonages]);
@@ -297,7 +297,7 @@ function LigneCapture({ numero, famille, capture, setS, niveau }: { numero: numb
           {capture.libres > 0 && <span className="ml-1.5 font-normal text-text-muted">×{capture.libres} au choix</span>}
         </>
       }
-      detail={capture.avance ? "en avance (séance suivante)" : "à capturer au filet"}
+      detail={capture.avance ? "en avance (pour plus tard)" : "à capturer au filet"}
       bouton={
         <PetitBouton ouvert={ouvert} onClick={() => setOuvert(!ouvert)}>
           Valider capture

@@ -96,6 +96,8 @@ export interface Options {
   makina?: "auto" | "optimakina" | "animakina";
   /** Mode automatique : chance de génération cible minimale pour conseiller l'Animakina (0,5 à 0,9 ; 0,8 par défaut). */
   seuilAnimakina?: number;
+  /** Priorité du plan : finir au plus tôt (plus de captures et naissances), équilibré (défaut) ou le moins d'actions. */
+  priorite?: "rapide" | "equilibre" | "econome";
   /** Objectif prioritaire par famille : couleur à obtenir (et garder) avant le reste du plan. */
   cibles?: Partial<Record<Famille, string>>;
   /** Saisie des jauges d'enclos : simple (paliers et demi-paliers) ou avancée (valeur exacte). */

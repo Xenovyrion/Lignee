@@ -102,7 +102,7 @@ function AnneauTotal({ faites, total }: { faites: number; total: number }) {
 }
 
 export function TableauDeBord({ famille, s, setS, allerArbre }: Props) {
-  const plan = useMemo(() => planifier(famille, s.montures, s.obtenues[famille], s.options.cibles?.[famille]), [famille, s.montures, s.obtenues, s.options.cibles]);
+  const plan = useMemo(() => planifier(famille, s.montures, s.obtenues[famille], s.options.cibles?.[famille], s.options.priorite), [famille, s.montures, s.obtenues, s.options.cibles, s.options.priorite]);
   const c = useMemo(() => conseiller(plan, { takeza: s.options.takeza, makina: s.options.makina, seuilAnimakina: s.options.seuilAnimakina }), [plan, s.options.takeza, s.options.makina, s.options.seuilAnimakina]);
   const objectif = useMemo(() => prochainObjectif(plan), [plan]);
   const clonages = useMemo(() => regrouperClonages(suggererClonages(s.montures.filter((m) => m.famille === famille))), [famille, s.montures]);

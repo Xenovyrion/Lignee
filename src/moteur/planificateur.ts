@@ -57,7 +57,16 @@ export interface Plan {
 
 const autreSexe = (s: Sexe): Sexe => (s === "M" ? "F" : "M");
 
-export function planifier(famille: Famille, montures: Monture[], obtenues: Iterable<string>, cible?: string | null): Plan {
+/** Priorité du plan : finir au plus tôt, ou faire le moins d'actions possible. */
+export type PrioritePlan = "rapide" | "equilibre" | "econome";
+/**
+ * Arbitrage temps / effort : une action de plus (capture ou naissance) n'est ajoutée au plan que si
+ * elle fait gagner plus de ce nombre de séances.
+ */
+export const POIDS_EFFORT: Record<PrioritePlan, number> = { rapide: 1, equilibre: 4, econome: 1e6 };
+
+export function planifier(famille: Famille, montures: Monture[], obtenues: Iterable<string>, cible?: string | null, priorite: PrioritePlan = "equilibre"): Plan {
+  const poids = POIDS_EFFORT[priorite];
   const dejaObtenues = new Set(obtenues);
   // Objectif prioritaire : une monture de cette couleur est gardée (jamais utilisée comme parent),
   // de préférence une stérile (inutile à l'élevage), sinon la plus haut niveau.
@@ -89,9 +98,67 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
   const reservees = new Set<string>();
   let clonages = 0;
   let memo = new Map<string, number>();
+  let memoT = new Map<string, number>();
+  const oublier = () => {
+    memo = new Map();
+    memoT = new Map();
+  };
+  /** Séance où chaque étape est faisable (1 = maintenant), comme seancesDesEtapes. */
+  const seanceEtape: number[] = [];
+  /** Séance à partir de laquelle un stérile (existant ou à venir) peut être cloné. */
+  const pretSterile = (st: Sterile) => ("monture" in st ? 1 : seanceEtape[st.apresEtape] + 1);
+  /** Séance à partir de laquelle une source est utilisable comme parent. */
+  const pretSource = (s: Source): number =>
+    s.type === "naissance" ? seanceEtape[s.etape] + 1 : s.type === "clone" ? Math.max(...s.steriles.map(pretSterile)) : 1;
 
   const disponible = (c: string) =>
     (stock.get(c)?.length ?? 0) + (virtuels.get(c)?.length ?? 0) + Math.floor((steriles.get(c)?.length ?? 0) / 2);
+
+  /** Les deux stériles d'une couleur clonables le plus tôt (existants d'abord). */
+  const meilleurePaire = (c: string): [number, number] | null => {
+    const st = steriles.get(c);
+    if (!st || st.length < 2) return null;
+    const ordre = st.map((x, i) => ({ i, t: pretSterile(x) })).sort((a, b) => a.t - b.t);
+    return [ordre[0].i, ordre[1].i];
+  };
+  const pretPaire = (c: string) => {
+    const p = meilleurePaire(c);
+    return p ? Math.max(...p.map((i) => pretSterile(steriles.get(c)![i]))) : Infinity;
+  };
+  /** Bébé à naître de cette couleur disponible le plus tôt (compatible avec le sexe voulu). */
+  const meilleurVirtuel = (c: string, sexe?: Sexe): number => {
+    const v = virtuels.get(c) ?? [];
+    let k = -1;
+    v.forEach((e, i) => {
+      if (sexe && etapes[e].sexeVoulu && etapes[e].sexeVoulu !== sexe) return;
+      if (k < 0 || seanceEtape[e] < seanceEtape[v[k]]) k = i;
+    });
+    return k;
+  };
+
+  /**
+   * Séance la plus proche où une monture de cette couleur peut être disponible : existante ou capture
+   * (1), bébé déjà prévu, clone, ou nouvelle naissance (1 + la séance de ses parents).
+   */
+  function temps(c: string): number {
+    if (stock.get(c)?.length || couleur(famille, c).generation === 1) return 1;
+    const deja = memoT.get(c);
+    if (deja !== undefined) return deja;
+    memoT.set(c, Infinity); // garde-fou contre une boucle
+    const v = virtuels.get(c) ?? [];
+    const sansEffort = Math.min(pretPaire(c), ...v.map((e) => seanceEtape[e] + 1));
+    const tN = tempsNaissance(c);
+    const t = tN + poids * coutNeuf(c) < sansEffort ? tN : sansEffort;
+    memoT.set(c, t);
+    return t;
+  }
+  /** Actions (naissances + captures) d'une monture de plus de cette couleur, en partant de zéro. */
+  const coutNeuf = (c: string) => {
+    const col = couleur(famille, c);
+    return col.generation === 1 ? 1 : 1 + Math.min(...col.recettes.map(([a, b]) => cout(a) + cout(b)));
+  };
+  /** Séance où un nouveau bébé de cette couleur serait disponible (meilleure recette). */
+  const tempsNaissance = (c: string) => 1 + Math.min(...couleur(famille, c).recettes.map(([a, b]) => Math.max(temps(a), temps(b))));
 
   /** Nombre d'actions (naissances + captures) pour disposer d'une monture de cette couleur. */
   function cout(c: string): number {
@@ -110,6 +177,17 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
    */
   function prendre(c: string, sexe?: Sexe, strict = false): Source {
     const reelles = stock.get(c);
+    // Temps d'abord : un bébé déjà prévu ou un clone qui n'arrive que dans plusieurs séances est
+    // remplacé par une source plus rapide (capture, nouvelle naissance en parallèle) quand elle existe.
+    if (!reelles?.length) {
+      const k = meilleurVirtuel(c, strict ? sexe : undefined);
+      const tVirtuel = k >= 0 ? seanceEtape[virtuels.get(c)![k]] + 1 : Infinity;
+      const tClone = pretPaire(c);
+      const tNeuf = couleur(famille, c).generation === 1 ? 1 : tempsNaissance(c);
+      // Une séance gagnée doit valoir l'effort ajouté (captures, naissances en plus).
+      if (tNeuf + poids * coutNeuf(c) < Math.min(tVirtuel, tClone)) return neuf(c, sexe);
+      if (tClone < tVirtuel) return cloner(c);
+    }
     if (reelles?.length) {
       // Sans sexe imposé, prendre dans le sexe le plus nombreux pour garder des couples possibles.
       const males = reelles.filter((m) => m.sexe === "M").length;
@@ -119,29 +197,39 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
       if (i >= 0) {
         const [m] = reelles.splice(i, 1);
         reservees.add(m.id);
-        memo = new Map();
+        oublier();
         return { type: "monture", monture: m };
       }
     }
     const v = virtuels.get(c);
     if (v?.length) {
-      let k = sexe ? v.findIndex((e) => !etapes[e].sexeVoulu || etapes[e].sexeVoulu === sexe) : 0;
-      if (k < 0 && !(strict && sexe)) k = 0;
+      let k = meilleurVirtuel(c, sexe);
+      if (k < 0 && !(strict && sexe)) k = meilleurVirtuel(c);
       if (k >= 0) {
         const [e] = v.splice(k, 1);
         if (sexe && !etapes[e].sexeVoulu) etapes[e].sexeVoulu = sexe;
-        memo = new Map();
+        oublier();
         return { type: "naissance", etape: e };
       }
     }
-    const st = steriles.get(c);
-    if (st && st.length >= 2) {
-      const paire = st.splice(0, 2) as [Sterile, Sterile];
-      for (const x of paire) if ("monture" in x) reservees.add(x.monture.id);
-      clonages++;
-      memo = new Map();
-      return { type: "clone", couleur: c, steriles: paire };
-    }
+    if (meilleurePaire(c)) return cloner(c);
+    return neuf(c, sexe);
+  }
+
+  /** Clone les deux stériles de cette couleur disponibles le plus tôt. */
+  function cloner(c: string): Source {
+    const st = steriles.get(c)!;
+    const [i, j] = meilleurePaire(c)!;
+    const paire = [st[i], st[j]] as [Sterile, Sterile];
+    steriles.set(c, st.filter((_, k) => k !== i && k !== j));
+    for (const x of paire) if ("monture" in x) reservees.add(x.monture.id);
+    clonages++;
+    oublier();
+    return { type: "clone", couleur: c, steriles: paire };
+  }
+
+  /** Nouvelle monture : capture en génération 1, sinon une naissance de plus dans le plan. */
+  function neuf(c: string, sexe?: Sexe): Source {
     if (couleur(famille, c).generation === 1) {
       captures[c] = (captures[c] ?? 0) + 1;
       return { type: "capture", couleur: c, sexe };
@@ -168,10 +256,11 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
   function produire(c: string, pour: Etape["pour"]): number {
     const col = couleur(famille, c);
     let recette = col.recettes[0];
-    let meilleur = Infinity;
+    let meilleur = [Infinity, Infinity];
     for (const r of col.recettes) {
-      const k = cout(r[0]) + cout(r[1]);
-      if (k < meilleur) [meilleur, recette] = [k, r];
+      const c0 = cout(r[0]) + cout(r[1]);
+      const k = [Math.max(temps(r[0]), temps(r[1])) + poids * c0, c0];
+      if (k[0] < meilleur[0] || (k[0] === meilleur[0] && k[1] < meilleur[1])) [meilleur, recette] = [k, r];
     }
     // Si les deux parents existent dans l'étable, choisir le sexe du premier pour que le second
     // ait une monture du sexe opposé disponible, en préférant le couple déjà fécond (prêt tout de suite)
@@ -197,6 +286,8 @@ export function planifier(famille: Famille, montures: Monture[], obtenues: Itera
     const alerteSexe = a.type === "monture" && b.type === "monture" && a.monture.sexe === b.monture.sexe;
     etapes.push({ couleur: c, generation: col.generation, recette, pour, parents: [a, b], alerteSexe });
     const i = etapes.length - 1;
+    seanceEtape[i] = Math.max(pretSource(a), pretSource(b));
+    oublier();
     // Après l'accouplement, les deux parents sont stériles et peuvent être clonés plus tard.
     ajouterSterile(recette[0], { apresEtape: i });
     ajouterSterile(recette[1], { apresEtape: i });

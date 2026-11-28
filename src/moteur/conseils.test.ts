@@ -209,3 +209,14 @@ describe("en avance pour la séance suivante", () => {
     expect(c.aPreparerEnAvance).toEqual([]);
   });
 });
+
+describe("priorité du plan", () => {
+  it("Rapide finit en moins de séances, Économe fait moins d'actions", () => {
+    const max = (p: ReturnType<typeof planifier>) => Math.max(...seancesDesEtapes(p));
+    const [rapide, equilibre, econome] = (["rapide", "equilibre", "econome"] as const).map((pr) => planifier("muldo", [], [], null, pr));
+    expect(max(rapide)).toBeLessThan(max(equilibre));
+    expect(max(equilibre)).toBeLessThan(max(econome));
+    expect(econome.etapes.length).toBeLessThan(equilibre.etapes.length);
+    expect(equilibre.etapes.length).toBeLessThan(rapide.etapes.length);
+  });
+});

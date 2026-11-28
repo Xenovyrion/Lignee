@@ -477,8 +477,8 @@ export function FormClonages({ famille, g, setS, fermer }: { famille: Famille; g
 /** Pastille des actions facultatives qui préparent la séance suivante. */
 export function PastilleAvance() {
   return (
-    <span className="rounded-full border border-accent/40 bg-accent-dim px-2 py-0.5 text-[11px] font-medium text-accent" title="Facultatif : pour la séance suivante, à faire en même temps que celle-ci pour enchaîner. Les bébés d'aujourd'hui peuvent encore changer le plan.">
-      ⏩ En avance · séance suivante
+    <span className="rounded-full border border-accent/40 bg-accent-dim px-2 py-0.5 text-[11px] font-medium text-accent" title="Pour une séance suivante, déjà faisable : à faire en même temps que celle-ci pour gagner du temps. Les bébés d'aujourd'hui peuvent encore changer le plan.">
+      ⏩ En avance · pour plus tard
     </span>
   );
 }
@@ -510,7 +510,7 @@ export function CartePreparer({ id, numero, famille, groupes, setS, fertiles = 0
         {avance && (
           <div className="flex flex-wrap items-center gap-2 text-xs text-text-secondary">
             <PastilleAvance />
-            Déjà dans ton étable : mets-les en enclos avec les autres pour enchaîner la séance suivante.
+            Déjà dans ton étable, utiles aux séances suivantes : mets-les en enclos avec les autres pour gagner du temps.
           </div>
         )}
         {preparationParGeneration(famille, groupes).map(({ generation, couleurs }) => (

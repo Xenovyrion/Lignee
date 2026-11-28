@@ -251,6 +251,23 @@ export function Parametres({ s, setS, lancerDidacticiel }: Props) {
       </Carte>
       <Carte tuto="accouplements" titre="Accouplements">
         <Ligne
+          titre="Priorité du plan"
+          aide="Rapide : finir les succès au plus tôt, quitte à capturer et faire naître davantage en parallèle. Économe : le moins d'actions possible, en attendant les clones des stériles (beaucoup plus de séances). Équilibré : une capture ou une naissance de plus seulement si elle fait gagner plusieurs séances."
+        >
+          <select
+            className={champ}
+            value={o.priorite ?? "equilibre"}
+            onChange={(e) => {
+              maj({ priorite: e.target.value as Options["priorite"] });
+              notifier("Priorité du plan modifiée : le plan se recalcule", { ton: "info", annulable: true });
+            }}
+          >
+            <option value="rapide">Rapide (le moins de séances)</option>
+            <option value="equilibre">Équilibré</option>
+            <option value="econome">Économe (le moins d'actions)</option>
+          </select>
+        </Ligne>
+        <Ligne
           titre="Makina conseillée"
           aide="Optimakina : +20 % de chance d'atteindre la génération cible, sexe au hasard. Animakina : sexe choisi, sans bonus. Automatique : la meilleure chance globale selon que le sexe compte ou non. Reste modifiable à chaque saisie."
         >
