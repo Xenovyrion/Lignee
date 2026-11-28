@@ -102,7 +102,7 @@ const BoutonBarre = ({ titre, onClick, disabled, actif, children }: { titre: str
 export function LigneAction({ x, famille, setS, niveau }: { x: ActionMaintenant; famille: Famille; setS: SetS; niveau: number }) {
   if (x.type === "naissance") return <LigneNaissance numero={x.numero} famille={famille} a={x.a} setS={setS} niveau={niveau} />;
   if (x.type === "clonage") return <LigneClonage numero={x.numero} famille={famille} g={x.g} setS={setS} />;
-  if (x.type === "preparer") return <LignePreparer numero={x.numero} famille={famille} groupes={x.groupes} setS={setS} />;
+  if (x.type === "preparer") return <LignePreparer numero={x.numero} famille={famille} groupes={x.groupes} setS={setS} avance={x.avance} />;
   return <LigneCapture numero={x.numero} famille={famille} capture={x.capture} setS={setS} niveau={niveau} />;
 }
 
@@ -233,7 +233,7 @@ function LigneClonage({ numero, famille, g, setS }: { numero: number; famille: F
   );
 }
 
-function LignePreparer({ numero, famille, groupes, setS }: { numero: number; famille: Famille; groupes: GroupePreparer[]; setS: SetS }) {
+function LignePreparer({ numero, famille, groupes, setS, avance }: { numero: number; famille: Famille; groupes: GroupePreparer[]; setS: SetS; avance?: boolean }) {
   const rendrePretes = useRendrePretes(famille, setS);
   const toutesPretes = useToutesPretes(famille, setS);
   const total = groupes.reduce((n, g) => n + g.montures.length, 0);
@@ -244,7 +244,7 @@ function LignePreparer({ numero, famille, groupes, setS }: { numero: number; fam
       type="preparer"
       nombre={total}
       visuel={couleurs.slice(0, 6).map((c) => <ImageMonture key={c.couleur} famille={famille} id={c.couleur} taille={IMG - 2} />)}
-      titre={`${total} à mettre en enclos`}
+      titre={`${total} à mettre en enclos${avance ? " · en avance" : ""}`}
       extra={
         <span className="mt-0.5 flex flex-wrap gap-x-2.5 gap-y-1 text-xs text-text-secondary">
           {couleurs.map((c) => (
@@ -297,7 +297,7 @@ function LigneCapture({ numero, famille, capture, setS, niveau }: { numero: numb
           {capture.libres > 0 && <span className="ml-1.5 font-normal text-text-muted">×{capture.libres} au choix</span>}
         </>
       }
-      detail="à capturer au filet"
+      detail={capture.avance ? "en avance (séance suivante)" : "à capturer au filet"}
       bouton={
         <PetitBouton ouvert={ouvert} onClick={() => setOuvert(!ouvert)}>
           Valider capture

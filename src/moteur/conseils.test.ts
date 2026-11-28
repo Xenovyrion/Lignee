@@ -191,3 +191,21 @@ describe("objectif prioritaire", () => {
     expect(plan.etapes[plan.cible!.etape!]).toMatchObject({ couleur: "amande_doree", pour: "intermediaire" });
   });
 });
+
+describe("en avance pour la séance suivante", () => {
+  it("propose de monter dès maintenant un parent de l'étable qui attend un bébé d'aujourd'hui", () => {
+    const tout = jusquA(10).filter((x) => x !== "ebene_indigo" && x !== "pourpre");
+    const attend = m("amande_rousse", "F", { etat: "fertile" });
+    const c = conseiller(planifier("dragodinde", [m("ebene", "M"), m("indigo", "F"), attend], tout), {});
+    expect(c.aPreparerEnAvance.map((x) => x.id)).toEqual([attend.id]);
+    const liste = actionsMaintenant(c, []);
+    expect(liste.map((x) => `${x.type}${x.type === "preparer" && x.avance ? "+" : ""}`)).toEqual(["naissance", "preparer+"]);
+    const cles = liste.map(cleAction);
+    expect(new Set(cles).size).toBe(cles.length);
+  });
+  it("rien en avance quand le parent est déjà fécond", () => {
+    const tout = jusquA(10).filter((x) => x !== "ebene_indigo" && x !== "pourpre");
+    const c = conseiller(planifier("dragodinde", [m("ebene", "M"), m("indigo", "F"), m("amande_rousse", "F")], tout), {});
+    expect(c.aPreparerEnAvance).toEqual([]);
+  });
+});

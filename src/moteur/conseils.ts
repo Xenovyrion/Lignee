@@ -47,6 +47,8 @@ export interface ActionCapture {
   /** Captures dont le sexe n'importe pas encore. */
   libres: number;
   nombre: number;
+  /** Capture pour la séance suivante, faisable dès maintenant (facultatif). */
+  avance?: boolean;
 }
 
 export interface Blocage {
@@ -134,6 +136,10 @@ export interface Conseils {
   ordre: ActionAccouplement[];
   aPreparer: ActionAccouplement[];
   captures: ActionCapture[];
+  /** Séance suivante : montures de l'étable à monter dès maintenant, en même temps que celles d'aujourd'hui. */
+  aPreparerEnAvance: Monture[];
+  /** Séance suivante : captures au sexe déjà connu, faisables dès maintenant. */
+  capturesEnAvance: ActionCapture[];
   /** Étapes qui attendent d'abord un clonage de deux stériles existants. */
   clonagesUtiles: number;
   blocages: Blocage[];
@@ -281,6 +287,30 @@ export function conseiller(plan: Plan, options: Bonus & { takeza?: boolean; maki
   prets.sort(priorite);
   aPreparer.sort(priorite);
 
+  // Séance suivante : ce qui peut déjà avancer en parallèle (jauges des parents déjà dans l'étable,
+  // captures dont le sexe ne dépend pas d'un bébé à naître). Facultatif : les bébés d'aujourd'hui peuvent changer le plan.
+  const numSeance = seancesDesEtapes(plan);
+  const dejaPrevues = new Set(aPreparer.flatMap((a) => a.aPreparer.map((x) => x.id)));
+  const enAvance = new Map<string, Monture>();
+  const capturesEnAvance = new Map<string, ActionCapture>();
+  plan.etapes.forEach((e, i) => {
+    if (numSeance[i] !== 2) return;
+    const [a, b] = e.parents;
+    for (const [p, autre] of [
+      [a, b],
+      [b, a],
+    ] as const) {
+      if (p.type === "monture" && p.monture.etat === "fertile" && !dejaPrevues.has(p.monture.id)) enAvance.set(p.monture.id, p.monture);
+      if (p.type !== "capture") continue;
+      const sexe = p.sexe ?? (autre.type === "monture" ? autreSexe(autre.monture.sexe) : undefined);
+      if (!sexe) continue;
+      const c = capturesEnAvance.get(p.couleur) ?? { couleur: p.couleur, M: 0, F: 0, libres: 0, nombre: 0, avance: true };
+      c[sexe]++;
+      c.nombre++;
+      capturesEnAvance.set(p.couleur, c);
+    }
+  });
+
   // Un même blocage (même couleur, même cause) n'est affiché qu'une fois.
   const blocagesUniques = new Map<string, Blocage>();
   for (const b of blocages) {
@@ -289,7 +319,16 @@ export function conseiller(plan: Plan, options: Bonus & { takeza?: boolean; maki
     if (deja) deja.nombre++;
     else blocagesUniques.set(k, b);
   }
-  return { prets, ordre, aPreparer, captures: [...captures.values()].sort((x, y) => y.nombre - x.nombre), clonagesUtiles, blocages: [...blocagesUniques.values()] };
+  return {
+    prets,
+    ordre,
+    aPreparer,
+    captures: [...captures.values()].sort((x, y) => y.nombre - x.nombre),
+    aPreparerEnAvance: [...enAvance.values()],
+    capturesEnAvance: [...capturesEnAvance.values()].sort((x, y) => y.nombre - x.nombre),
+    clonagesUtiles,
+    blocages: [...blocagesUniques.values()],
+  };
 }
 
 type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
@@ -298,12 +337,13 @@ type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K>
 export type ActionMaintenant =
   | { type: "naissance"; numero: number; a: ActionAccouplement }
   | { type: "clonage"; numero: number; g: GroupeClonage }
-  | { type: "preparer"; numero: number; groupes: { couleur: string; sexe: Sexe; montures: Monture[] }[] }
+  | { type: "preparer"; numero: number; groupes: { couleur: string; sexe: Sexe; montures: Monture[] }[]; avance?: boolean }
   | { type: "capture"; numero: number; capture: ActionCapture };
 
 /**
  * Liste unique des actions à faire maintenant : naissances prêtes, clonages (instantanés), jauges
- * à remplir, captures, puis les naissances qui attendent cette préparation. Fixe aussi le rang
+ * à remplir, captures, puis les naissances qui attendent cette préparation, et enfin ce qui peut être
+ * fait en avance pour la séance suivante (jauges, captures). Fixe aussi le rang
  * des naissances sur ce numéro (étoiles de l'arbre et du chemin).
  */
 export function actionsMaintenant(c: Conseils, clonages: GroupeClonage[]): ActionMaintenant[] {
@@ -311,17 +351,22 @@ export function actionsMaintenant(c: Conseils, clonages: GroupeClonage[]): Actio
   const ajouter = (x: DistributiveOmit<ActionMaintenant, "numero">) => liste.push({ ...x, numero: liste.length + 1 } as ActionMaintenant);
   for (const a of c.ordre) if (!a.aPreparer.length) ajouter({ type: "naissance", a });
   for (const g of clonages) ajouter({ type: "clonage", g });
-  const groupes = new Map<string, { couleur: string; sexe: Sexe; montures: Monture[] }>();
-  for (const a of c.ordre)
-    for (const m of a.aPreparer) {
+  const grouper = (montures: Monture[]) => {
+    const groupes = new Map<string, { couleur: string; sexe: Sexe; montures: Monture[] }>();
+    for (const m of montures) {
       const k = `${m.couleur}/${m.sexe}`;
       const g = groupes.get(k) ?? { couleur: m.couleur, sexe: m.sexe, montures: [] };
       if (!g.montures.some((x) => x.id === m.id)) g.montures.push(m);
       groupes.set(k, g);
     }
-  if (groupes.size) ajouter({ type: "preparer", groupes: [...groupes.values()] });
+    return [...groupes.values()];
+  };
+  const groupes = grouper(c.ordre.flatMap((a) => a.aPreparer));
+  if (groupes.length) ajouter({ type: "preparer", groupes });
   for (const capture of c.captures) ajouter({ type: "capture", capture });
   for (const a of c.ordre) if (a.aPreparer.length) ajouter({ type: "naissance", a });
+  if (c.aPreparerEnAvance.length) ajouter({ type: "preparer", groupes: grouper(c.aPreparerEnAvance), avance: true });
+  for (const capture of c.capturesEnAvance) ajouter({ type: "capture", capture });
   for (const x of liste) if (x.type === "naissance") x.a.rang = x.numero;
   return liste;
 }
@@ -333,5 +378,7 @@ export const cleAction = (x: ActionMaintenant) =>
     : x.type === "clonage"
       ? `c-${x.g.couleurs.join("+")}`
       : x.type === "preparer"
-        ? "preparer"
-        : `k-${x.capture.couleur}`;
+        ? x.avance
+          ? "preparer-avance"
+          : "preparer"
+        : `k-${x.capture.avance ? "avance-" : ""}${x.capture.couleur}`;

@@ -8,6 +8,7 @@ import type { Etat, Famille, Monture, Sauvegarde, Sexe } from "../../moteur/type
 import { IconeGrille, IconeListe, IconeSterile } from "../../icones";
 import { useNotifier } from "../../notifications";
 import { Bouton, champ, ETATS, Segments } from "../../ui";
+import { useToutPasserFeconde } from "../tableau/typesActions";
 import { filtrer, filtreVide, trier, type Filtre, type Tri } from "./filtres";
 import { ListeMontures } from "./ListeMontures";
 import { PanneauFiltres } from "./PanneauFiltres";
@@ -56,6 +57,8 @@ export function Etable({ famille, s, setS }: Props) {
     [famille, s.montures, plan, s.options.takeza, s.options.makina, s.options.seuilAnimakina],
   );
   const deLaFamille = useMemo(() => s.montures.filter((m) => m.famille === famille), [s.montures, famille]);
+  const fertiles = deLaFamille.filter((m) => m.etat === "fertile").length;
+  const toutPasser = useToutPasserFeconde(famille, setS);
   const obtenues = useMemo(() => new Set(s.obtenues[famille]), [s.obtenues, famille]);
   const affichees = useMemo(() => trier(filtrer(deLaFamille, famille, filtre, reservees, obtenues), famille, tri), [deLaFamille, famille, filtre, reservees, obtenues, tri]);
   const choisies = affichees.filter((m) => selection.has(m.id));
@@ -162,6 +165,11 @@ export function Etable({ famille, s, setS }: Props) {
             </span>
           </div>
           <span className="flex-1" />
+          {fertiles > 0 && (
+            <Bouton discret data-tuto="tout-feconde" onClick={() => toutPasser(fertiles)} title="Tu as monté toutes tes fertiles en jeu : elles passent toutes en Féconde (annulable)">
+              Tout passer en Féconde ({fertiles})
+            </Bouton>
+          )}
           {!saisie && <Bouton data-tuto="ajouter" onClick={() => setSaisie(true)}>+ Ajouter des montures</Bouton>}
         </div>
 

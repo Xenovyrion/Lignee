@@ -144,7 +144,7 @@ function Clonage({ numero, famille, g, setS }: { numero: number; famille: Famill
   );
 }
 
-function Preparer({ numero, famille, groupes, setS }: { numero: number; famille: Famille; groupes: GroupePreparer[]; setS: SetS }) {
+function Preparer({ numero, famille, groupes, setS, avance }: { numero: number; famille: Famille; groupes: GroupePreparer[]; setS: SetS; avance?: boolean }) {
   const rendrePretes = useRendrePretes(famille, setS);
   const toutesPretes = useToutesPretes(famille, setS);
   const total = groupes.reduce((n, g) => n + g.montures.length, 0);
@@ -155,7 +155,7 @@ function Preparer({ numero, famille, groupes, setS }: { numero: number; famille:
       type="preparer"
       nombre={total}
       visuel={couleurs.slice(0, 5).map((c) => <ImageMonture key={c.couleur} famille={famille} id={c.couleur} taille={IMG - 4} />)}
-      titre={`${total} monture${total > 1 ? "s" : ""} à mettre en enclos`}
+      titre={`${total} monture${total > 1 ? "s" : ""} à mettre en enclos${avance ? " · en avance (séance suivante)" : ""}`}
       detail={
         <span className="flex flex-wrap gap-x-3 gap-y-1 whitespace-normal">
           {couleurs.map((c) => (
@@ -208,7 +208,7 @@ function Capture({ numero, famille, capture, setS, niveau }: { numero: number; f
           {capture.libres > 0 && <span className="ml-2 font-normal text-text-muted">×{capture.libres} au choix</span>}
         </>
       }
-      detail="génération 1 · à capturer au filet"
+      detail={capture.avance ? "en avance (séance suivante) · à capturer au filet" : "génération 1 · à capturer au filet"}
       actions={
         <Bouton data-principal discret={ouvert} onClick={() => setOuvert(!ouvert)} className="w-full">
           {ouvert ? "Annuler" : "Valider capture"}
@@ -223,6 +223,6 @@ function Capture({ numero, famille, capture, setS, niveau }: { numero: number; f
 export function LigneCompacte({ x, famille, setS, niveau, etapePreparer }: { x: ActionMaintenant; famille: Famille; setS: SetS; niveau: number; etapePreparer?: number }) {
   if (x.type === "naissance") return <Naissance numero={x.numero} famille={famille} a={x.a} setS={setS} niveau={niveau} etapePreparer={etapePreparer} />;
   if (x.type === "clonage") return <Clonage numero={x.numero} famille={famille} g={x.g} setS={setS} />;
-  if (x.type === "preparer") return <Preparer numero={x.numero} famille={famille} groupes={x.groupes} setS={setS} />;
+  if (x.type === "preparer") return <Preparer numero={x.numero} famille={famille} groupes={x.groupes} setS={setS} avance={x.avance} />;
   return <Capture numero={x.numero} famille={famille} capture={x.capture} setS={setS} niveau={niveau} />;
 }

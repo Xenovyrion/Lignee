@@ -13,7 +13,7 @@ import { Bouton, ChampNombre, champ, pourcent, sexeSymbole } from "../../ui";
 import { ChoixCouleur } from "../ChoixCouleur";
 import { useNotifier } from "../../notifications";
 import { ImageMonture } from "../arbre/commun";
-import { NOM_MAKINA, preparationParGeneration, TYPES, useRendrePretes, useToutesPretes } from "./typesActions";
+import { NOM_MAKINA, preparationParGeneration, TYPES, useRendrePretes, useToutesPretes, useToutPasserFeconde } from "./typesActions";
 
 type SetS = (f: (s: Sauvegarde) => Sauvegarde) => void;
 
@@ -474,10 +474,20 @@ export function FormClonages({ famille, g, setS, fermer }: { famille: Famille; g
 
 // ---------------------------------------------------------------------------------------------
 
-export function CartePreparer({ id, numero, famille, groupes, setS }: { id?: string; numero: number; famille: Famille; groupes: { couleur: string; sexe: Sexe; montures: Monture[] }[]; setS: SetS }) {
+/** Pastille des actions facultatives qui préparent la séance suivante. */
+export function PastilleAvance() {
+  return (
+    <span className="rounded-full border border-accent/40 bg-accent-dim px-2 py-0.5 text-[11px] font-medium text-accent" title="Facultatif : pour la séance suivante, à faire en même temps que celle-ci pour enchaîner. Les bébés d'aujourd'hui peuvent encore changer le plan.">
+      ⏩ En avance · séance suivante
+    </span>
+  );
+}
+
+export function CartePreparer({ id, numero, famille, groupes, setS, fertiles = 0, avance }: { id?: string; numero: number; famille: Famille; groupes: { couleur: string; sexe: Sexe; montures: Monture[] }[]; setS: SetS; fertiles?: number; avance?: boolean }) {
   const nb = groupes.reduce((n, g) => n + g.montures.length, 0);
   const rendrePretes = useRendrePretes(famille, setS);
   const toutesPretes = useToutesPretes(famille, setS);
+  const toutPasser = useToutPasserFeconde(famille, setS);
   return (
     <CadreAction
       id={id}
@@ -485,11 +495,24 @@ export function CartePreparer({ id, numero, famille, groupes, setS }: { id?: str
       type="preparer"
       nombre={nb}
       droite={
-        <Bouton data-principal onClick={() => toutesPretes(groupes)} title="Toutes les jauges sont remplies : tout passer en Féconde">
-          ✓ Toutes prêtes ({nb})
-        </Bouton>
+        <span className="flex flex-wrap justify-end gap-2">
+          {!avance && fertiles > nb && (
+            <Bouton discret onClick={() => toutPasser(fertiles)} title="Tu as monté toutes tes fertiles en jeu, même celles dont le plan n'a pas besoin : toutes passent en Féconde">
+              Tout passer en Féconde ({fertiles})
+            </Bouton>
+          )}
+          <Bouton data-principal onClick={() => toutesPretes(groupes)} title="Toutes les jauges sont remplies : tout passer en Féconde">
+            ✓ Toutes prêtes ({nb})
+          </Bouton>
+        </span>
       }>
       <div className="flex min-w-0 flex-1 flex-col gap-2">
+        {avance && (
+          <div className="flex flex-wrap items-center gap-2 text-xs text-text-secondary">
+            <PastilleAvance />
+            Déjà dans ton étable : mets-les en enclos avec les autres pour enchaîner la séance suivante.
+          </div>
+        )}
         {preparationParGeneration(famille, groupes).map(({ generation, couleurs }) => (
           <div key={generation} className="flex flex-wrap items-center gap-2">
             <span className="w-9 shrink-0 text-xs font-semibold text-accent">G{generation}</span>
@@ -571,7 +594,10 @@ export function CarteCapture({ id, numero, famille, capture, setS, niveau }: { i
             {(["M", "F"] as Sexe[]).map((sx) => capture[sx] > 0 && <span key={sx} className={`ml-2 text-sm ${couleurSexe(sx)}`}>{sexeSymbole(sx)} ×{capture[sx]}</span>)}
             {capture.libres > 0 && <span className="ml-2 text-sm text-text-muted">×{capture.libres} au choix</span>}
           </div>
-          <div className="text-xs text-text-secondary">Génération 1 · à capturer au filet (métier Éleveur)</div>
+          <div className="flex flex-wrap items-center gap-2 text-xs text-text-secondary">
+            {capture.avance && <PastilleAvance />}
+            Génération 1 · à capturer au filet (métier Éleveur)
+          </div>
         </div>
       </div>
     </CadreAction>

@@ -1,7 +1,7 @@
 // Constantes partagées par les cartes d'actions (tableau de bord, mode compagnon).
 // Gardées hors des fichiers de composants pour que le rechargement à chaud de React fonctionne.
 import { couleur, nomCouleur } from "../../moteur/donnees";
-import { rendreFecondes } from "../../moteur/etable";
+import { rendreFecondes, toutesFecondes } from "../../moteur/etable";
 import { useNotifier } from "../../notifications";
 import type { Famille, Makina, Monture, Sauvegarde, Sexe } from "../../moteur/types";
 
@@ -53,6 +53,15 @@ export function useRendrePretes(famille: Famille, setS: (f: (s: Sauvegarde) => S
       }
       return r;
     });
+  };
+}
+
+/** Passe en Féconde toutes les fertiles de la famille, même celles dont le plan n'a pas besoin (toutes montées en jeu). */
+export function useToutPasserFeconde(famille: Famille, setS: (f: (s: Sauvegarde) => Sauvegarde) => void) {
+  const notifier = useNotifier();
+  return (n: number) => {
+    notifier(`${n} monture${n > 1 ? "s" : ""} fertile${n > 1 ? "s" : ""} passée${n > 1 ? "s" : ""} en Féconde`, { annulable: true });
+    setS((s) => toutesFecondes(s, famille));
   };
 }
 

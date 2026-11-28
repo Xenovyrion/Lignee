@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { couleurs } from "./donnees";
 import { sauvegardeVide } from "./actions";
-import { ajusterStock, appliquerNiveauUnique, besoinsParCouleur, compterStock, nombreEnclos, prochainPalierEnclos, rendreFecondes, ressourcesExtraction, roleDansLePlan } from "./etable";
+import { ajusterStock, appliquerNiveauUnique, toutesFecondes, besoinsParCouleur, compterStock, nombreEnclos, prochainPalierEnclos, rendreFecondes, ressourcesExtraction, roleDansLePlan } from "./etable";
 import { planifier } from "./planificateur";
 import type { Monture, Sexe } from "./types";
 
@@ -52,5 +52,15 @@ describe("étable", () => {
     expect([1, 39, 40, 119, 120, 199, 200].map(nombreEnclos)).toEqual([1, 1, 2, 3, 4, 5, 6]);
     expect(prochainPalierEnclos(85)).toBe(120);
     expect(prochainPalierEnclos(200)).toBeNull();
+  });
+});
+
+describe("toutesFecondes", () => {
+  it("passe toutes les fertiles de la famille en Féconde, sans toucher aux autres", () => {
+    const m = (id: string, famille: "dragodinde" | "muldo", etat: "fertile" | "feconde" | "sterile") =>
+      ({ id, famille, couleur: "indigo", sexe: "M", niveau: 100, etat, origine: "saisie", creeLe: "2026-11-28T00:00:00Z" }) as const;
+    const s = { montures: [m("a", "dragodinde", "fertile"), m("b", "dragodinde", "sterile"), m("c", "muldo", "fertile"), m("d", "dragodinde", "fertile")] } as never;
+    const r = toutesFecondes(s, "dragodinde") as unknown as { montures: { id: string; etat: string }[] };
+    expect(r.montures.map((x) => `${x.id}:${x.etat}`)).toEqual(["a:feconde", "b:sterile", "c:fertile", "d:feconde"]);
   });
 });

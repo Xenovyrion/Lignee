@@ -119,5 +119,11 @@ export function rendreFecondes(s: Sauvegarde, famille: Famille, c: string, sexe:
   return { ...s, montures: s.montures.map((m) => (ids.has(m.id) ? { ...m, etat: "feconde" as const } : m)) };
 }
 
+/** Passe en « Féconde » toutes les montures fertiles d'une famille (toutes montées en jeu d'un coup). */
+export const toutesFecondes = (s: Sauvegarde, famille: Famille): Sauvegarde => ({
+  ...s,
+  montures: s.montures.map((m) => (m.famille === famille && m.etat === "fertile" ? { ...m, etat: "feconde" as const } : m)),
+});
+
 /** Mode simple : toutes les montures prennent le niveau unique réglé dans les Paramètres. */
 export const appliquerNiveauUnique = (s: Sauvegarde, niveau: number): Sauvegarde => ({ ...s, montures: s.montures.map((m) => (m.niveau === niveau ? m : { ...m, niveau })) });

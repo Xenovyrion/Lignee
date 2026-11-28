@@ -414,7 +414,7 @@ export function TableauDeBord({ famille, s, setS, allerArbre }: Props) {
               if (x.type === "naissance")
                 return <CarteNaissance key={k} id={id} numero={x.numero} famille={famille} a={x.a} prevues={prevues(x.a.e.couleur)} setS={setS} niveauBebes={niveauNouvelles} etapePreparer={premier("preparer")} />;
               if (x.type === "clonage") return <CarteClonage key={k} id={id} numero={x.numero} famille={famille} g={x.g} setS={setS} />;
-              if (x.type === "preparer") return <CartePreparer key={k} id={id} numero={x.numero} famille={famille} groupes={x.groupes} setS={setS} />;
+              if (x.type === "preparer") return <CartePreparer key={k} id={id} numero={x.numero} famille={famille} groupes={x.groupes} setS={setS} avance={x.avance} fertiles={s.montures.filter((m) => m.famille === famille && m.etat === "fertile").length} />;
               return <CarteCapture key={k} id={id} numero={x.numero} famille={famille} capture={x.capture} setS={setS} niveau={niveauNouvelles} />;
             })}
           </ul>

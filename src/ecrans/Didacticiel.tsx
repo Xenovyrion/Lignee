@@ -327,7 +327,7 @@ export const CHAPITRES: Record<Chapitre, DefChapitre> = {
       {
         titre: "Préparer les montures",
         texte:
-          "Les montures fertiles dont le plan a besoin : mets-les en enclos pour remplir Endurance, Maturité et Amour (10 montures par enclos). Quand elles sont fécondes en jeu, clique sur le sexe concerné ou « Toutes prêtes ».",
+          "Les montures fertiles dont le plan a besoin : mets-les en enclos pour remplir Endurance, Maturité et Amour (10 montures par enclos). Quand elles sont fécondes en jeu, clique sur le sexe concerné ou « Toutes prêtes ». Tu as monté toutes tes fertiles, même celles hors plan ? « Tout passer en Féconde ». En bas de la liste, les actions « ⏩ En avance » préparent la séance suivante (jauges, captures) : fais-les en même temps pour enchaîner.",
         cible: '#actions li[data-type="preparer"]',
         onglet: "actions",
       },
