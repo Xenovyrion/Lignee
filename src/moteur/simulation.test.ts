@@ -47,5 +47,6 @@ describe("simulation d'un élevage complet", () => {
   for (const f of ["dragodinde", "muldo", "volkorne"] as Famille[])
     it(`${f} : toutes les couleurs obtenues, sans blocage de sexe`, () => {
       for (const graine of [1, 2]) expect(simuler(f, graine)).toEqual({ manquantes: 0, blocages: 0 });
-    });
+      // Centaines de plans recalculés : plusieurs secondes sur les machines lentes de l'intégration continue.
+    }, 30_000);
 });
